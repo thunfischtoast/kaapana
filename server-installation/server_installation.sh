@@ -532,7 +532,7 @@ where opt is:
 
 QUIET=NA
 DEFAULT_MICRO_VERSION=1.18/stable
-HELM_VERSION=3.5/stable
+HELM_VERSION=3.6/stable
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
