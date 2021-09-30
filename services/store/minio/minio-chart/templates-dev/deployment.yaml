@@ -1,0 +1,74 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # This name uniquely identifies the Deployment
+  name: minio-deployment
+  namespace: store
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app-name: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app-name: minio
+    spec:
+      initContainers:
+        - name: init
+          image: registry.hzdr.de/k.kades/september-kaapana-test/service_checker:1.1
+          imagePullPolicy:  Always
+          env:
+            - name: WAIT
+              value: "keycloak,keycloak-internal-service.kube-system.svc,443"
+            - name: DELAY
+              value: "3"
+            - name: TIMEOUT
+              value: "10"
+      containers:
+      - name: minio
+        image: registry.hzdr.de/k.kades/september-kaapana-test/minio:2021.09.24
+        imagePullPolicy:  Always
+        command: 
+          - "/bin/sh"
+          - "-ce"
+          - "/usr/bin/docker-entrypoint.sh minio server /export -S /etc/minio/certs/ --address :9000 --console-address :9001"
+        env:
+        # - name: MINIO_IDENTITY_OPENID_CLIENT_ID
+        #   value: "kaapana"
+        # - name: MINIO_KAAPANA_AUTHORIZATION_ENDPOINT
+        #   value: "https://10.128.129.28:443/auth/realms/kaapana/protocol/openid-connect/auth"
+        # # - name: MINIO_IDENTITY_OPENID_JWKS_URL
+        # #  value: https://vm-129-6.cloud.dkfz-heidelberg.de/auth/realms/kaapana/protocol/openid-connect/certs
+        # - name: MINIO_IDENTITY_OPENID_CONFIG_URL
+        #   value: "http://keycloak-external-service.kube-system.svc:80/auth/realms/kaapana/.well-known/openid-configuration"
+        # Minio access key and secret key
+        - name: MINIO_ROOT_USER
+          value: kaapanaminio
+        - name: MINIO_ROOT_PASSWORD
+          value: Kaapana2020
+        ports:
+        - name: minio
+          containerPort: 9000
+        - name: minio-console
+          containerPort: 9001          
+        resources:
+          requests:
+            memory: 200Mi
+          limits:
+            memory: 500Mi
+        volumeMounts:
+        - name: export # must match the volume name, above
+          mountPath: "/export"
+      volumes:
+      - name: export
+        hostPath:
+          # path: /home/kaapana/minio
+          path: /home/kaapana/minio
+          type: DirectoryOrCreate
+      imagePullSecrets:
+      - name: registry-secret
+---

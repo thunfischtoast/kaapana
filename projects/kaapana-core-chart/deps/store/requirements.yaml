@@ -7,10 +7,10 @@ dependencies:
     version: "4.9.21"
     repository: file://../../../../services/store/ohif-viewer/ohif-chart
   - name: minio-chart
-    version: "2021.03.12"
+    version: "2021.09.24"
     repository: file://../../../../services/store/minio/minio-chart
   - name: minio-init-chart
-    version: "0.1.2"
+    version: "0.1.3"
     condition: Release.IsInstall
     repository: file://../../../../services/store/store-init/minio-init/minio-init-chart
   # TESTS

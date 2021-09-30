@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console-service
+  namespace: store
+  labels:
+    app-name: minio
+spec:
+  selector:
+    app-name: minio
+  # type: ClusterIP
+  type: NodePort
+  ports:
+    - port: 9001
+      protocol: TCP
+      targetPort: 9001
+      nodePort: 9001
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: minio-console-ingress
+  namespace: store
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    # traefik.ingress.kubernetes.io/router.middlewares: kube-system-errorpages@kubernetescrd # uncomment later!
+    # ingress.kubernetes.io/custom-request-headers: "Authorization:||cookie:"
+    kubernetes.io/ingress.global-static-ip-name: "kubernetes-ingress"
+spec:
+  rules:
+  - host:
+    http:
+      paths:
+      - path: /minio-console
+        backend:
+          serviceName: minio-console-service
+          servicePort: 9001
+---
