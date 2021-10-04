@@ -11,11 +11,21 @@ ENV GO111MODULE on
 RUN  \
      apk add --no-cache git && \
      git clone https://github.com/minio/minio && cd minio && \
-     git checkout 769f0b1e24c42d6ef1a370a5c657c9f6d5484fe7
+     git checkout 2ec44f762061481853a7a647f04d99dd3ace7d7f
+
+# RUN  \
+#      apk add --no-cache git && \
+#      git clone https://github.com/minio/minio 2ec44f762061481853a7a647f04d99dd3ace7d7f
+
+# # ENV he
+# RUN  \
+#      apk add --no-cache git && \
+#      git clone https://github.com/klauskades/minio/ && cd minio && \
+#      git checkout suburl
 
 WORKDIR /go/minio
 
-COPY jwt.go /go/minio/internal/config/identity/openid/
+# COPY jwt.go /go/minio/internal/config/identity/openid/
 
 RUN go install -v -ldflags "$(go run buildscripts/gen-ldflags.go)"
 
@@ -67,7 +77,8 @@ RUN \
      chmod +x /usr/bin/docker-entrypoint.sh
      # chmod +x /usr/bin/verify-minio.sh && \
      # /usr/bin/verify-minio.sh
-
+     
+RUN microdnf install vim
 EXPOSE 9000
 
 ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]

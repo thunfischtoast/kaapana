@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: minio-console-service
-  namespace: store
+  namespace: kube-system
   labels:
     app-name: minio
 spec:
@@ -21,11 +21,13 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: minio-console-ingress
-  namespace: store
+  namespace: kube-system
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     # traefik.ingress.kubernetes.io/router.middlewares: kube-system-errorpages@kubernetescrd # uncomment later!
     # ingress.kubernetes.io/custom-request-headers: "Authorization:||cookie:"
+    # traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-prefix@kubernetescrd
+    # traefik.ingress.kubernetes.io/preserve-host: "true"
     kubernetes.io/ingress.global-static-ip-name: "kubernetes-ingress"
 spec:
   rules:

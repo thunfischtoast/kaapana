@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   # This name uniquely identifies the Deployment
   name: minio-deployment
-  namespace: store
+  namespace: kube-system
 spec:
   replicas: 1
   selector:
@@ -32,20 +32,33 @@ spec:
       - name: minio
         image: registry.hzdr.de/k.kades/september-kaapana-test/minio:2021.09.24
         imagePullPolicy:  Always
+        # command: ["tail"]
+        # args: ["-f", "/dev/null"]
         command: 
           - "/bin/sh"
           - "-ce"
           - "/usr/bin/docker-entrypoint.sh minio server /export -S /etc/minio/certs/ --address :9000 --console-address :9001"
         env:
-        # - name: MINIO_IDENTITY_OPENID_CLIENT_ID
-        #   value: "kaapana"
+        - name: MINIO_IDENTITY_OPENID_CLIENT_ID
+          value: "kaapana"
+        - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+          value: "1c4645f0-e654-45a1-a8b6-cf28790104ea"
         # - name: MINIO_KAAPANA_AUTHORIZATION_ENDPOINT
         #   value: "https://10.128.129.28:443/auth/realms/kaapana/protocol/openid-connect/auth"
-        # # - name: MINIO_IDENTITY_OPENID_JWKS_URL
-        # #  value: https://vm-129-6.cloud.dkfz-heidelberg.de/auth/realms/kaapana/protocol/openid-connect/certs
-        # - name: MINIO_IDENTITY_OPENID_CONFIG_URL
-        #   value: "http://keycloak-external-service.kube-system.svc:80/auth/realms/kaapana/.well-known/openid-configuration"
-        # Minio access key and secret key
+        - name: MINIO_IDENTITY_OPENID_JWKS_URL
+          value: "https://10.128.129.28:443/auth/realms/kaapana/protocol/openid-connect/certs"
+        - name: MINIO_IDENTITY_OPENID_CONFIG_URL
+          value: "https://10.128.129.28:443/auth/realms/kaapana/.well-known/openid-configuration"
+        - name: MINIO_IDENTITY_OPENID_REDIRECT_URI
+          value: "http://10.128.129.28:9001/oauth_callback"
+          # value: "http://keycloak-external-service.kube-system.svc:80/auth/realms/kaapana/.well-known/openid-configuration"
+        # # Minio access key and secret key
+        # - name: MINIO_BROWSER_REDIRECT_URL
+        #   value: "https://10.128.129.28/minio-console/"
+        # - name: MINIO_SERVER_URL
+        #   value: "https://10.128.129.28"
+        - name: GODEBUG
+          value: x509ignoreCN=0
         - name: MINIO_ROOT_USER
           value: kaapanaminio
         - name: MINIO_ROOT_PASSWORD
@@ -63,12 +76,18 @@ spec:
         volumeMounts:
         - name: export # must match the volume name, above
           mountPath: "/export"
+        - name: ssl-config
+          mountPath: /etc/minio/certs/CAs/
+          readOnly: false
       volumes:
       - name: export
         hostPath:
           # path: /home/kaapana/minio
           path: /home/kaapana/minio
           type: DirectoryOrCreate
+      - name: ssl-config
+        secret:
+          secretName: certificate
       imagePullSecrets:
       - name: registry-secret
 ---
