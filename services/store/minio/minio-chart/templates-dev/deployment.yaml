@@ -29,6 +29,15 @@ spec:
             - name: TIMEOUT
               value: "10"
       containers:
+      - name: mc-admin
+        image: minio/mc:RELEASE.2021-09-23T05-44-03Z
+        command: ["tail"]
+        args: ["-f", "/dev/null"]
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: kaapanaminio
+        - name: MINIO_SECRET_KEY
+          value: Kaapana2020
       - name: minio
         image: registry.hzdr.de/k.kades/september-kaapana-test/minio:2021.09.24
         imagePullPolicy:  Always
@@ -39,24 +48,24 @@ spec:
           - "-ce"
           - "/usr/bin/docker-entrypoint.sh minio server /export -S /etc/minio/certs/ --address :9000 --console-address :9001"
         env:
-        - name: MINIO_IDENTITY_OPENID_CLIENT_ID
-          value: "kaapana"
-        - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET
-          value: "1c4645f0-e654-45a1-a8b6-cf28790104ea"
-        # - name: MINIO_KAAPANA_AUTHORIZATION_ENDPOINT
-        #   value: "https://10.128.129.28:443/auth/realms/kaapana/protocol/openid-connect/auth"
-        - name: MINIO_IDENTITY_OPENID_JWKS_URL
-          value: "https://10.128.129.28:443/auth/realms/kaapana/protocol/openid-connect/certs"
-        - name: MINIO_IDENTITY_OPENID_CONFIG_URL
-          value: "https://10.128.129.28:443/auth/realms/kaapana/.well-known/openid-configuration"
-        - name: MINIO_IDENTITY_OPENID_REDIRECT_URI
-          value: "http://10.128.129.28:9001/oauth_callback"
-          # value: "http://keycloak-external-service.kube-system.svc:80/auth/realms/kaapana/.well-known/openid-configuration"
-        # # Minio access key and secret key
-        # - name: MINIO_BROWSER_REDIRECT_URL
-        #   value: "https://10.128.129.28/minio-console/"
-        # - name: MINIO_SERVER_URL
-        #   value: "https://10.128.129.28"
+        # - name: MINIO_IDENTITY_OPENID_CLIENT_ID
+        #   value: "kaapana"
+        # - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+        #   value: "1c4645f0-e654-45a1-a8b6-cf28790104ea"
+        # # - name: MINIO_KAAPANA_AUTHORIZATION_ENDPOINT
+        # #   value: "https://10.128.129.28:443/auth/realms/kaapana/protocol/openid-connect/auth"
+        # - name: MINIO_IDENTITY_OPENID_JWKS_URL
+        #   value: "https://10.128.129.28:443/auth/realms/kaapana/protocol/openid-connect/certs"
+        # - name: MINIO_IDENTITY_OPENID_CONFIG_URL
+        #   value: "https://10.128.129.28:443/auth/realms/kaapana/.well-known/openid-configuration"
+        # - name: MINIO_IDENTITY_OPENID_REDIRECT_URI
+        #   value: "http://10.128.129.28:9001/oauth_callback"
+        #   # value: "http://keycloak-external-service.kube-system.svc:80/auth/realms/kaapana/.well-known/openid-configuration"
+        # # # Minio access key and secret key
+        # # - name: MINIO_BROWSER_REDIRECT_URL
+        # #   value: "https://10.128.129.28/minio-console/"
+        # # - name: MINIO_SERVER_URL
+        # #   value: "https://10.128.129.28"
         - name: GODEBUG
           value: x509ignoreCN=0
         - name: MINIO_ROOT_USER
