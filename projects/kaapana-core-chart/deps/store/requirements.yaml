@@ -6,6 +6,9 @@ dependencies:
   - name: ohif-chart
     version: "4.9.21"
     repository: file://../../../../services/store/ohif-viewer/ohif-chart
+  - name: slim-chart
+    version: "0.4.2"
+    repository: file://../../../../services/store/slim-viewer/slim-chart
   - name: minio-chart
     version: "2021.03.12"
     repository: file://../../../../services/store/minio/minio-chart
