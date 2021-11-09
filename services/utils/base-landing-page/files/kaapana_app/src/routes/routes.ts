@@ -26,6 +26,15 @@ const routes = [
             isPublic: false,
         },
     },
+    {
+        name: 'tdfadashboard',
+        path: '/tdfadashboard',
+        component: () => import('@/views/Dashboard.vue'),
+        title: 'TFDA Dashboard',
+        permissions: {
+            isPublic: false,
+        },
+    },
 
     {
         name: 'data-upload',
