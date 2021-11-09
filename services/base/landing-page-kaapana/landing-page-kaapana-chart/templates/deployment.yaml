@@ -19,7 +19,8 @@ spec:
       containers:
       - name: landingpage
         image: {{  .Values.global.registry_url }}/landing-page-kaapana:0.1.3
-        imagePullPolicy:  {{ .Values.global.pull_policy_pods }}
+        #imagePullPolicy:  {{ .Values.global.pull_policy_pods }}
+        imagePullPolicy:  Always
         ports:
         - name: landing-http
           containerPort: 5000

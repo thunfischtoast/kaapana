@@ -131,10 +131,10 @@ export default Vue.extend({
     ],
     datalist: [
       {
-        name: "Diabetes Data",
-        dataprovider: "DKFZ",
+        name: "Sementation DataSet For Cohort PZ34TK",
+        dataprovider: "RadplanBio",
         datasize: 6.0,
-        modificationdate: "01-Dec-2020",
+        modificationdate: "09-No-2021",
         dataformat: "CSV",
       },
 

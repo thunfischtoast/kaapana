@@ -3,8 +3,8 @@ apiVersion: v1
 data:
   commonData.json: |-
     {
-      "name": "Kaapana platform",
-      "shortName": "Kaapana",
+      "name": "Trusted Federated Data Analytics",
+      "shortName": "TFDA",
       "infoText": "Welcome to Kaapana",
       "version": "{{ .Values.global.version }}"
     }
@@ -21,11 +21,6 @@ data:
             "label": "Minio",
             "endpoint": "/minio",
             "linkTo": "/minio"
-          },
-          "doccano": {
-            "label": "Doccano",
-            "endpoint": "/doccano/",
-            "linkTo": "/doccano/"
           }
         }
       },
@@ -120,4 +115,4 @@ data:
 kind: ConfigMap
 metadata:
   name: landing-page-config
-  namespace: {{ .Values.global.base_namespace }}
+  namespace: base

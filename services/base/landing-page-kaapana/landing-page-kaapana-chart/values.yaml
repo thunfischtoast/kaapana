@@ -1,4 +1,4 @@
 ---
 global:
-    pull_policy_pods: "IfNotPresent"
-    base_namespace: "default"
+    pull_policy_pods: "Always"
+    base_namespace: "base"
