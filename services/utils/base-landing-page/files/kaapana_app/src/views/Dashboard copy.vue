@@ -96,13 +96,12 @@ export default Vue.extend({
     singleSelect: false,
     singleSelects: true,
     datasetInformation: [],
-    //workflowInformation: [],
-    //installedWorkflow: [] as any,
     installedWorkflow: [] as any,
-   // message: "Workflow Submitted Successfully !",
+    finaMinioBuckets: [] as any,
+ 
 
     checkbox: false,
-    //algorithm: "",
+  
     search: "",
     dialog: false,
    
@@ -144,6 +143,7 @@ export default Vue.extend({
   }),
   mounted() {
     this.installedWorkFlowDags();
+    this.getMinioBuckets();
   },
 
   methods: {
@@ -156,6 +156,36 @@ export default Vue.extend({
       this.$store.dispatch(LOGOUT);
     },
 
+    getMinioBuckets() {
+      //const getMinioBucketsAPI = "http://backend-service.base.svc:5000/api/v1/minio/buckets";
+      const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
+
+      request
+        .get(getMinioBucketsAPI)
+        .then((response: any) => {
+          
+          const bucketsList = JSON.stringify(response.data);
+          //console.log(response.data);
+          console.log('_________________!!!!!!!!!!______________');
+          //console.log(bucketsList);
+          JSON.parse(bucketsList, (key, value) => {
+            // console.log(key);
+            //if (key.includes("a")) {
+              console.log(value['bucket_name']);
+          
+
+              this.finaMinioBuckets = key;
+             
+            //}
+          });
+
+          
+        })
+        .catch((err: any) => {
+          
+          console.log(err);
+        });
+    },
     installedWorkFlowDags() {
       const installedWorkFlowDagsResult = "/flow/kaapana/api/getdags";
 
@@ -166,11 +196,11 @@ export default Vue.extend({
           const myObjStr = JSON.stringify(response.data);
           JSON.parse(myObjStr, (key, value) => {
             // console.log(key);
-            if (key.includes("tfda")) {
+           // if (key.includes("a")) {
               
 
               this.installedWorkflow = key;
-            }
+           // }
           });
 
           
@@ -180,6 +210,8 @@ export default Vue.extend({
           console.log(err);
         });
     },
+
+    
 
     onResize() {
       

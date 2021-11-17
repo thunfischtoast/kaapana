@@ -157,7 +157,7 @@ export default Vue.extend({
     },
 
     getMinioBuckets() {
-      //const getMinioBucketsAPI = "http://backend-service.base.svc:5000/api/v1/minio/buckets";
+     
       const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
 
       request
@@ -166,14 +166,18 @@ export default Vue.extend({
           
           const bucketsList = JSON.stringify(response.data);
           console.log(response.data);
-          JSON.parse(bucketsList, (key, value) => {
+          console.log('_________________!!!!!!!!!!______________');
+          console.log('_________________$$$$$$$$$$$$$$______________');
+          
+          //JSON.parse(bucketsList, (key, value) => {
             // console.log(key);
             //if (key.includes("a")) {
-          
+          //console.log(value);
 
-              this.finaMinioBuckets = key;
+              this.finaMinioBuckets = JSON.stringify(response.data);
+             
             //}
-          });
+         // });
 
           
         })
