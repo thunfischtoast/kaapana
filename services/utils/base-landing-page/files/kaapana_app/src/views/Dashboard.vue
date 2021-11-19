@@ -30,8 +30,25 @@
         :label="` ${installedWorkflow}`"
       ></v-checkbox>
       
-       
+        <h1 class="title my-3" align="left">Test API</h1>
+          <ul>
+    <li v-for="(item, key, index) in finaMinioBuckets">
+     {{item - key - index}}
+      <td v-for="check in item">
+         {{check[0]}}
+      </td>
+    </li>
+  </ul>
+  
+<h1 class="title my-3" align="left">Test API NEW</h1>
+<option v-for="(bucketName, index) in finaMinioBuckets" v-bind:value="bucketName.bucket_name" v-bind:selected="index === 0">
+  {{ bucketName.bucket_name }} - {{ bucketName.link }}
+<v-checkbox
+        v-model="checkbox"
+        :label="` ${bucketName.bucket_name}`"
+      ></v-checkbox>
 
+</option>
 
            <div class="text-center pt-2">
             <v-btn color="primary" dark @click.stop="dialog = true">
@@ -130,7 +147,7 @@ export default Vue.extend({
     ],
     datalist: [
       {
-        name: "Sementation DataSet For Cohort PZ34TK",
+        name: "Segmentation DataSet For Cohort PZ34TK",
         dataprovider: "RadplanBio",
         datasize: 6.0,
         modificationdate: "09-No-2021",
@@ -174,7 +191,8 @@ export default Vue.extend({
             //if (key.includes("a")) {
           //console.log(value);
 
-              this.finaMinioBuckets = JSON.stringify(response.data);
+              this.finaMinioBuckets = response.data;
+              //this.finaMinioBuckets = JSON.stringify(response.data);
              
             //}
          // });
