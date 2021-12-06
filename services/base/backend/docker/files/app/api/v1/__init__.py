@@ -9,3 +9,4 @@ from . import minio_apis
 from . import helm_apis
 from . import monitoring
 from . import users
+from . import tfda_minio_services
