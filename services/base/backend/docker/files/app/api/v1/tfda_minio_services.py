@@ -26,15 +26,44 @@ minioClient = Minio(_minio_host+":"+_minio_port,
                         secret_key="Kaapana2020",
                         
                         secure=False)
+# test runs
+#FEDERATED_HOSTS = ['https://vm-129-221.cloud.dkfz-heidelberg.de/','https://vm-128-153.cloud.dkfz-heidelberg.de/','https://vm-130-171.cloud.dkfz-heidelberg.de/']
+FEDERATED_HOSTS = ['https://vm-129-221.cloud.dkfz-heidelberg.de/']
+
+@api_v1.route('/tfda/minio/allsitebuckets/')
+def tfda_collect_all_site_buckets():
+    """Return List of Minio buckets
+    To List Buckets from all participating sites
+    ---
+    tags:
+      - TFDA get bucket names of all parcipating sites
+   
+    responses:
+      200:
+        description: Return List of Minio buckets
+    """
+    all_buckets = []
+    for i in FEDERATED_HOSTS:
+      #test runs
+      #https://vm-129-221.cloud.dkfz-heidelberg.de/backend/api/v1/tfda/minio/buckets/
+      #r=requests.get(i+'backend/api/v1/tfda/minio/buckets/')
+      r=requests.get('http://vm-129-221.cloud.dkfz-heidelberg.de/backend/api/v1/tfda/minio/buckets/')
+      all_buckets.append(r.json())
+    print(all_buckets)
+    
+       
+        
+        
+    return all_buckets
 
 
 @api_v1.route('/tfda/minio/buckets/')
 def tfda_listbuckets():
     """Return List of Minio buckets
-    To List Buckets
+    To List Buckets from all participating sites
     ---
     tags:
-      - Minio APIs
+      - TFDA get bucket names of all parcipating sites
    
     responses:
       200:
@@ -60,7 +89,7 @@ def tfda_makebucket(bucketname):
     To Create a Bucket
     ---
     tags:
-      - Minio APIs
+      - TFDA Minio APIs
     parameters:
       - name: bucketname
         in: path
@@ -85,7 +114,7 @@ def tfda_listbucketitems(bucketname):
     To List  Bucket Items
     ---
     tags:
-      - Minio APIs
+      - TFDA Minio APIs
     parameters:
       - name: bucketname
         in: path
@@ -124,7 +153,7 @@ def tfda_removebucket(bucketname):
     
     ---
     tags:
-      - Minio APIs
+      - TFDA Minio APIs
     parameters:
       - name: bucketname
         in: path

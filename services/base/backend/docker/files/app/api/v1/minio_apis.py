@@ -142,6 +142,6 @@ def removebucket(bucketname):
         minioClient.remove_bucket(bucketname)
         return f"{bucketname} Removed Successfully"
     else:
-        abort(404)
-        #return f"{bucketname} Does not exist"
+        abort(404) 
+        #return f"{bucketname} Does not exist" 
 
