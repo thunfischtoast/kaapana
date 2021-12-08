@@ -175,7 +175,7 @@ export default Vue.extend({
 
     getMinioBuckets() {
      
-      const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
+      const getMinioBucketsAPI = "/backend/api/v1/tfda/minio/buckets";
 
       request
         .get(getMinioBucketsAPI)
@@ -183,7 +183,7 @@ export default Vue.extend({
           
           const bucketsList = JSON.stringify(response.data);
           console.log(response.data);
-          console.log('_________________!!!!!!!!!!______________');
+          console.log('_________________from tfda backend !!!!!!!!!!______________');
           console.log('_________________$$$$$$$$$$$$$$______________');
           
           //JSON.parse(bucketsList, (key, value) => {
