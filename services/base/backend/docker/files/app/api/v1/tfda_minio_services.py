@@ -15,8 +15,6 @@ import socket
 #Production
 _minio_host='minio-service.store.svc'
 
-#Local Testing
-#_minio_host='127.0.0.1'
 
 _minio_port='9000'
 
@@ -28,7 +26,6 @@ minioClient = Minio(_minio_host+":"+_minio_port,
                         secure=False)
 # test runs
 FEDERATED_HOSTS = ['10.128.129.221','10.128.128.153']
-#FEDERATED_HOSTS = ['https://vm-129-221.cloud.dkfz-heidelberg.de/']
 
 @api_v1.route('/tfda/minio/allsitebuckets/')
 def tfda_collect_all_site_buckets():
@@ -66,122 +63,3 @@ def tfda_collect_all_site_buckets():
         
         
     return json.dumps(all_buckets)
-
-
-@api_v1.route('/tfda/minio/buckets/')
-def tfda_listbuckets():
-    """Return List of Minio buckets
-    To List Buckets from all participating sites
-    ---
-    tags:
-      - TFDA Minio
-   
-    responses:
-      200:
-        description: Return List of Minio buckets
-    """
-    buckets = minioClient.list_buckets()
-    data = []
-   
-
-    for bucket in buckets:
-      
-        millisec = (bucket.creation_date).timestamp() * 1000
-        
-        data.append({'bucket_name':str(bucket.name),'creation_date':millisec,'link':f'{socket.gethostname()}/minio/{str(bucket.name)}'})
-        
-        
-        
-    return json.dumps(data)
-
-@api_v1.route('/tfda/minio/bucket/<string:bucketname>/', methods=['POST'])
-def tfda_makebucket(bucketname):
-    """
-    To Create a Bucket
-    ---
-    tags:
-      - TFDA Minio
-    parameters:
-      - name: bucketname
-        in: path
-        type: string
-        required: true
-        description: Enter bucket name
-    responses:
-      200:
-        description: Success
-    """    
-    print('"""""""""""""""""""""""',bucketname)
-    bucketname =  bucketname.lower().strip()
-    if minioClient.bucket_exists(bucketname):
-        return f"{bucketname} Already Exist."
-    else:
-        minioClient.make_bucket(bucketname)
-        return f"{bucketname} created successfully"
-
-@api_v1.route('/tfda/minio/bucketitemslist/<string:bucketname>/', methods=['GET'])
-def tfda_listbucketitems(bucketname):
-    """
-    To List  Bucket Items
-    ---
-    tags:
-      - TFDA Minio
-    parameters:
-      - name: bucketname
-        in: path
-        type: string
-        required: true
-        description: Enter bucket name
-    responses:
-      200:
-        description: Success
-      404:
-        description: If the bucket does not
-    """   
-    bucket_items = [] 
-    bucketname =  bucketname.lower().strip()
-    if minioClient.bucket_exists(bucketname):
-        objects = minioClient.list_objects(bucketname,recursive=True)
-        for obj in objects:
-          
-          bucket_items.append({'bucket_name':str(obj.bucket_name), \
-                                'object_name':str(obj.object_name), \
-                                'last_modified':(obj.last_modified).timestamp() * 1000, \
-                                'etag':obj.etag, \
-                                'size':obj.size, \
-                                'type':obj.content_type})      
-
-        return json.dumps(bucket_items)
-    else:
-        
-        abort(404)
-        
-
-@api_v1.route('/tfda/minio/bucketremove/<string:bucketname>/', methods=['POST'])
-def tfda_removebucket(bucketname):
-    """
-    To remove a bucket
-    
-    ---
-    tags:
-      - TFDA Minio
-    parameters:
-      - name: bucketname
-        in: path
-        type: string
-        required: true
-        description: Enter bucket name to remove
-    responses:
-      200:
-        description: Success
-      404:
-        description: If the bucket does not exist
-    """    
-    bucketname =  bucketname.lower().strip()
-    if minioClient.bucket_exists(bucketname):
-        minioClient.remove_bucket(bucketname)
-        return f"{bucketname} Removed Successfully"
-    else:
-        abort(404)
-        #return f"{bucketname} Does not exist"
-
