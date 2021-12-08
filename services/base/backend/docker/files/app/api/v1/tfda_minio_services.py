@@ -27,8 +27,8 @@ minioClient = Minio(_minio_host+":"+_minio_port,
                         
                         secure=False)
 # test runs
-#FEDERATED_HOSTS = ['https://vm-129-221.cloud.dkfz-heidelberg.de/','https://vm-128-153.cloud.dkfz-heidelberg.de/','https://vm-130-171.cloud.dkfz-heidelberg.de/']
-FEDERATED_HOSTS = ['https://vm-129-221.cloud.dkfz-heidelberg.de/']
+FEDERATED_HOSTS = ['10.128.129.221','10.128.128.153']
+#FEDERATED_HOSTS = ['https://vm-129-221.cloud.dkfz-heidelberg.de/']
 
 @api_v1.route('/tfda/minio/allsitebuckets/')
 def tfda_collect_all_site_buckets():
@@ -36,25 +36,36 @@ def tfda_collect_all_site_buckets():
     To List Buckets from all participating sites
     ---
     tags:
-      - TFDA get bucket names of all parcipating sites
+      - TFDA Minio
    
     responses:
       200:
         description: Return List of Minio buckets
     """
-    all_buckets = []
+    all_buckets = {}
+    all_buckets['minio'] = []
+    _minio_port = "9000"
     for i in FEDERATED_HOSTS:
+      print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$  INSIDE ITERATION $$$$$$$$$$$$$$$$$$')
       #test runs
-      #https://vm-129-221.cloud.dkfz-heidelberg.de/backend/api/v1/tfda/minio/buckets/
-      #r=requests.get(i+'backend/api/v1/tfda/minio/buckets/')
-      r=requests.get('http://vm-129-221.cloud.dkfz-heidelberg.de/backend/api/v1/tfda/minio/buckets/')
-      all_buckets.append(r.json())
+      _minio_host = i
+      client = Minio(_minio_host+":"+_minio_port,
+                            access_key="kaapanaminio",
+                        secret_key="Kaapana2020",
+                        
+                        secure=False)
+      buckets = client.list_buckets()
+      for bucket in buckets:
+        
+        all_buckets['minio'].append({'bucket_name':str(bucket.name),'host':i})
+        #print(bucket.name, bucket.creation_date)
+        
     print(all_buckets)
     
        
         
         
-    return all_buckets
+    return json.dumps(all_buckets)
 
 
 @api_v1.route('/tfda/minio/buckets/')
@@ -63,7 +74,7 @@ def tfda_listbuckets():
     To List Buckets from all participating sites
     ---
     tags:
-      - TFDA get bucket names of all parcipating sites
+      - TFDA Minio
    
     responses:
       200:
@@ -89,7 +100,7 @@ def tfda_makebucket(bucketname):
     To Create a Bucket
     ---
     tags:
-      - TFDA Minio APIs
+      - TFDA Minio
     parameters:
       - name: bucketname
         in: path
@@ -114,7 +125,7 @@ def tfda_listbucketitems(bucketname):
     To List  Bucket Items
     ---
     tags:
-      - TFDA Minio APIs
+      - TFDA Minio
     parameters:
       - name: bucketname
         in: path
@@ -153,7 +164,7 @@ def tfda_removebucket(bucketname):
     
     ---
     tags:
-      - TFDA Minio APIs
+      - TFDA Minio
     parameters:
       - name: bucketname
         in: path
