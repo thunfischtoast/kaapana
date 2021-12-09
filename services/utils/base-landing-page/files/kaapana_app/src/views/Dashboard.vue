@@ -25,7 +25,8 @@
           
 
           <h1 class="title my-3" align="left">Available Charts from Registry</h1>
-          
+           
+ {{ availableCharts}}
        {{ availableCharts.chart_name}}
        {{ availableCharts.url}}
 
@@ -130,6 +131,7 @@ export default Vue.extend({
      
       
     ],
+   
     headersWorkfLow: [
       {
         text: "Work Flow",
@@ -204,7 +206,7 @@ export default Vue.extend({
     },
     availableChartsFromRegistry() {
      
-      //const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
+      
       const getChartsAPI = "/backend/api/v1/minio/charts/getcharts/";
       
 
@@ -218,17 +220,9 @@ export default Vue.extend({
            console.log(response);
           console.log('_________________from tfda charts !!!!!!!!!!______________');
           console.log('_________________charts______________');
-          
-          //JSON.parse(bucketsList, (key, value) => {
-            // console.log(key);
-            //if (key.includes("a")) {
-          //console.log(value);
 
-              this.availableCharts = response.data;
-              //this.finaMinioBuckets = JSON.stringify(response.data);
+          this.availableCharts = response.data;
              
-            //}
-         // });
 
           
         })
