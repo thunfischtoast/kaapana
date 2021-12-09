@@ -24,29 +24,23 @@
 
           
 
-          <h1 class="title my-3" align="left">Installed Workflows</h1>
+          <h1 class="title my-3" align="left">Available Charts from Registry</h1>
+          
+       {{ availableCharts.chart_name}}
+       {{ availableCharts.url}}
+
+         <h1 class="title my-3" align="left">Installed Workflows</h1>
           <v-checkbox
         v-model="checkbox"
         :label="` ${installedWorkflow}`"
       ></v-checkbox>
       
-        <h1 class="title my-3" align="left">Test API</h1>
-          <ul>
-    <li v-for="(item, key, index) in finaMinioBuckets">
-     {{item - key - index}}
-      <td v-for="check in item">
-         {{check[0]}}
-      </td>
-    </li>
-  </ul>
   
 <h1 class="title my-3" align="left">Test API NEW</h1>
 <option v-for="(bucketName, index) in finaMinioBuckets" v-bind:value="bucketName.bucket_name" v-bind:selected="index === 0">
-  {{ bucketName.bucket_name }} - {{ bucketName.link }}
-<v-checkbox
-        v-model="checkbox"
-        :label="` ${bucketName.bucket_name}`"
-      ></v-checkbox>
+ 
+  {{ finaMinioBuckets}}
+  
 
 </option>
 
@@ -114,6 +108,7 @@ export default Vue.extend({
     singleSelects: true,
     datasetInformation: [],
     installedWorkflow: [] as any,
+    availableCharts: [] as any,
     finaMinioBuckets: [] as any,
  
 
@@ -131,9 +126,9 @@ export default Vue.extend({
         value: "name",
       },
       { text: "Data Provider", value: "dataprovider" },
-      { text: "Data Size (GB)", value: "datasize" },
-      { text: "Data Modification Date", value: "modificationdate" },
-      { text: "Data Format", value: "dataformat" },
+     
+     
+      
     ],
     headersWorkfLow: [
       {
@@ -149,9 +144,7 @@ export default Vue.extend({
       {
         name: "Segmentation DataSet For Cohort PZ34TK",
         dataprovider: "RadplanBio",
-        datasize: 6.0,
-        modificationdate: "09-No-2021",
-        dataformat: "CSV",
+        
       },
 
       
@@ -161,6 +154,7 @@ export default Vue.extend({
   mounted() {
     this.installedWorkFlowDags();
     this.getMinioBuckets();
+    this.availableChartsFromRegistry();
   },
 
   methods: {
@@ -175,7 +169,9 @@ export default Vue.extend({
 
     getMinioBuckets() {
      
-      const getMinioBucketsAPI = "/backend/api/v1/tfda/minio/buckets";
+      //const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
+      const getMinioBucketsAPI = "/backend/api/v1/minio/bucketsandhosts/";
+      
 
       request
         .get(getMinioBucketsAPI)
@@ -183,7 +179,9 @@ export default Vue.extend({
           
           const bucketsList = JSON.stringify(response.data);
           console.log(response.data);
-          console.log('_________________from tfda backend !!!!!!!!!!______________');
+          console.log('____ hahahaah_____________');
+           console.log(response);
+          console.log('_________________from tfda backendssss !!!!!!!!!!______________');
           console.log('_________________$$$$$$$$$$$$$$______________');
           
           //JSON.parse(bucketsList, (key, value) => {
@@ -204,6 +202,42 @@ export default Vue.extend({
           console.log(err);
         });
     },
+    availableChartsFromRegistry() {
+     
+      //const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
+      const getChartsAPI = "/backend/api/v1/minio/charts/getcharts/";
+      
+
+      request
+        .get(getChartsAPI)
+        .then((response: any) => {
+          
+          const chartsList = JSON.stringify(response.data);
+          console.log(response.data);
+          console.log('____ charts_____________');
+           console.log(response);
+          console.log('_________________from tfda charts !!!!!!!!!!______________');
+          console.log('_________________charts______________');
+          
+          //JSON.parse(bucketsList, (key, value) => {
+            // console.log(key);
+            //if (key.includes("a")) {
+          //console.log(value);
+
+              this.availableCharts = response.data;
+              //this.finaMinioBuckets = JSON.stringify(response.data);
+             
+            //}
+         // });
+
+          
+        })
+        .catch((err: any) => {
+          
+          console.log(err);
+        });
+    },
+
     installedWorkFlowDags() {
       const installedWorkFlowDagsResult = "/flow/kaapana/api/getdags";
 

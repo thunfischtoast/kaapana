@@ -30,8 +30,17 @@
         :label="` ${installedWorkflow}`"
       ></v-checkbox>
       
-       
+  
+<h1 class="title my-3" align="left">Test API NEW</h1>
+<option v-for="(bucketName, index) in finaMinioBuckets" v-bind:value="bucketName.bucket_name" v-bind:selected="index === 0">
+  {{ bucketName }} - {{ bucketName }}
+  {{ finaMinioBuckets }}
+<v-checkbox
+        v-model="checkbox"
+        :label="` ${bucketName.bucket_name}`"
+      ></v-checkbox>
 
+</option>
 
            <div class="text-center pt-2">
             <v-btn color="primary" dark @click.stop="dialog = true">
@@ -130,7 +139,7 @@ export default Vue.extend({
     ],
     datalist: [
       {
-        name: "Sementation DataSet For Cohort PZ34TK",
+        name: "Segmentation DataSet For Cohort PZ34TK",
         dataprovider: "RadplanBio",
         datasize: 6.0,
         modificationdate: "09-No-2021",
@@ -157,27 +166,32 @@ export default Vue.extend({
     },
 
     getMinioBuckets() {
-      //const getMinioBucketsAPI = "http://backend-service.base.svc:5000/api/v1/minio/buckets";
-      const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
+     
+      //const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
+      const getMinioBucketsAPI = "/backend/api/v1/minio/bucketsandhosts/";
+      
 
       request
         .get(getMinioBucketsAPI)
         .then((response: any) => {
           
           const bucketsList = JSON.stringify(response.data);
-          //console.log(response.data);
-          console.log('_________________!!!!!!!!!!______________');
-          //console.log(bucketsList);
-          JSON.parse(bucketsList, (key, value) => {
+          console.log(response.data);
+          console.log('____ hahahaah_____________');
+           console.log(response);
+          console.log('_________________from tfda backendssss !!!!!!!!!!______________');
+          console.log('_________________$$$$$$$$$$$$$$______________');
+          
+          //JSON.parse(bucketsList, (key, value) => {
             // console.log(key);
             //if (key.includes("a")) {
-              console.log(value['bucket_name']);
-          
+          //console.log(value);
 
-              this.finaMinioBuckets = key;
+              this.finaMinioBuckets = response.data;
+              //this.finaMinioBuckets = JSON.stringify(response.data);
              
             //}
-          });
+         // });
 
           
         })
@@ -196,11 +210,11 @@ export default Vue.extend({
           const myObjStr = JSON.stringify(response.data);
           JSON.parse(myObjStr, (key, value) => {
             // console.log(key);
-           // if (key.includes("a")) {
+            if (key.includes("a")) {
               
 
               this.installedWorkflow = key;
-           // }
+            }
           });
 
           
