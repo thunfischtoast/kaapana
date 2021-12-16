@@ -18,7 +18,7 @@ _minio_host='minio-service.store.svc'
 
 _minio_port='9000'
 
-#todo: add charts values fetched from registry instead custom values
+#tfdatodo: add charts values fetched from registry instead custom values
 def returnChartsDetails():
   return json.dumps({'chart_name': 'test', 'url': 'www.test.com'})
 

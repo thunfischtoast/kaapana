@@ -13,22 +13,24 @@
           <v-data-table
             v-model="datasetInformation"
             :headers="headers"
-            :items="datalist"
+            :items="sampleData"
             :single-select="singleSelect"
             :search="search"
-            item-key="name"
+            item-key="cohortkey" dark
             show-select
             class="elevation-3"
           >
           </v-data-table>
+        <h1 class="title my-3" align="left">Available Charts API Response</h1>
 
-          
-
-          <h1 class="title my-3" align="left">Available Charts from Registry</h1>
-           
- {{ availableCharts}}
+        {{ availableCharts}}
        {{ availableCharts.chart_name}}
        {{ availableCharts.url}}
+          
+  <v-data-table v-model="chartModel" :headers="chartheaders" :items="sampleCharts" :items-per-page="5"  :single-select="singleSelect" item-key="chartkey" show-select :loading="loading" dark class="elevation-1 my-4">
+   
+  </v-data-table>
+
 
          <h1 class="title my-3" align="left">Installed Workflows</h1>
           <v-checkbox
@@ -37,13 +39,13 @@
       ></v-checkbox>
       
   
-<h1 class="title my-3" align="left">Test API NEW</h1>
-<option v-for="(bucketName, index) in finaMinioBuckets" v-bind:value="bucketName.bucket_name" v-bind:selected="index === 0">
+<h1 class="title my-3" align="left">API response Bucket and Hosts</h1>
+
  
   {{ finaMinioBuckets}}
   
 
-</option>
+
 
            <div class="text-center pt-2">
             <v-btn color="primary" dark @click.stop="dialog = true">
@@ -121,12 +123,48 @@ export default Vue.extend({
 
     headers: [
       {
-        text: "Data Set",
+        text: "Cohort Name",
         align: "start",
         sortable: false,
-        value: "name",
+        value: "cohort",
       },
-      { text: "Data Provider", value: "dataprovider" },
+      { text: "Participating Host", value: "host" },
+    
+    ],
+    sampleData: [
+          {
+            cohort: 'cohort1',
+            host: "10.128.129.221",
+          },
+          {
+            cohort: 'cohort2',
+            host: "10.128.129.221",
+          },
+          {
+            cohort: 'cohort5',
+            host: "10.128.128.153",
+          },],
+    sampleCharts: [
+          {
+            chart_name: 'testchart1',
+            hosturl: "www.testchart.com",
+          },
+          {
+            chart_name: 'testchart2',
+            hosturl: "www.testchart.com",
+          },
+          {
+            chart_name: 'testchart3',
+            hosturl: "www.testchart.com",
+          },],
+    chartheaders: [
+      {
+        text: "Chart Name",
+        align: "start",
+
+        value: "chart_name",
+      },
+      { text: "ChartLocation", value: "hosturl" },
      
      
       
@@ -147,11 +185,16 @@ export default Vue.extend({
         name: "Segmentation DataSet For Cohort PZ34TK",
         dataprovider: "RadplanBio",
         
-      },
-
-      
-      
+      }, 
     ],
+    //chartlist: [
+      //{
+       // chart: "Sample Chart",
+       // url: "www.sampleurl.com",
+        
+    //  }, 
+  //  ],
+
   }),
   mounted() {
     this.installedWorkFlowDags();
