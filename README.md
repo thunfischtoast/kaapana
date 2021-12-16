@@ -1,5 +1,6 @@
 [![Documentation Status](https://readthedocs.org/projects/kaapana/badge/?version=latest)](https://kaapana.readthedocs.io/en/latest/?badge=latest)
-<a href="https://join.slack.com/t/kaapana/shared_invite/zt-hilvek0w-ucabihas~jn9PDAM0O3gVQ/"><img src="https://img.shields.io/badge/chat-slack-blueviolet" /></a>
+<a href="https://join.slack.com/t/kaapana/shared_invite/zt-hilvek0w-ucabihas~jn9PDAM0O3gVQ/"><img src="https://img.shields.io/badge/chat-slack-blueviolet" /></a> [![DOI](https://zenodo.org/badge/285529340.svg)](https://zenodo.org/badge/latestdoi/285529340) 
+
 
 ## What is Kaapana?
 
