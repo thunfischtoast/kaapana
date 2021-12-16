@@ -25,7 +25,7 @@ spec:
               name: elasticdata
       containers:
         - name: elastic-logging-container
-          image: {{  .Values.global.registry_url }}/elasticsearch-oss:6.8.12
+          image: {{  .Values.global.registry_url }}/elasticsearch-oss:6.8.21
           imagePullPolicy:  {{ .Values.global.pull_policy_pods }}
           env:
           - name: ES_JAVA_OPTS

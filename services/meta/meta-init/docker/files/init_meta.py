@@ -225,7 +225,7 @@ if __name__ == "__main__":
     print("provisioning...")
     init_kibana = os.getenv('INITKIBANA', False)
     init_elastic = os.getenv('INITELASTIC', False)
-    stack_version = os.getenv('STACKVERSION', '6.8.12')
+    stack_version = os.getenv('STACKVERSION', '6.8.21')
     override_objects = os.getenv('OVERRIDE_OBJECTS', 'false')
     domain = os.getenv('DOMAIN', None)
     https_port = os.getenv('HTTPS_PORT', "443")
