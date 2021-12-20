@@ -306,6 +306,24 @@ export default Vue.extend({
       
     },
     predict() {
+      // testing purpose
+      const userSelectedDataAndAlgorithm = 
+      {
+      "minio":{
+              "bucket_name":"data",
+              "host":[
+                    "10.128.129.221",
+                    "10.128.128.153"
+                      ]
+               },
+      "charts":{
+              "chart_name":"dcm-extract-study-id-chart",
+              "chart_version": "0.1.0",
+              "registry_url":"registry.hzdr.de/santhosh.parampottupadam/tfdachartsregistry"
+
+                }
+    }
+      
       const article = {
         "get-tfda-data": {
           bucket_name: "tfda-test",
