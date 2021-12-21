@@ -36,7 +36,7 @@ data:
       reconnect_on_error true
       reload_on_failure true
       index_name kubernetes
-      default_elasticsearch_version 6.8.21
+      default_elasticsearch_version 6.8.22
       <buffer>
         @type file
         path /fluentd/log/elastic-buffer-kubernetes
@@ -70,7 +70,7 @@ data:
       reconnect_on_error true
       reload_on_failure true
       index_name kubernetes
-      default_elasticsearch_version 6.8.21
+      default_elasticsearch_version 6.8.22
       <buffer>
         @type file
         path /fluentd/log/elastic-buffer-airflow
@@ -104,7 +104,7 @@ data:
       reconnect_on_error true
       reload_on_failure true
       index_name kubernetes
-      default_elasticsearch_version 6.8.21
+      default_elasticsearch_version 6.8.22
       <buffer>
         @type file
         path /fluentd/log/elastic-buffer-cto

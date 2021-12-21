@@ -4,7 +4,7 @@
   "description": "Workflow-Trigger plugin for Kaapana",
   "main": "index.js",
   "kibana": {
-    "version": "6.8.21",
+    "version": "6.8.22",
     "templateVersion": "1.0.0"
   },
   "scripts": {

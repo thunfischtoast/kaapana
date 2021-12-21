@@ -1,7 +1,7 @@
 FROM python:3.9-alpine3.12
 
 LABEL IMAGE="init-meta"
-LABEL VERSION="6.8.21"
+LABEL VERSION="6.8.22"
 LABEL CI_IGNORE="False"
 
 WORKDIR /

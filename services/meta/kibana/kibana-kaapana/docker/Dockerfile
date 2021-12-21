@@ -1,7 +1,7 @@
-FROM docker.elastic.co/kibana/kibana-oss:6.8.21
+FROM docker.elastic.co/kibana/kibana-oss:6.8.22
 
 LABEL IMAGE="kibana-kaapana"
-LABEL VERSION="6.8.21"
+LABEL VERSION="6.8.22"
 LABEL CI_IGNORE="False"
 
 WORKDIR /usr/share/kibana/
