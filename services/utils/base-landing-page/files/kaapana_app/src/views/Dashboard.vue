@@ -216,7 +216,27 @@ export default Vue.extend({
      
       //const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
       const getMinioBucketsAPI = "/backend/api/v1/minio/bucketsandhosts/";
+
+
+
       
+      
+      const requestURL = "/backend/api/v1/minio/tfda-get-request/testReuests";
+       //const requestURL = "/backend/api/v1/minio/tfda-get-request/";
+      const sampleQuery =  "sampleQuery"
+      const headers = {"Accept": "application/json"};
+
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%% Api test post §§§§§§§§§§§§§§§§: ")
+      axios.post(requestURL,{headers} )
+     .then((response: any) => {
+console.log("%%%%%%%  Flask Response: ", response.data)
+        })
+   .catch((err: any) => {
+          
+          console.log(err);
+        });
+
+
 
       request
         .get(getMinioBucketsAPI)
@@ -324,17 +344,17 @@ export default Vue.extend({
                 }
     }
       
-      const article = {
-        "get-tfda-data": {
-          bucket_name: "tfda-test",
-          action_operator_dirs: ["example"],
-        },
-        "tfda-calculations": { tfda_epochs: 3 },
-        "put-tfda-data": { bucket_name: "tfda-heidelberg" },
-      };
+      //const article = {
+        //"get-tfda-data": {
+          //bucket_name: "tfda-test",
+          //action_operator_dirs: ["example"],
+        //},
+        //"tfda-calculations": { tfda_epochs: 3 },
+        //"put-tfda-data": { bucket_name: "tfda-heidelberg" },
+      //};
       const airflow_url = "/flow/kaapana/api/trigger/tfda-diabetes-prediction";
       request
-        .post(airflow_url, article)
+        .post(airflow_url, userSelectedDataAndAlgorithm)
         .then((response) => {
           console.log("Api response: ", response.data);
           //this.snackbar = true;
