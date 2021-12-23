@@ -37,7 +37,7 @@ def tfda_collect_all_site_buckets():
     To List Buckets from all participating sites
     ---
     tags:
-      - TFDA Minio
+      - TFDA Services
    
     responses:
       200:
@@ -74,7 +74,7 @@ def tfda_get_charts():
     Return  List of Charts
     ---
     tags:
-      - TFDA Charts
+      - TFDA Services
    
     responses:
       200:
@@ -82,3 +82,24 @@ def tfda_get_charts():
     """
    
     return returnChartsDetails()
+
+
+@api_v1.route('/minio/tfda-get-request/<string:reqData>', methods=['GET', 'POST'])
+def query_example(reqData):
+    """Serving Get Requests
+    ---
+    tags:
+      - TFDA Services
+    parameters:
+      - name: reqData
+        in: path
+        type: string
+        required: true
+        description: Serving get requests
+    responses:
+      200:
+        description: Serving get requests
+    """
+    #language = request.args.get(reqData)
+
+    return '''<h1>The test value for from post response is : {}</h1>'''.format(reqData)
