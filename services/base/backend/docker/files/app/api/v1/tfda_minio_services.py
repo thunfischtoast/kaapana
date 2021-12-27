@@ -109,7 +109,6 @@ def query_example(reqData):
 def json_test():
     
     data = json.loads(request.data)
-    print("sdofgjdfgjdfghkfdhglkfdbgjkfdbgkdfjgbldfgboi")
     print(data)
     return data
     
