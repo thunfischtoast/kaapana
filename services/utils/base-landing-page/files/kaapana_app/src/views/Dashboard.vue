@@ -187,17 +187,11 @@ export default Vue.extend({
         
       }, 
     ],
-    //chartlist: [
-      //{
-       // chart: "Sample Chart",
-       // url: "www.sampleurl.com",
-        
-    //  }, 
-  //  ],
+    
 
   }),
   mounted() {
-    this.installedWorkFlowDags();
+    
     this.getMinioBuckets();
     this.availableChartsFromRegistry();
   },
@@ -218,16 +212,19 @@ export default Vue.extend({
       const getMinioBucketsAPI = "/backend/api/v1/minio/bucketsandhosts/";
 
 
-
+ 
+  const testvalueeessssss = {"firstName":"John","lastName":"Smith"}
       
       
-      const requestURL = "/backend/api/v1/minio/tfda-get-request/testReuests";
-       //const requestURL = "/backend/api/v1/minio/tfda-get-request/";
-      const sampleQuery =  "sampleQuery"
+      
+      
+      //const requestURL = "/backend/api/v1/minio/tfda-get-request/";
+      const requestURL = "/backend/api/v1/minio/tfda/userchoicesubmission";
+    
       const headers = {"Accept": "application/json"};
 
       console.log("%%%%%%%%%%%%%%%%%%%%%%%%% Api test post §§§§§§§§§§§§§§§§: ")
-      axios.post(requestURL,{headers} )
+      axios.post(requestURL,testvalueeessssss,{headers} )
      .then((response: any) => {
 console.log("%%%%%%%  Flask Response: ", response.data)
         })
@@ -243,22 +240,12 @@ console.log("%%%%%%%  Flask Response: ", response.data)
         .then((response: any) => {
           
           const bucketsList = JSON.stringify(response.data);
-          console.log(response.data);
-          console.log('____ hahahaah_____________');
-           console.log(response);
-          console.log('_________________from tfda backendssss !!!!!!!!!!______________');
-          console.log('_________________$$$$$$$$$$$$$$______________');
+         
           
-          //JSON.parse(bucketsList, (key, value) => {
-            // console.log(key);
-            //if (key.includes("a")) {
-          //console.log(value);
+         
 
               this.finaMinioBuckets = response.data;
-              //this.finaMinioBuckets = JSON.stringify(response.data);
-             
-            //}
-         // });
+              
 
           
         })
@@ -278,11 +265,7 @@ console.log("%%%%%%%  Flask Response: ", response.data)
         .then((response: any) => {
           
           const chartsList = JSON.stringify(response.data);
-          console.log(response.data);
-          console.log('____ charts_____________');
-           console.log(response);
-          console.log('_________________from tfda charts !!!!!!!!!!______________');
-          console.log('_________________charts______________');
+         
 
           this.availableCharts = response.data;
              
@@ -293,34 +276,7 @@ console.log("%%%%%%%  Flask Response: ", response.data)
           
           console.log(err);
         });
-    },
-
-    installedWorkFlowDags() {
-      const installedWorkFlowDagsResult = "/flow/kaapana/api/getdags";
-
-      request
-        .get(installedWorkFlowDagsResult)
-        .then((response: any) => {
-          
-          const myObjStr = JSON.stringify(response.data);
-          JSON.parse(myObjStr, (key, value) => {
-            // console.log(key);
-            if (key.includes("a")) {
-              
-
-              this.installedWorkflow = key;
-            }
-          });
-
-          
-        })
-        .catch((err: any) => {
-          
-          console.log(err);
-        });
-    },
-
-    
+    },    
 
     onResize() {
       
@@ -344,31 +300,17 @@ console.log("%%%%%%%  Flask Response: ", response.data)
                 }
     }
       
-      //const article = {
-        //"get-tfda-data": {
-          //bucket_name: "tfda-test",
-          //action_operator_dirs: ["example"],
-        //},
-        //"tfda-calculations": { tfda_epochs: 3 },
-        //"put-tfda-data": { bucket_name: "tfda-heidelberg" },
-      //};
       const airflow_url = "/flow/kaapana/api/trigger/tfda-diabetes-prediction";
       request
         .post(airflow_url, userSelectedDataAndAlgorithm)
         .then((response) => {
           console.log("Api response: ", response.data);
-          //this.snackbar = true;
-          //this.snacktext = snacktext;
-          //this.snackbar = {
-         // message: "Workflow Submitted Successfully !",
-          //color: "green",
-          //show: true,
-          //};
+          
          alert('Workflow submitted Successfully, output will be available in Minio. Track Progress via Airflow.')
           
         })
         .catch((error) => {
-          //this.errorMessage = error.message;
+          
           console.error("There was an error!", error);
         });
     },

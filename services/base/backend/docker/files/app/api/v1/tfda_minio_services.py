@@ -1,5 +1,5 @@
 
-from flask import jsonify, abort
+from flask import jsonify, abort,request
 
 from . import api_v1
 
@@ -103,3 +103,14 @@ def query_example(reqData):
     #language = request.args.get(reqData)
 
     return '''<h1>The test value for from post response is : {}</h1>'''.format(reqData)
+
+
+@api_v1.route('/minio/tfda/userchoicesubmission', methods=['GET', 'POST'])
+def json_test():
+    
+    data = json.loads(request.data)
+    print("sdofgjdfgjdfghkfdhglkfdbgjkfdbgkdfjgbldfgboi")
+    print(data)
+    return data
+    
+    #return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 

@@ -13,10 +13,10 @@
           <v-data-table
             v-model="datasetInformation"
             :headers="headers"
-            :items="datalist"
+            :items="sampleData"
             :single-select="singleSelect"
             :search="search"
-            item-key="name" dark
+            item-key="cohortkey" dark
             show-select
             class="elevation-3"
           >
@@ -27,24 +27,10 @@
        {{ availableCharts.chart_name}}
        {{ availableCharts.url}}
           
-  <v-data-table :headers="chartheaders" :items="availableCharts" :items-per-page="5" :loading="loading" dark class="elevation-1 my-4">
+  <v-data-table v-model="chartModel" :headers="chartheaders" :items="sampleCharts" :items-per-page="5"  :single-select="singleSelect" item-key="chartkey" show-select :loading="loading" dark class="elevation-1 my-4">
    
   </v-data-table>
 
- <h1 class="title my-3" align="left">Available Charts from Registry</h1>
-<ul>
-    <td v-for="(value, propertyName, index) in availableCharts">
-        {{ propertyName }}: {{ value }}   
-    </td>
-  </ul>
-          <h1 class="title my-3" align="left">Testing</h1>  
-     <v-list>
-            <v-list-item v-for=" item  in availableCharts"  :key="item.chart_name">
-
-           <v-checkbox v-model="model"  :label="item"  :value="item"  :value-comparator="comparator"></v-checkbox>
-             
-           </v-list-item>
-          </v-list>
 
          <h1 class="title my-3" align="left">Installed Workflows</h1>
           <v-checkbox
@@ -59,7 +45,7 @@
   {{ finaMinioBuckets}}
   
 
-</option>
+
 
            <div class="text-center pt-2">
             <v-btn color="primary" dark @click.stop="dialog = true">
@@ -137,16 +123,40 @@ export default Vue.extend({
 
     headers: [
       {
-        text: "Data Set",
+        text: "Cohort Name",
         align: "start",
         sortable: false,
-        value: "name",
+        value: "cohort",
       },
-      { text: "Data Provider", value: "dataprovider" },
-     
-     
-      
+      { text: "Participating Host", value: "host" },
+    
     ],
+    sampleData: [
+          {
+            cohort: 'cohort1',
+            host: "10.128.129.221",
+          },
+          {
+            cohort: 'cohort2',
+            host: "10.128.129.221",
+          },
+          {
+            cohort: 'cohort5',
+            host: "10.128.128.153",
+          },],
+    sampleCharts: [
+          {
+            chart_name: 'testchart1',
+            hosturl: "www.testchart.com",
+          },
+          {
+            chart_name: 'testchart2',
+            hosturl: "www.testchart.com",
+          },
+          {
+            chart_name: 'testchart3',
+            hosturl: "www.testchart.com",
+          },],
     chartheaders: [
       {
         text: "Chart Name",
@@ -154,7 +164,7 @@ export default Vue.extend({
 
         value: "chart_name",
       },
-      { text: "ChartLocation", value: "url" },
+      { text: "ChartLocation", value: "hosturl" },
      
      
       
@@ -206,7 +216,30 @@ export default Vue.extend({
      
       //const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
       const getMinioBucketsAPI = "/backend/api/v1/minio/bucketsandhosts/";
+
+
+  const testvalueee = "GGGGGGGG"
+  const testvalueeessssss = {"firstName":"John","lastName":"Smith"}
       
+      
+      
+      //const requestURL = "/backend/api/v1/minio/tfda-get-request/"+ testvalueee;
+      //const requestURL = "/backend/api/v1/minio/tfda-get-request/";
+      const requestURL = "/backend/api/v1/minio/jsontest/hello";
+    
+      const headers = {"Accept": "application/json"};
+
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%% Api test post §§§§§§§§§§§§§§§§: ")
+      axios.post(requestURL,testvalueeessssss,{headers} )
+     .then((response: any) => {
+console.log("%%%%%%%  Flask Response: ", response.data)
+        })
+   .catch((err: any) => {
+          
+          console.log(err);
+        });
+
+
 
       request
         .get(getMinioBucketsAPI)
@@ -296,17 +329,35 @@ export default Vue.extend({
       
     },
     predict() {
-      const article = {
-        "get-tfda-data": {
-          bucket_name: "tfda-test",
-          action_operator_dirs: ["example"],
-        },
-        "tfda-calculations": { tfda_epochs: 3 },
-        "put-tfda-data": { bucket_name: "tfda-heidelberg" },
-      };
+      // testing purpose
+      const userSelectedDataAndAlgorithm = 
+      {
+      "minio":{
+              "bucket_name":"data",
+              "host":[
+                    "10.128.129.221",
+                    "10.128.128.153"
+                      ]
+               },
+      "charts":{
+              "chart_name":"dcm-extract-study-id-chart",
+              "chart_version": "0.1.0",
+              "registry_url":"registry.hzdr.de/santhosh.parampottupadam/tfdachartsregistry"
+
+                }
+    }
+      
+      //const article = {
+        //"get-tfda-data": {
+          //bucket_name: "tfda-test",
+          //action_operator_dirs: ["example"],
+        //},
+        //"tfda-calculations": { tfda_epochs: 3 },
+        //"put-tfda-data": { bucket_name: "tfda-heidelberg" },
+      //};
       const airflow_url = "/flow/kaapana/api/trigger/tfda-diabetes-prediction";
       request
-        .post(airflow_url, article)
+        .post(airflow_url, userSelectedDataAndAlgorithm)
         .then((response) => {
           console.log("Api response: ", response.data);
           //this.snackbar = true;
