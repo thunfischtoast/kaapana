@@ -47,8 +47,7 @@ def tfda_collect_all_site_buckets():
     all_buckets['minio'] = []
     _minio_port = "9000"
     for i in FEDERATED_HOSTS:
-      #print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$  INSIDE ITERATION $$$$$$$$$$$$$$$$$$')
-      #test runs
+      
       _minio_host = i
       client = Minio(_minio_host+":"+_minio_port,
                             access_key="kaapanaminio",
@@ -106,7 +105,7 @@ def query_example(reqData):
 
 
 @api_v1.route('/minio/tfda/userchoicesubmission', methods=['GET', 'POST'])
-def json_test():
+def user_choice_submission():
     
     data = json.loads(request.data)
     print(data)
