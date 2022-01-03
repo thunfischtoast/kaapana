@@ -11,3 +11,5 @@ python-keycloak==0.25.0
 marshmallow
 marshmallow-dataclass
 pydantic
+ansible==2.9.0
+openstacksdk

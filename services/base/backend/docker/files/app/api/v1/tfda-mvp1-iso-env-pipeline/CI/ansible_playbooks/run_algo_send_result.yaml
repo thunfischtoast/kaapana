@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    - target: "{{ target_host }}"
+      default: "10.128.128.218"
+
+  tasks:
+    - add_host:
+        name: "{{ target }}"
+        groups: os_server
+
+- name: Run algorithm on data in isolated environment and send results back to parent data site
+  hosts: os_server
+  # strategy: free
+  remote_user: "{{ remote_username }}"
+  # remote_user: "ubuntu"
+
+  tasks:
+    - name: Run algorithm chart on data
+      # command: "tar -xzvf /home/ubuntu/{{ chart_filename }}"
+      command: "helm install /home/ubuntu/{{ chart_filename }} --generate-name"
+
+    - name: Copy results back to the parent data site
+      become: yes
+      ## Currently Ansible doesn't directly support directory/recursive copying from remote to local
+      fetch:
+        src: "/home/kaapana/minio/output/test.json"
+        # src: "/home/ubuntu/test/test.json"
+        dest: "/home/kaapana/minio/output/"
+        # dest: "/home/ubuntu/test/"
+        flat: yes

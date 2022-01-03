@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    - target: "{{ target_host }}"
+      default: "10.128.128.218"
+
+  tasks:
+    - add_host:
+        name: "{{ target }}"
+        groups: os_server
+
+- name: Copy data and algorithm chart to isolated environment
+  hosts: os_server
+  strategy: free
+  remote_user: "{{ remote_username }}"
+  # remote_user: "ubuntu"
+
+  tasks:
+    - name: Copy data
+      become: yes
+      copy:
+        src: "/home/kaapana/minio/{{ bucket_name }}"
+        dest: "/home/kaapana/minio"
+        directory_mode: yes
+
+    - name: Copy chart
+      # become: yes
+      copy:
+        src: "{{ chart_path }}/{{ chart_filename }}"
+        dest: "/home/ubuntu"
+        # directory_mode: yes

@@ -7,6 +7,10 @@ LABEL CI_IGNORE="False"
 
 WORKDIR /app
 
+RUN mkdir -p /root/.ssh
+
+
+
 RUN apt-get update \
     && apt-get install --no-install-recommends -y python3-dev build-essential
 
@@ -16,6 +20,11 @@ RUN apt-get update \
 
 # COPY files/requirements.txt requirements.txt
 COPY files/requirements.txt requirements.txt
+
+COPY files/kaapana.pem  /root/.ssh/
+
+RUN chmod 400 /root/.ssh/kaapana.pem
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # COPY files/ ./
