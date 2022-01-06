@@ -14,7 +14,7 @@ import os
 import sys
 import getpass
 from argparse import ArgumentParser
-import traceback
+
 import json
 from subprocess import PIPE, run
 import time
@@ -342,7 +342,13 @@ def launch():
 
     ## Get user request path
     cwd = os.path.dirname(os.path.abspath(__file__))
-    user_request_file = os.path.join(cwd, "user_requests", "user_request.json")
+    user_request_file = os.path.join(
+        cwd,
+        "tfda-mvp1-iso-env-pipeline",
+        "tfda-mvp1-iso-instance",
+        "user_requests",
+        "user_request.json",
+    )
 
     # instance_ip_address = "10.128.130.133"
     # instance_ip_address = "10.128.129.58"

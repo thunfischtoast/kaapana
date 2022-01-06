@@ -15,10 +15,16 @@ spec:
       labels:
         app-name: backend
     spec:
+      hostNetwork: true
       containers:
       - name: backend
         image: {{  .Values.global.registry_url }}/kaapana-backend:0.0.1
         imagePullPolicy: {{ .Values.global.pull_policy_pods }}
+        env:
+          - name: http_proxy
+            value: 'http://www-int2.dkfz-heidelberg.de:80'
+          - name: https_proxy
+            value: 'http://www-int2.dkfz-heidelberg.de:80'
         resources:
           limits:
             cpu: 500m

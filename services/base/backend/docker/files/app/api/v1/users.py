@@ -15,10 +15,12 @@ class KaapanaUser:
     idx: str
     name: str
 
+
 @dataclass
 class KaapanaGroup:
     idx: str
     name: str
+
 
 @dataclass
 class KaapanaRole:
@@ -28,7 +30,15 @@ class KaapanaRole:
 
 
 class KaapanaUserService:
-    def __init__(self, server_url: str,  username: str, password: str, realm_name : str = "kaapana", user_realm_name : str = "kaapana", verify: bool = False):
+    def __init__(
+        self,
+        server_url: str,
+        username: str,
+        password: str,
+        realm_name: str = "kaapana",
+        user_realm_name: str = "kaapana",
+        verify: bool = False,
+    ):
         self.server_url = server_url
         self.username = username
         self.password = password
@@ -39,7 +49,7 @@ class KaapanaUserService:
 
     def _login(self):
         # Option 1 - Use Admin from Master (insecure)
-        #keycloak_admin = KeycloakAdmin(server_url="https://localhost/auth/", #server_url="https://localhost/auth/",
+        # keycloak_admin = KeycloakAdmin(server_url="https://localhost/auth/", #server_url="https://localhost/auth/",
         #                               username='admin',
         #                               password='Kaapana2020',
         #                               realm_name="kaapana",
@@ -48,18 +58,22 @@ class KaapanaUserService:
         #
 
         # Option 2 - Create a User in Kaapana for this
-        # 
+        #
         # HowTo (Source: https://stackoverflow.com/questions/56743109/keycloak-create-admin-user-in-a-realm)
         # 1. Create a user and set a password
         # 2. Under Roles>Client Roles select `realm-managment` and add all roles `query-*` and `view-*`
-        self.keycloak_admin = KeycloakAdmin(server_url=self.server_url,
-                                       username=self.username,
-                                       password=self.password,
-                                       realm_name=self.realm_name,
-                                       user_realm_name=self.user_realm_name,
-                                       verify=self.verify)
+        self.keycloak_admin = KeycloakAdmin(
+            server_url=self.server_url,
+            username=self.username,
+            password=self.password,
+            realm_name=self.realm_name,
+            user_realm_name=self.user_realm_name,
+            verify=self.verify,
+        )
 
-    def get_users(self, username: str = None, group_id: str = None) -> List[KaapanaUser]:
+    def get_users(
+        self, username: str = None, group_id: str = None
+    ) -> List[KaapanaUser]:
         self._login()
         if username:
             lower_user_name = username.lower()
@@ -68,12 +82,12 @@ class KaapanaUserService:
             result = self.keycloak_admin.get_group_members(group_id)
         else:
             result = self.keycloak_admin.get_users({})
-        return [KaapanaUser(name=r['username'], idx=r['id']) for r in result]
+        return [KaapanaUser(name=r["username"], idx=r["id"]) for r in result]
 
     def get_user(self, idx: str) -> KaapanaUser:
         self._login()
         r = self.keycloak_admin.get_user(idx)
-        return KaapanaUser(name=r['username'], idx=r['id'])
+        return KaapanaUser(name=r["username"], idx=r["id"])
 
     def get_groups(self, user_id: str = None) -> List[KaapanaGroup]:
         self._login()
@@ -82,7 +96,7 @@ class KaapanaUserService:
         else:
             result = self.keycloak_admin.get_groups()
 
-        return [KaapanaGroup(name=r['name'], idx=r['id']) for r in result]
+        return [KaapanaGroup(name=r["name"], idx=r["id"]) for r in result]
 
     def get_group(self, idx: str = None) -> KaapanaGroup:
         self._login()
@@ -91,7 +105,7 @@ class KaapanaUserService:
         except KeycloakGetError:
             # Group not found
             return None
-        return KaapanaGroup(name=r['name'], idx=r['id'])
+        return KaapanaGroup(name=r["name"], idx=r["id"])
 
     def _refresh_token_if_necessary(self):
         pass
@@ -103,17 +117,26 @@ class KaapanaUserService:
         else:
             result = self.keycloak_admin.get_realm_roles()
         print(result)
-        return [KaapanaRole(idx=r['id'], name=r['name'], description=r.get('description', "")) for r in result]
+        return [
+            KaapanaRole(
+                idx=r["id"], name=r["name"], description=r.get("description", "")
+            )
+            for r in result
+        ]
 
 
 # user_service = KaapanaUserService(server_url="https://10.128.128.212/auth/", username="backend", password="asdf")
-#user_service = KaapanaUserService(server_url="https://keycloak-internal-service.kube-system.svc/auth/", username="backend", password="asdf")
-user_service = KaapanaUserService(server_url="https://keycloak-internal-service.kube-system.svc/auth/", username="admin", password="Kaapana2020")
+# user_service = KaapanaUserService(server_url="https://keycloak-internal-service.kube-system.svc/auth/", username="backend", password="asdf")
+user_service = KaapanaUserService(
+    server_url="https://keycloak-internal-service.kube-system.svc/auth/",
+    username="admin",
+    password="Kaapana2020",
+)
 
 
-@api_v1.route('/users')
+@api_v1.route("/users")
 def get_users():
-    """ Returns either all users or a subset matching the parameteres
+    """Returns either all users or a subset matching the parameteres
     ---
     tags:
       - auth
@@ -146,11 +169,14 @@ def get_users():
         examples:
           rgb: ['red', 'green', 'blue']
     """
-    users = user_service.get_users(username=request.args.get("username", default=None),
-                                   group_id=request.args.get("groupid", default=None))
+    users = user_service.get_users(
+        username=request.args.get("username", default=None),
+        group_id=request.args.get("groupid", default=None),
+    )
     return jsonify(users)
 
-@api_v1.route('/users/<idx>')
+
+@api_v1.route("/users/<idx>")
 def get_user(idx: str):
     """Returns a specific user of the kaapana platform
     ---
@@ -174,7 +200,8 @@ def get_user(idx: str):
         abort(404)
     return jsonify(user)
 
-@api_v1.route('/users/<idx>/roles')
+
+@api_v1.route("/users/<idx>/roles")
 def get_user_roles(idx: str):
     """Returns the realm roles belonging to a given user
     ---
@@ -206,7 +233,8 @@ def get_user_roles(idx: str):
     roles = user_service.get_roles(user_id=idx)
     return jsonify(roles)
 
-@api_v1.route('/users/<idx>/groups')
+
+@api_v1.route("/users/<idx>/groups")
 def get_user_groups(idx: str):
     """Returns the groups a user belongs to
     ---
@@ -226,9 +254,10 @@ def get_user_groups(idx: str):
     groups = user_service.get_groups(user_id=idx)
     return jsonify(groups)
 
-@api_v1.route('/roles')
+
+@api_v1.route("/roles")
 def get_roles():
-    """ Returns a list of all realm roles available
+    """Returns a list of all realm roles available
     ---
     tags:
      - auth
@@ -241,9 +270,10 @@ def get_roles():
     roles = user_service.get_roles()
     return jsonify(roles)
 
-@api_v1.route('/groups')
+
+@api_v1.route("/groups")
 def get_groups():
-    """ Returns all existing groups
+    """Returns all existing groups
     ---
     tags:
      - auth
@@ -268,9 +298,10 @@ def get_groups():
     groups = user_service.get_groups()
     return jsonify(groups)
 
-@api_v1.route('/groups/<idx>')
+
+@api_v1.route("/groups/<idx>")
 def get_group_by_id(idx: str):
-    """ Returns a given group
+    """Returns a given group
     ---
     tags:
      - auth
@@ -293,9 +324,9 @@ def get_group_by_id(idx: str):
     return jsonify(group)
 
 
-@api_v1.route('/groups/<idx>/users')
+@api_v1.route("/groups/<idx>/users")
 def get_group_users(idx: str):
-    """ Returns the users belonging to a given group
+    """Returns the users belonging to a given group
     ---
     tags:
      - auth

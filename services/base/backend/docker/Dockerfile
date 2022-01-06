@@ -1,5 +1,11 @@
 # FROM python:3.9-alpine3.12
 FROM python:3.9
+#ENV HTTP_PROXY http://www-int2.dkfz-heidelberg.de:80
+#ENV HTTPS_PROXY http://www-int2.dkfz-heidelberg.de:80
+#ENV http_proxy http://www-int2.dkfz-heidelberg.de:80
+#ENV https_proxy http://www-int2.dkfz-heidelberg.de:80
+ENV http_proxy http://www-int2.dkfz-heidelberg.de:80
+ENV https_proxy http://www-int2.dkfz-heidelberg.de:80
 
 LABEL IMAGE="kaapana-backend"
 LABEL VERSION="0.0.1"
@@ -8,8 +14,6 @@ LABEL CI_IGNORE="False"
 WORKDIR /app
 
 RUN mkdir -p /root/.ssh
-
-
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y python3-dev build-essential

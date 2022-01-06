@@ -9,8 +9,11 @@ spec:
   ports:
     - protocol: TCP
       port: 5000
+      targetPort: 5000
+      nodePort: 5000
       name: backend-http
-  type: ClusterIP
+  #type: ClusterIP
+  type: NodePort
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
