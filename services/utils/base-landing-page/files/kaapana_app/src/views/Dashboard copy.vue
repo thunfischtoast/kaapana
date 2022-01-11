@@ -43,9 +43,6 @@
 
  
   {{ finaMinioBuckets}}
-  
-
-
 
            <div class="text-center pt-2">
             <v-btn color="primary" dark @click.stop="dialog = true">
@@ -113,13 +110,11 @@ export default Vue.extend({
     installedWorkflow: [] as any,
     availableCharts: [] as any,
     finaMinioBuckets: [] as any,
- 
 
     checkbox: false,
-  
+
     search: "",
     dialog: false,
-   
 
     headers: [
       {
@@ -129,34 +124,35 @@ export default Vue.extend({
         value: "cohort",
       },
       { text: "Participating Host", value: "host" },
-    
     ],
     sampleData: [
-          {
-            cohort: 'cohort1',
-            host: "10.128.129.221",
-          },
-          {
-            cohort: 'cohort2',
-            host: "10.128.129.221",
-          },
-          {
-            cohort: 'cohort5',
-            host: "10.128.128.153",
-          },],
+      {
+        cohort: "cohort1",
+        host: "10.128.129.221",
+      },
+      {
+        cohort: "cohort2",
+        host: "10.128.129.221",
+      },
+      {
+        cohort: "cohort5",
+        host: "10.128.128.153",
+      },
+    ],
     sampleCharts: [
-          {
-            chart_name: 'testchart1',
-            hosturl: "www.testchart.com",
-          },
-          {
-            chart_name: 'testchart2',
-            hosturl: "www.testchart.com",
-          },
-          {
-            chart_name: 'testchart3',
-            hosturl: "www.testchart.com",
-          },],
+      {
+        chart_name: "testchart1",
+        hosturl: "www.testchart.com",
+      },
+      {
+        chart_name: "testchart2",
+        hosturl: "www.testchart.com",
+      },
+      {
+        chart_name: "testchart3",
+        hosturl: "www.testchart.com",
+      },
+    ],
     chartheaders: [
       {
         text: "Chart Name",
@@ -165,11 +161,8 @@ export default Vue.extend({
         value: "chart_name",
       },
       { text: "ChartLocation", value: "hosturl" },
-     
-     
-      
     ],
-   
+
     headersWorkfLow: [
       {
         text: "Work Flow",
@@ -184,20 +177,10 @@ export default Vue.extend({
       {
         name: "Segmentation DataSet For Cohort PZ34TK",
         dataprovider: "RadplanBio",
-        
-      }, 
+      },
     ],
-    //chartlist: [
-      //{
-       // chart: "Sample Chart",
-       // url: "www.sampleurl.com",
-        
-    //  }, 
-  //  ],
-
   }),
   mounted() {
-    this.installedWorkFlowDags();
     this.getMinioBuckets();
     this.availableChartsFromRegistry();
   },
@@ -213,166 +196,68 @@ export default Vue.extend({
     },
 
     getMinioBuckets() {
-     
       //const getMinioBucketsAPI = "/backend/api/v1/minio/buckets";
       const getMinioBucketsAPI = "/backend/api/v1/minio/bucketsandhosts/";
-
-
-  const testvalueee = "GGGGGGGG"
-  const testvalueeessssss = {"firstName":"John","lastName":"Smith"}
-      
-      
-      
-      //const requestURL = "/backend/api/v1/minio/tfda-get-request/"+ testvalueee;
-      //const requestURL = "/backend/api/v1/minio/tfda-get-request/";
-      const requestURL = "/backend/api/v1/minio/jsontest/hello";
-    
-      const headers = {"Accept": "application/json"};
-
-      console.log("%%%%%%%%%%%%%%%%%%%%%%%%% Api test post §§§§§§§§§§§§§§§§: ")
-      axios.post(requestURL,testvalueeessssss,{headers} )
-     .then((response: any) => {
-console.log("%%%%%%%  Flask Response: ", response.data)
-        })
-   .catch((err: any) => {
-          
-          console.log(err);
-        });
-
-
 
       request
         .get(getMinioBucketsAPI)
         .then((response: any) => {
-          
           const bucketsList = JSON.stringify(response.data);
-          console.log(response.data);
-          console.log('____ hahahaah_____________');
-           console.log(response);
-          console.log('_________________from tfda backendssss !!!!!!!!!!______________');
-          console.log('_________________$$$$$$$$$$$$$$______________');
-          
-          //JSON.parse(bucketsList, (key, value) => {
-            // console.log(key);
-            //if (key.includes("a")) {
-          //console.log(value);
 
-              this.finaMinioBuckets = response.data;
-              //this.finaMinioBuckets = JSON.stringify(response.data);
-             
-            //}
-         // });
-
-          
+          this.finaMinioBuckets = response.data;
         })
         .catch((err: any) => {
-          
           console.log(err);
         });
     },
     availableChartsFromRegistry() {
-     
-      
       const getChartsAPI = "/backend/api/v1/minio/charts/getcharts/";
-      
 
       request
         .get(getChartsAPI)
         .then((response: any) => {
-          
           const chartsList = JSON.stringify(response.data);
-          console.log(response.data);
-          console.log('____ charts_____________');
-           console.log(response);
-          console.log('_________________from tfda charts !!!!!!!!!!______________');
-          console.log('_________________charts______________');
 
           this.availableCharts = response.data;
-             
-
-          
         })
         .catch((err: any) => {
-          
           console.log(err);
         });
     },
 
-    installedWorkFlowDags() {
-      const installedWorkFlowDagsResult = "/flow/kaapana/api/getdags";
-
-      request
-        .get(installedWorkFlowDagsResult)
-        .then((response: any) => {
-          
-          const myObjStr = JSON.stringify(response.data);
-          JSON.parse(myObjStr, (key, value) => {
-            // console.log(key);
-            if (key.includes("a")) {
-              
-
-              this.installedWorkflow = key;
-            }
-          });
-
-          
-        })
-        .catch((err: any) => {
-          
-          console.log(err);
-        });
-    },
-
-    
-
-    onResize() {
-      
-    },
+    onResize() {},
     predict() {
       // testing purpose
-      const userSelectedDataAndAlgorithm = 
-      {
-      "minio":{
-              "bucket_name":"data",
-              "host":[
-                    "10.128.129.221",
-                    "10.128.128.153"
-                      ]
-               },
-      "charts":{
-              "chart_name":"dcm-extract-study-id-chart",
-              "chart_version": "0.1.0",
-              "registry_url":"registry.hzdr.de/santhosh.parampottupadam/tfdachartsregistry"
+      const userSelectedDataAndAlgorithm = {
+        minio: {
+          bucket_name: "data",
+          host: ["10.128.129.221", "10.128.128.153"],
+        },
+        charts: {
+          chart_name: "dcm-extract-study-id-chart",
+          chart_version: "0.1.0",
+          registry_url:
+            "registry.hzdr.de/santhosh.parampottupadam/tfdachartsregistry",
+        },
+      };
 
-                }
-    }
-      
-      //const article = {
-        //"get-tfda-data": {
-          //bucket_name: "tfda-test",
-          //action_operator_dirs: ["example"],
-        //},
-        //"tfda-calculations": { tfda_epochs: 3 },
-        //"put-tfda-data": { bucket_name: "tfda-heidelberg" },
-      //};
-      const airflow_url = "/flow/kaapana/api/trigger/tfda-diabetes-prediction";
-      request
-        .post(airflow_url, userSelectedDataAndAlgorithm)
-        .then((response) => {
-          console.log("Api response: ", response.data);
-          //this.snackbar = true;
-          //this.snacktext = snacktext;
-          //this.snackbar = {
-         // message: "Workflow Submitted Successfully !",
-          //color: "green",
-          //show: true,
-          //};
-         alert('Workflow submitted Successfully, output will be available in Minio. Track Progress via Airflow.')
-          
+      //const requestURL = "/backend/api/v1/minio/tfda-get-request/";
+      const requestURL = "/backend/api/v1/minio/tfda/userchoicesubmission";
+
+      const headers = { Accept: "application/json" };
+
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%% Api test post §§§§§§§§§§§§§§§§: ");
+      axios
+        .post(requestURL, userSelectedDataAndAlgorithm, { headers })
+        .then((response: any) => {
+          console.log("%%%%%%%  Flask Response: ", response.data);
+
+          alert(
+            "Workflow submitted Successfully, User Request Transmitted to source site is in progress"
+          );
         })
-        .catch((error) => {
-          //this.errorMessage = error.message;
-          console.error("There was an error!", error);
+        .catch((err: any) => {
+          console.log(err);
         });
     },
   },

@@ -51,12 +51,13 @@ os_project_name = "E230"
 os_project_id = "1396d67192c24eb7ab606cfae1151208"
 instance_name = "tfda-iso-env-test"
 
-username = "s669m"
-password = "Heidelberg2021!"
+username = "kaapana-ci"
+password = "HawaiiBeach2020"
 registry_user = "nU9A-xWex6tMzJzc5ksu"
 registry_pwd = "tfdachartsregistrymaintainer"
 registry_url = "registry.hzdr.de/santhosh.parampottupadam/tfdachartsregistry"
 delete_instance = True
+
 
 debug_mode = False
 
@@ -79,6 +80,8 @@ instance_flavor = instance_flavor
 ssh_key = ssh_key
 os_project_name = os_project_name if os_project_name is not None else os_project_name
 os_image = os_image if os_image is not None else os_image
+# local_script = True
+local_script = False
 
 
 def handle_logs(logs):
@@ -110,7 +113,7 @@ def install_server_dependencies(target_hosts):
     return_value, logs = ci_playbooks.start_install_server_dependencies(
         target_hosts=target_hosts,
         remote_username=os_image,
-        local_script=True,
+        local_script=local_script,
         suite_name="Get new instance",
     )
     handle_logs(logs)
@@ -124,7 +127,7 @@ def deploy_platform(target_hosts):
         registry_user=registry_user,
         registry_pwd=registry_pwd,
         registry_url=registry_url,
-        local_script=True,
+        local_script=local_script,
         platform_name="Kaapana platform",
     )
     handle_logs(logs)
@@ -351,7 +354,7 @@ def launch():
     )
 
     # instance_ip_address = "10.128.130.133"
-    # instance_ip_address = "10.128.129.58"
+    # instance_ip_address = "10.128.130.196"
     instance_ip_address = start_os_instance()
     result = (
         install_server_dependencies(target_hosts=[instance_ip_address])
