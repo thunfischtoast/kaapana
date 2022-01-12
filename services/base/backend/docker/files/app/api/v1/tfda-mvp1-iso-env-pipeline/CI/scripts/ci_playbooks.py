@@ -56,8 +56,11 @@ def start_install_server_dependencies(
     target_hosts, remote_username, local_script=False, suite_name="Setup Test Server"
 ):
 
-    playbook_path = os.path.join(
+    """playbook_path = os.path.join(
         kaapana_home, "CI/ansible_playbooks/01_install_server_dependencies.yaml"
+    )"""
+    playbook_path = os.path.join(
+        kaapana_home, "CI/ansible_playbooks/01_change_hostname.yaml"
     )
     if not os.path.isfile(playbook_path):
         print("playbook yaml not found.")

@@ -35,6 +35,15 @@ const routes = [
             isPublic: false,
         },
     },
+    {
+        name: 'status',
+        path: '/status',
+        component: () => import('@/views/Status.vue'),
+        title: 'TFDA Status',
+        permissions: {
+            isPublic: false,
+        },
+    },
 
     {
         name: 'data-upload',

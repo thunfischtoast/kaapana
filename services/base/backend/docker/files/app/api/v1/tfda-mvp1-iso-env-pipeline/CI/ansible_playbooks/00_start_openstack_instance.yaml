@@ -92,7 +92,10 @@
           project_name: "{{ project_name }}"
         network: "{{ network_id | default('') }}"
         name: "{{ instance_name }}"
-        image: "{{ instance_image }}"
+        #image: "{{ instance_image }}"
+        image: fec2b483-8959-4f9f-a355-86fa0d5c9d45
+        #id: "eac31ce9-b623-4525-ab11-6fe25f28f3ea"
+        #volumes: e2dbb47f-b65b-4328-874c-322838d8aef5
         volume_size: "{{ volume_size }}"
         flavor: "{{ instance_flavor }}"
         key_name: "{{ ssh_key }}"

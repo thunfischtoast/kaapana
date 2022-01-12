@@ -17,7 +17,7 @@
 
   tasks:
 
-    - name: Set server installation script path
+    - name: Set platform installation script path
       set_fact: 
         script_path: "{{ lookup('env','HOME') }}/kaapana/platforms/kaapana-platform/platform-installation"
     
@@ -43,7 +43,7 @@
 
       - name: Download install_platform.sh file
         get_url: 
-          url: https://raw.githubusercontent.com/kaapana/kaapana/develop/platforms/kaapana-platform/platform-installation/install_platform.sh
+          url: https://raw.githubusercontent.com/kaapana/kaapana/feature/tfdamvp1/platforms/kaapana-platform/platform-installation/install_platform.sh
           dest: "{{ script_path }}/install_platform.sh"
         delegate_to: 127.0.0.1
       

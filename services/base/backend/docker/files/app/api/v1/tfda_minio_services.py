@@ -23,12 +23,11 @@ os.environ["HELM_EXPERIMENTAL_OCI"] = "1"
 
 kaapana_int_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 kaapana_int_dir = os.path.join(kaapana_int_dir, "v1", "tfda-mvp1-iso-env-pipeline")
-# print("////////////////////////////////////////////////////////////", kaapana_int_dir)
+
 scripts_dir = os.path.join(kaapana_int_dir, "CI", "scripts")
-# print("////////////////////////////////////////////////////////////", scripts_dir)
+
 playbook_dir = os.path.join(kaapana_int_dir, "CI", "ansible_playbooks")
-# print("////////////////////////////////////////////////////////////")
-# print(sys.path)
+
 sys.path.insert(1, scripts_dir)
 import ci_playbooks
 
@@ -38,17 +37,26 @@ import ci_playbooks
 volume_size = "100"
 instance_flavor = "dkfz-8.16"
 ssh_key = "kaapana"
-os_project_name = "E230-DKTK-JIP"
-os_project_id = "969831bf53424f1fb318a9c1d98e1941"
+os_project_name = "E230-Production"
+os_project_id = "8c5c6d678a4e4a01b9d8794262e6b85d"
 instance_name = "tfda-iso-env-test" """
 
 # E230
-os_image = "ubuntu"
+"""os_image = "ubuntu"
 volume_size = "100"
 instance_flavor = "dkfz-8.16"
 ssh_key = "kaapana"
 os_project_name = "E230"
 os_project_id = "1396d67192c24eb7ab606cfae1151208"
+instance_name = "tfda-iso-env-test" """
+
+# E230 Production
+os_image = "ubuntu"
+volume_size = "100"
+instance_flavor = "dkfz-8.16"
+ssh_key = "kaapana"
+os_project_name = "E230-Production"
+os_project_id = "8c5c6d678a4e4a01b9d8794262e6b85d"
 instance_name = "tfda-iso-env-test"
 
 username = "kaapana-ci"
@@ -57,7 +65,7 @@ registry_user = "nU9A-xWex6tMzJzc5ksu"
 registry_pwd = "tfdachartsregistrymaintainer"
 registry_url = "registry.hzdr.de/santhosh.parampottupadam/tfdachartsregistry"
 delete_instance = True
-
+update_status = None
 
 debug_mode = False
 
@@ -110,6 +118,9 @@ def start_os_instance():
 
 
 def install_server_dependencies(target_hosts):
+    global update_status
+    update_status = "Installing Server Dependancy Requested In progress...!!!!!!!!"
+    status_update()
     return_value, logs = ci_playbooks.start_install_server_dependencies(
         target_hosts=target_hosts,
         remote_username=os_image,
@@ -355,7 +366,13 @@ def launch():
 
     # instance_ip_address = "10.128.130.133"
     # instance_ip_address = "10.128.130.196"
+    global update_status
+    update_status = "Instance creation request Instantiated.....!!!!!!!!"
+    status_update()
     instance_ip_address = start_os_instance()
+    # global update_status
+    update_status = "Instance created....!!!!!!!!"
+    status_update()
     result = (
         install_server_dependencies(target_hosts=[instance_ip_address])
         if instance_ip_address != "FAILED"
@@ -463,6 +480,12 @@ def query_example(reqData):
     return """<h1>The test value for from post response is : {}</h1>""".format(reqData)
 
 
+@api_v1.route("/minio/tfda-post-status/", methods=["GET", "POST"])
+def status_update():
+    print("$$$$$$$$$$$$$$$$$$$$$$$", update_status)
+    return """<h1> Status is : {}</h1>""".format(update_status)
+
+
 @api_v1.route("/minio/tfda/userchoicesubmission", methods=["GET", "POST"])
 def user_choice_submission():
 
@@ -471,6 +494,9 @@ def user_choice_submission():
         "!!!!!!!!!!!!!!!!!!!!!!! user choice submission API Triggered from frond end !!!!!!!!!!!!!!!!!!!!!"
     )
     print(data)
+    global update_status
+    update_status = "Request Submitted.....!!!!!!!!"
+    status_update()
     launch()
     return data
 
