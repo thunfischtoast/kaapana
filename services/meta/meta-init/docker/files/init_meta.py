@@ -229,7 +229,7 @@ if __name__ == "__main__":
     override_objects = os.getenv('OVERRIDE_OBJECTS', 'false')
     domain = os.getenv('DOMAIN', None)
     https_port = os.getenv('HTTPS_PORT', "443")
-    elastic_host = os.getenv('ELASTICHOST', 'elastic-meta-service.default.svc')
+    elastic_host = os.getenv('ELASTICHOST', 'opensearch-service.default.svc')
     elastic_indexname = os.getenv('ELASTICINDEX', 'meta-index')
     kibana_host = os.getenv('KIBANAHOST', 'kibana-service.meta.svc')
     kibana_dashboard_file = os.getenv('KIBANADASHBOARD', '/dashboards/kibana-dashboard.json')

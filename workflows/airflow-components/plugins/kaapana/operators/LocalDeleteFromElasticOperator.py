@@ -68,7 +68,7 @@ class LocalDeleteFromElasticOperator(KaapanaPythonBaseOperator):
     def __init__(self,
                  dag,
                  delete_operator=None,
-                 elastic_host='elastic-meta-service.meta.svc',
+                 elastic_host='opensearch.meta.svc',
                  elastic_port=9200,
                  elastic_index="meta-index",
                  delete_all_documents=False,

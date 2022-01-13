@@ -16,7 +16,7 @@ spec:
         imagePullPolicy:  {{ .Values.global.pull_policy_jobs }}
         env:
           - name: WAIT
-            value: "kibana,kibana-meta-service.meta.svc,5601;elastic,elastic-meta-service.meta.svc,9200"
+            value: "kibana,kibana-meta-service.meta.svc,5601;elastic,opensearch-service.meta.svc,9200"
           - name: DELAY
             value: "1"
           - name: TIMEOUT
@@ -39,7 +39,7 @@ spec:
           - name: INITELASTIC
             value: "True"
           - name: ELASTICHOST
-            value: "elastic-meta-service.meta.svc"
+            value: "opensearch-service.meta.svc"
           - name: ELASTICPORT
             value: "9200"
           - name: ELASTICINDEX

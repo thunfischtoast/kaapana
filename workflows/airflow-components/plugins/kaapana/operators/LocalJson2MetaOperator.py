@@ -193,7 +193,7 @@ class LocalJson2MetaOperator(KaapanaPythonBaseOperator):
                  no_update=False,
                  avalability_check_delay = 10,
                  avalability_check_max_tries = 15,
-                 elastic_host='elastic-meta-service.meta.svc',
+                 elastic_host='opensearch-service.meta.svc',
                  elastic_port=9200,
                  elastic_index="meta-index",
                  check_in_pacs=True,

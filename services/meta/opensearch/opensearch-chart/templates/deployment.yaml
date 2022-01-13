@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch-de
+  namespace: {{ .Values.global.meta_namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app-name: opensearch
+  template:
+    metadata:
+      labels:
+        app-name: opensearch
+    spec:
+      # initContainers:
+      #     - name: volume-permissions
+      #       image: {{  .Values.global.registry_url }}/busybox:1.31
+
+      #       imagePullPolicy:  {{ .Values.global.pull_policy_pods }}
+      #       command: ["sh", "-c", "chown -R 1000:1000 /elastic_data"]
+      #       volumeMounts:
+      #       - mountPath: /elastic_data
+      #         name: elasticdata
+      containers:
+        - name: opensearch-container
+          image: {{  .Values.global.registry_url }}/opensearch:1.2.3
+          imagePullPolicy:  {{ .Values.global.pull_policy_pods }}
+          env:
+          - name: ES_JAVA_OPTS
+            value: "-Xms{{ .Values.global.elastic_memory }}m -Xmx{{ .Values.global.elastic_memory }}m -Dlog4j2.formatMsgNoLookups=true"
+          ports:
+            - containerPort: 9200
+          resources:
+            requests:
+              memory: 1500Mi
+            limits:
+              memory: 2000Mi
+          volumeMounts:
+            - mountPath: /usr/share/opensearch/data
+              name: osdata
+          livenessProbe:
+            tcpSocket:
+              port: 9200
+            initialDelaySeconds: 15
+            periodSeconds: 120
+      volumes:
+      - name: osdata
+        hostPath:
+          path: {{ .Values.global.fast_data_dir }}/opensearch
+          type: DirectoryOrCreate
+      imagePullSecrets:
+      - name: registry-secret
+---

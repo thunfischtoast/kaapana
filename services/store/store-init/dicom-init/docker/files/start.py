@@ -15,7 +15,7 @@ dcm_host = "ctp-dicom-service.flow.svc"
 dcm_port = "11112"
 dcm4chee_host = os.getenv("DCM4CHEE", "http://dcm4chee-service.store.svc:8080")
 aet = os.getenv("AET", "KAAPANA")
-_elastichost = os.getenv("ELASTIC_HOST", "elastic-meta-service.meta.svc:9200")
+_elastichost = os.getenv("ELASTIC_HOST", "opensearch-service.meta.svc:9200")
 airflow_host = os.getenv("AIRFLOW_TRIGGER", "http://airflow-service.flow.svc:8080/flow/kaapana/api/trigger")
 example_files = os.getenv("EXAMPLE", "/example/Winfried_phantom.zip")
 

@@ -6,7 +6,7 @@ class HelperElasticsearch():
     SOPInstanceUID_tag = "00080018 SOPInstanceUID_keyword"
     modality_tag = "00080060 Modality_keyword"
 
-    _elastichost = "elastic-meta-service.meta.svc:9200"
+    _elastichost = "opensearch-service.meta.svc:9200"
     es = Elasticsearch(hosts=_elastichost)
 
     @staticmethod
