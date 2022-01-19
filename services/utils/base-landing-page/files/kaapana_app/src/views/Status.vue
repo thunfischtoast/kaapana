@@ -57,11 +57,10 @@ export default Vue.extend({
     },
 
     getMinioBuckets() {
-      //const getMinioBucketsAPI = "/backend/api/v1/minio/bucketsandhosts/";
-      const getMinioBucketsAPI = "/backend/api/v1/minio/tfda-post-status/";
+      const getStatus = "/backend/api/v1/minio/tfda-post-status/";
 
       request
-        .get(getMinioBucketsAPI)
+        .get(getStatus)
         .then((response: any) => {
           const bucketsList = JSON.stringify(response.data);
           console.log(response.data);

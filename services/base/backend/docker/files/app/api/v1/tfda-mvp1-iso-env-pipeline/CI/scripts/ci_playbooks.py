@@ -56,9 +56,9 @@ def start_install_server_dependencies(
     target_hosts, remote_username, local_script=False, suite_name="Setup Test Server"
 ):
 
-    """playbook_path = os.path.join(
-        kaapana_home, "CI/ansible_playbooks/01_install_server_dependencies.yaml"
-    )"""
+    # """playbook_path = os.path.join(
+    # kaapana_home, "CI/ansible_playbooks/01_install_server_dependencies.yaml"
+    # )"""
     playbook_path = os.path.join(
         kaapana_home, "CI/ansible_playbooks/01_change_hostname.yaml"
     )
@@ -71,7 +71,7 @@ def start_install_server_dependencies(
     return_value, logs = ci_playbook_execute.execute(
         playbook_path,
         testsuite=suite_name,
-        testname="Install Server Dependencies",
+        testname="Change hostname",
         hosts=target_hosts,
         extra_vars=extra_vars,
     )
@@ -113,7 +113,14 @@ def deploy_platform(
     return return_value, logs
 
 
-def copy_data_algo(target_hosts, bucket_name, chart_path, chart_filename):
+def copy_data_algo(
+    target_hosts,
+    remote_username,
+    bucket_name,
+    chart_path,
+    chart_filename,
+    suite_name="Copy Data Algorithm to Iso env",
+):
     playbook_path = os.path.join(
         kaapana_home, "CI/ansible_playbooks/copy_data_algo_to_iso_env.yaml"
     )
@@ -141,7 +148,12 @@ def copy_data_algo(target_hosts, bucket_name, chart_path, chart_filename):
     return return_value, logs
 
 
-def run_algo_and_send_result(target_hosts, chart_filename):
+def run_algo_and_send_result(
+    target_hosts,
+    remote_username,
+    chart_filename,
+    suite_name="Run Algo and Send results",
+):
     playbook_path = os.path.join(
         kaapana_home, "CI/ansible_playbooks/run_algo_send_result.yaml"
     )

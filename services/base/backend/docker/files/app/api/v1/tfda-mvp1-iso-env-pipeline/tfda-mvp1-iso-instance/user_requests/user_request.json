@@ -9,7 +9,7 @@
    "charts":{
       "chart_name":"dcm-extract-study-id-chart",
       "chart_version": "0.1.0",
-      "registry_url":"registry.hzdr.de/santhosh.parampottupadam/tfdachartsregistry"
+      "registry_url":"registry.hzdr.de/santhosh.parampottupadam/tfdamvp1"
 
    }
 }

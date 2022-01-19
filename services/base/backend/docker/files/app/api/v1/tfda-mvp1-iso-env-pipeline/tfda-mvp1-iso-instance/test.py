@@ -1,33 +1,20 @@
-from typing import MappingView
-from flask import jsonify, abort, request
-
-from . import api_v1
-
-from minio import Minio
-import os
-import requests
-import json
-from datetime import datetime
-import socket
-
 import os
 import sys
 import getpass
 from argparse import ArgumentParser
-
+import traceback
 import json
 from subprocess import PIPE, run
 import time
 
+
 os.environ["HELM_EXPERIMENTAL_OCI"] = "1"
 
 kaapana_int_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-kaapana_int_dir = os.path.join(kaapana_int_dir, "v1", "tfda-mvp1-iso-env-pipeline")
 
 scripts_dir = os.path.join(kaapana_int_dir, "CI", "scripts")
 
 playbook_dir = os.path.join(kaapana_int_dir, "CI", "ansible_playbooks")
-
 sys.path.insert(1, scripts_dir)
 import ci_playbooks
 
@@ -103,6 +90,11 @@ def handle_logs(logs):
             exit(1)
         elif debug_mode:
             print(json.dumps(log, indent=4, sort_keys=True))
+
+
+def status_update():
+    print("$$$$$$$$$$$$$$$$$$$$$$$", update_status)
+    return """<h1> Status is : {}</h1>""".format(update_status)
 
 
 def start_os_instance():
@@ -181,6 +173,8 @@ def _extract_user_request(file_path=""):
     bucket_name = user_request["minio"]["bucket_name"]
     chart_details = user_request["charts"]
     f.close()
+    # print(" !!!!!bucket name:", bucket_name)
+    # print("!!!!!!chart name:", chart_details)
     return {"bucket_name": bucket_name, "chart_details": chart_details}
 
 
@@ -188,6 +182,9 @@ def _pull_chart_and_compress(registry_user, registry_pwd, chart_details=""):
     chart_name = chart_details["chart_name"]
     chart_version = chart_details["chart_version"]
     ##TODO: the following part can also be implemented in Ansible, but is only executed in localhost
+    print("registry_user...", registry_user)
+    print("registry_pwd...", registry_pwd)
+    print("chart_details...", chart_details)
     print("Logging into the Helm registry...")
     command = [
         "helm",
@@ -214,7 +211,7 @@ def _pull_chart_and_compress(registry_user, registry_pwd, chart_details=""):
             command2, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=5
         )
         if output2.returncode != 0 and i < (loop - 1):
-            print("Failed to pull chart, will try again:", output2)
+            print("Failed to pull chart, will try again: ", output2)
             time.sleep(2)
         elif output2.returncode == 0:
             print("Chart successfully pulled!")
@@ -289,7 +286,7 @@ def delete_os_instance():
 
 
 def print_success(host):
-    print(" Waiting for pods to initialize, It may take around 8 Minutes..!!")
+    print("Calling sleep Method - waiting for pods to initialize.....!!!")
     time.sleep(480)
     print(
         """
@@ -364,21 +361,19 @@ def launch():
 
     ## Get user request path
     cwd = os.path.dirname(os.path.abspath(__file__))
+    print(" $$$ CWD ", cwd)
     user_request_file = os.path.join(
-        cwd,
-        "tfda-mvp1-iso-env-pipeline",
-        "tfda-mvp1-iso-instance",
+        "/home/ubuntu/tfda-mvp1-iso-env-pipeline/tfda-mvp1-iso-instance",
         "user_requests",
         "user_request.json",
     )
 
-    # instance_ip_address = "10.128.130.133"
-    # instance_ip_address = "10.128.130.196"
     global update_status
     update_status = "Instance creation request Instantiated.....!!!!!!!!"
     status_update()
+    # instance_ip_address = "10.128.128.232"
     instance_ip_address = start_os_instance()
-    # global update_status
+
     update_status = "Instance created....!!!!!!!!"
     status_update()
     result = (
@@ -394,118 +389,18 @@ def launch():
     result = print_success(instance_ip_address) if result != "FAILED" else "FAILED"
     result = run_algo_on_data(
         target_hosts=[instance_ip_address], user_request_file=user_request_file
-    )  # if result != "FAILED" else "FAILED"
-    result = delete_os_instance() if delete_instance else "SKIPPED"
-    # flask post status to host instances
+    )
+    print(
+        " NOT CALLING DELETE INSTANCE METHOD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    )
+    # result = delete_os_instance() if delete_instance else "SKIPPED"
 
 
-# tfdatodo: add charts values fetched from registry instead custom values
 def returnChartsDetails():
 
     return json.dumps({"chart_name": "test", "url": "www.test.com"})
 
 
-# Initializing Minio Client
-minioClient = Minio(
-    _minio_host + ":" + _minio_port,
-    access_key="kaapanaminio",
-    secret_key="Kaapana2020",
-    secure=False,
-)
-# test runs
-FEDERATED_HOSTS = ["10.128.129.221", "10.128.128.153"]
+if __name__ == "__main__":
 
-
-@api_v1.route("/minio/bucketsandhosts/")
-def tfda_collect_all_site_buckets():
-    """Return List of Minio buckets
-    To List Buckets from all participating sites
-    ---
-    tags:
-      - TFDA Services
-
-    responses:
-      200:
-        description: Return List of Minio buckets
-    """
-    all_buckets = {}
-    all_buckets["minio"] = []
-    _minio_port = "9000"
-    for i in FEDERATED_HOSTS:
-
-        _minio_host = i
-        client = Minio(
-            _minio_host + ":" + _minio_port,
-            access_key="kaapanaminio",
-            secret_key="Kaapana2020",
-            secure=False,
-        )
-        buckets = client.list_buckets()
-        for bucket in buckets:
-
-            all_buckets["minio"].append({"bucket_name": str(bucket.name), "host": i})
-            # print(bucket.name, bucket.creation_date)
-
-    print(all_buckets)
-
-    return json.dumps(all_buckets)
-
-
-@api_v1.route("/minio/charts/getcharts/")
-def tfda_get_charts():
-    """Return List of Charts
-    Return  List of Charts
-    ---
-    tags:
-      - TFDA Services
-
-    responses:
-      200:
-        description: Return List of Charts
-    """
-
-    return returnChartsDetails()
-
-
-@api_v1.route("/minio/tfda-get-request/<string:reqData>", methods=["GET", "POST"])
-def query_example(reqData):
-    """Serving Get Requests
-    ---
-    tags:
-      - TFDA Services
-    parameters:
-      - name: reqData
-        in: path
-        type: string
-        required: true
-        description: Serving get requests
-    responses:
-      200:
-        description: Serving get requests
-    """
-    # language = request.args.get(reqData)
-
-    return """<h1>The test value for from post response is : {}</h1>""".format(reqData)
-
-
-@api_v1.route("/minio/tfda-post-status/", methods=["GET", "POST"])
-def status_update():
-    print("$$$$$$$$$$$$$$$$$$$$$$$", update_status)
-    return """<h1> Status is : {}</h1>""".format(update_status)
-
-
-@api_v1.route("/minio/tfda/userchoicesubmission", methods=["GET", "POST"])
-def user_choice_submission():
-
-    data = json.loads(request.data)
-    print(
-        "!!!!!!!!!!!!!!!!!!!!!!! user choice submission API Triggered from frond end !!!!!!!!!!!!!!!!!!!!!"
-    )
-    print(data)
-    global update_status
-    update_status = "Request Submitted.....!!!!!!!!"
-    status_update()
     launch()
-    return data
-
-    # return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
