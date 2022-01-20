@@ -10,6 +10,7 @@ RUN sed -i 's#mirror://mirrors.ubuntu.com/mirrors.txt#http://archive.ubuntu.com/
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wmctrl \
     gedit \
+    libxkbcommon-x11-0 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY files/startup.sh /startup.sh
