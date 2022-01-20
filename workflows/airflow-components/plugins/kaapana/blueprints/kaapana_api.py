@@ -20,7 +20,7 @@ import time
 from kaapana.blueprints.kaapana_utils import generate_run_id
 from kaapana.blueprints.kaapana_utils import generate_minio_credentials
 from airflow.api.common.experimental.trigger_dag import trigger_dag as trigger
-from kaapana.operators.HelperElasticsearch import HelperElasticsearch
+from kaapana.operators.HelperOpensearch import HelperOpensearch
 from flask import current_app as app
 from multiprocessing.pool import ThreadPool
 
@@ -35,10 +35,10 @@ kaapanaApi = Blueprint('kaapana', __name__, url_prefix='/kaapana')
 def async_dag_trigger(queue_entry):
     hit, dag_id, tmp_conf = queue_entry
     hit = hit["_source"]
-    studyUID = hit[HelperElasticsearch.study_uid_tag]
-    seriesUID = hit[HelperElasticsearch.series_uid_tag]
-    SOPInstanceUID = hit[HelperElasticsearch.SOPInstanceUID_tag]
-    modality = hit[HelperElasticsearch.modality_tag]
+    studyUID = hit[HelperOpensearch.study_uid_tag]
+    seriesUID = hit[HelperOpensearch.series_uid_tag]
+    SOPInstanceUID = hit[HelperOpensearch.SOPInstanceUID_tag]
+    modality = hit[HelperOpensearch.modality_tag]
 
     print(f"# Triggering {dag_id} - series: {seriesUID}")
 
@@ -93,9 +93,9 @@ def trigger_dag(dag_id):
         print(f"single_execution: {single_execution}")
 
         if single_execution:
-            hits = HelperElasticsearch.get_query_cohort(elastic_query=query, elastic_index=index)
+            hits = HelperOpensearch.get_query_cohort(elastic_query=query, elastic_index=index)
             if hits is None:
-                message = ["Error in HelperElasticsearch: {}!".format(dag_id)]
+                message = ["Error in HelperOpensearch: {}!".format(dag_id)]
                 response = jsonify(message=message)
                 response.status_code = 500
                 return response

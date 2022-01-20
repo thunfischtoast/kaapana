@@ -5,7 +5,7 @@ dependencies:
     repository: file://../../../projects/kaapana-core-chart
   - name: meta-init-chart
     condition: Release.IsInstall
-    version: "6.8.12"
+    version: "1.2.3"
     repository: file://../../../services/meta/meta-init/meta-init-chart
   - name: opensearch-chart
     version: "1.2.3"

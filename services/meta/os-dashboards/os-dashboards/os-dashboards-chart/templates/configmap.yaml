@@ -158,17 +158,17 @@ data:
     #vis_type_timeline.graphiteBlockedIPs: []
 
     opensearchDashboards.branding:
-      logo:
-        defaultUrl: "http://localhost:5601/meta/ui/kaapana.svg"
-        darkModeUrl: "http://localhost:5601/meta/ui/kaapana_mono.svg"
+      # logo:
+      #   defaultUrl: "https://{{ .Values.global.hostname }}:{{ .Values.global.https_port }}/meta/ui/kaapana.svg"
+      #   darkModeUrl: "https://{{ .Values.global.hostname }}:{{ .Values.global.https_port }}/meta/ui/kaapana_mono.svg"
       # mark:
         # defaultUrl: ""
         # darkModeUrl: ""
-      loadingLogo: 
-        defaultUrl: "http://localhost:5601/meta/ui/loading.png"
-        darkModeUrl: "http://localhost:5601/meta/ui/loading.png"
+      # loadingLogo: 
+      #   defaultUrl: "https://{{ .Values.global.hostname }}:{{ .Values.global.https_port }}/meta/ui/loading.png"
+      #   darkModeUrl: "https://{{ .Values.global.hostname }}:{{ .Values.global.https_port }}/meta/ui/loading.png"
       # faviconUrl: ""
-      # applicationTitle: ""
+      applicationTitle: "META"
 
     # Set the value of this setting to true to capture region blocked warnings and errors 
     # for your map rendering services.

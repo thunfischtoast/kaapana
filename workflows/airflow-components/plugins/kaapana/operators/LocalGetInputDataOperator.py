@@ -5,7 +5,7 @@ import json
 from datetime import timedelta
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
 from kaapana.operators.HelperDcmWeb import HelperDcmWeb
-from kaapana.operators.HelperElasticsearch import HelperElasticsearch
+from kaapana.operators.HelperOpensearch import HelperOpensearch
 from multiprocessing.pool import ThreadPool
 from os.path import join, exists, dirname
 import shutil
@@ -64,7 +64,7 @@ class LocalGetInputDataOperator(KaapanaPythonBaseOperator):
                 download_successful = False
 
         elif self.data_type == "json":
-            meta_data = HelperElasticsearch.get_series_metadata(series_uid=seriesUID)
+            meta_data = HelperOpensearch.get_series_metadata(series_uid=seriesUID)
             json_path = join(target_dir, "metadata.json")
             with open(json_path, 'w') as fp:
                 json.dump(meta_data, fp, indent=4, sort_keys=True)
@@ -172,15 +172,15 @@ class LocalGetInputDataOperator(KaapanaPythonBaseOperator):
                 query = elastic_query["query"]
                 index = elastic_query["index"]
 
-                cohort = HelperElasticsearch.get_query_cohort(elastic_index=index, elastic_query=query)
+                cohort = HelperOpensearch.get_query_cohort(elastic_index=index, elastic_query=query)
 
                 for series in cohort:
                     series = series["_source"]
 
-                    study_uid = series[HelperElasticsearch.study_uid_tag]
-                    series_uid = series[HelperElasticsearch.series_uid_tag]
+                    study_uid = series[HelperOpensearch.study_uid_tag]
+                    series_uid = series[HelperOpensearch.series_uid_tag]
                     # SOPInstanceUID = series[ElasticDownloader.SOPInstanceUID_tag]
-                    modality = series[HelperElasticsearch.modality_tag]
+                    modality = series[HelperOpensearch.modality_tag]
 
                     print(f"# Found elastic result: {modality}: {series_uid}")
                     if self.check_modality:

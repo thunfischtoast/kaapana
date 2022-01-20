@@ -13,9 +13,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install pydicom \
-    requests \
-    elasticsearch
+COPY files/requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt 
 
 RUN curl --header "DEPLOY-TOKEN: EaexsV_q2BKG8BeurRT8" --output /test-dicoms.zip "https://gitlab.hzdr.de/api/v4/projects/2521/packages/generic/test-data/0.0.3/init-dicoms.zip" \
     && mkdir -p /dicom_test_data && unzip /test-dicoms.zip -d /dicom_test_data && rm -rf test-dicoms.zip

@@ -1,9 +1,5 @@
-import shutil
 import os
 import json
-import elasticsearch
-import elasticsearch.helpers
-from datetime import datetime
 import glob
 import traceback
 import logging
@@ -13,8 +9,33 @@ import time
 from kaapana.operators.HelperDcmWeb import HelperDcmWeb
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
+from opensearchpy import OpenSearch
 
 class LocalJson2MetaOperator(KaapanaPythonBaseOperator):
+
+    def push_json(self, json_dict):
+        print("# Pushing JSON ...")
+        if "0020000E SeriesInstanceUID_keyword" in json_dict:
+            id= json_dict["0020000E SeriesInstanceUID_keyword"]
+        else:
+            print("# No ID found! - exit")
+            exit(1)
+        try:
+            response = self.os_client.index(
+                index = self.elastic_index,
+                body = json_dict,
+                id = id,
+                refresh = True
+            )
+        except Exception as e:
+            print("#")
+            print("# Error while pushing JSON ...")
+            print("#")
+            exit(1)
+
+        print("#")
+        print("# success")
+        print("#")
 
     def start(self, ds, **kwargs):
         global es
@@ -33,17 +54,14 @@ class LocalJson2MetaOperator(KaapanaPythonBaseOperator):
         self.run_id = kwargs['dag_run'].run_id
         print(("RUN_ID: %s" % self.run_id))
 
-        es = elasticsearch.Elasticsearch([{'host': self.elastic_host, 'port': self.elastic_port}])
-
         for batch_element_dir in batch_folder:
 
             if self.jsonl_operator:
-                #jsonl_dir = os.path.join(batch_element_dir, self.jsonl_operator.operator_out_dir)
-                jsonl_dir = os.path.join(batch_element_dir, self.jsonl_operator.operator_out_dir)
-                jsonl_list = glob.glob(jsonl_dir+'/**/*.jsonl', recursive=True)
-                for jsonl_file in jsonl_list:
-                    print(("Pushing file: %s to elasticsearch!" % jsonl_file))
-                    with open(jsonl_file, encoding='utf-8') as f:
+                json_dir = os.path.join(batch_element_dir, self.jsonl_operator.operator_out_dir)
+                json_list = glob.glob(json_dir+'/**/*.jsonl', recursive=True)
+                for json_file in json_list:
+                    print(f"Pushing file: {json_file} to META!")
+                    with open(json_file, encoding='utf-8') as f:
                         for line in f:
                             obj = json.loads(line)
                             self.push_json(obj)
@@ -63,7 +81,7 @@ class LocalJson2MetaOperator(KaapanaPythonBaseOperator):
                 assert len(json_list) > 0
 
                 for json_file in json_list:
-                    print(("Pushing file: %s to elasticsearch!" % json_file))
+                    print(f"Pushing file: {json_file} to META!")
                     with open(json_file, encoding='utf-8') as f:
                         new_json = json.load(f)
                     self.push_json(new_json)
@@ -88,44 +106,6 @@ class LocalJson2MetaOperator(KaapanaPythonBaseOperator):
         else:
             print("dicom_operator and dct_to_push not specified!")
 
-    def push_json(self, json_dict):
-        global es
-        if (es.indices.exists(self.elastic_index)):
-            try:
-                print(("Index", self.elastic_index, "exists, producing inserts and streaming them into ES."))
-                for ok, item in elasticsearch.helpers.streaming_bulk(es, self.produce_inserts(json_dict), chunk_size=500, raise_on_error=True):
-                    print(("status: %s" % item['index']['result']))
-                    if not ok:
-                        print(("appendJsonToIndex(): %s Item: %s" % (ok, item)))
-            except Exception as e:
-                print("######################################################################################################### ERROR IN TRANSMISSION!")
-                logging.error(traceback.format_exc())
-                print("#######################################  ERROR: %s")
-                for err_msg in e.args:
-                    print(err_msg)
-
-                print("ERROR @PUSH FILE TO ELASTIC")
-                exit(1)
-        else:
-            print("INDEX NOT EXISTING!")
-
-    # def update_document(self, new_json):
-    #     global elastic_indexname
-    #     doc_id = self.instanceUID
-    #     try:
-    #         old_json = es.get(index=elastic_indexname,
-    #                           doc_type="_doc", id=doc_id)["_source"]
-    #     except Exception as e:
-    #         print("doc is not updated! -> not found in es")
-    #         old_json = {}
-
-    #     for new_key in new_json:
-    #         new_value = new_json[new_key]
-    #         old_json[new_key] = new_value
-
-    #     return old_json
-
-
     def check_pacs_availability(self, instanceUID: str):
         print("#")
         print("# Checking if series available in PACS...")
@@ -142,47 +122,6 @@ class LocalJson2MetaOperator(KaapanaPythonBaseOperator):
             print(f"# -> waiting {self.avalability_check_delay} s")
             time.sleep(self.avalability_check_delay)
             check_count += 1
-
-    def produce_inserts(self, new_json):
-        global es
-        
-
-        if self.check_in_pacs:
-            self.check_pacs_availability(self.instanceUID)
-
-        global elastic_indexname
-
-        try:
-            old_json = es.get(index=self.elastic_index, doc_type="_doc", id=self.instanceUID)["_source"]
-            print("Series already found in ES")
-            if self.no_update:
-                exit(1)
-        except Exception as e:
-            print("doc is not updated! -> not found in es")
-            print(e)
-            old_json = {}
-
-        bpr_key = "predicted_bodypart_string"
-        for new_key in new_json:
-            if new_key == bpr_key and bpr_key in old_json and old_json[bpr_key].lower() != "n/a":
-                continue
-            new_value = new_json[new_key]
-            old_json[new_key] = new_value
-
-        index = self.elastic_index
-
-        try:
-
-            doc = {}
-            doc["_id"] = self.instanceUID
-            doc["_index"] = index
-            doc["_type"] = "_doc"
-            doc["_source"] = old_json
-
-            yield doc
-        except (KeyError) as e:
-            print(('KeyError in produce_inserts():', e, ', from input line: ', line[line.find('InstanceUID')-32:line.find('InstanceUID')+172]))
-            pass
 
     def __init__(self,
                  dag,
@@ -213,6 +152,21 @@ class LocalJson2MetaOperator(KaapanaPythonBaseOperator):
         self.elastic_index = elastic_index
         self.instanceUID = None
         self.check_in_pacs = check_in_pacs
+        auth = None
+        # auth = ('admin', 'admin') # For testing only. Don't store credentials in code.
+        self.os_client = OpenSearch(
+            hosts = [{'host': self.elastic_host, 'port': self.elastic_port}],
+            http_compress = True, # enables gzip compression for request bodies
+            http_auth = auth,
+            # client_cert = client_cert_path,
+            # client_key = client_key_path,
+            use_ssl = False,
+            verify_certs = False,
+            ssl_assert_hostname = False,
+            ssl_show_warn = False,
+            timeout=2,
+            # ca_certs = ca_certs_path
+        )
 
         super().__init__(
             dag=dag,

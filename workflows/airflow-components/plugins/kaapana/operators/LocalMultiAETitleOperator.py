@@ -1,5 +1,5 @@
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
-from kaapana.operators.HelperElasticsearch import HelperElasticsearch
+from kaapana.operators.HelperOpensearch import HelperOpensearch
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
 import os
@@ -44,7 +44,7 @@ class LocalMultiAETitleOperator(KaapanaPythonBaseOperator):
         series_uid = dcm_file[0x0020, 0x000E].value
         series_trail_subject = dcm_file[self.AETITLE_DICOM_TAG].value
         print(f"Sending AETITLE is: {series_trail_subject}")
-        metadata = HelperElasticsearch.get_series_metadata(series_uid)
+        metadata = HelperOpensearch.get_series_metadata(series_uid)
         if metadata:
             if series_trail_subject in metadata[self.AETITLE_IN_META]:
                 print("Reimporting series")

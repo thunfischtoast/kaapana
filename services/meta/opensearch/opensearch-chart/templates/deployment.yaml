@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: opensearch-de
-  namespace: meta
+  namespace: {{ .Values.global.meta_namespace }}
 spec:
   replicas: 1
   selector:
@@ -32,7 +32,7 @@ spec:
       containers:
         - name: opensearch-container
           image: 'registry.hzdr.de/jonas.scherer/kaapana/opensearch:1.2.3'
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {{ .Values.global.pull_policy_pods }}
           # command: [ "/bin/bash", "-c", "--" ]
           # args: [ "while true; do sleep 30; done;" ]
           env:
@@ -52,21 +52,22 @@ spec:
             value: '-Xms512m -Xmx512m'
           # - name: plugins.security.ssl.transport.enabled
           #   value: "true"
-          # - name: plugins.security.ssl.http.pemcert_filepath
-          #   value: "certs/tls.crt"
-          # - name: plugins.security.ssl.transport.server.pemcert_filepath
-          #   value: "certs/tls.crt"
-          # - name: plugins.security.ssl.transport.pemcert_filepath
-          #   value: "certs/tls.crt"
-          # - name: plugins.security.ssl.transport.client.pemcert_filepath
-          #   value: "certs/tls.crt"
-          # - name: plugins.security.ssl.http.pemkey_filepath
-          #   value: "certs/tls.key"
           # - name: plugins.security.ssl.transport.pemkey_filepath
-          #   value: "certs/tls.key"
+          #   value: "certs/node1-key.pem"
+          # - name: plugins.security.ssl.transport.pemcert_filepath
+          #   value: "certs/node1.pem"
           # - name: plugins.security.ssl.transport.pemtrustedcas_filepath
-          #   value: "certs/tls.key"
-          #   # [plugins.security.ssl.transport.enabled, 
+          #   value: "certs/root-ca.pem"
+          # - name: plugins.security.ssl.transport.enforce_hostname_verification
+          #   value: "false"
+          # - name: plugins.security.ssl.http.enabled
+          #   value: "true"
+          # - name: plugins.security.ssl.http.pemcert_filepath
+          #   value: "certs/node1.pem"
+          # - name: plugins.security.ssl.http.pemkey_filepath
+          #   value: "certs/node1-key.pem"
+          # - name: plugins.security.ssl.http.pemtrustedcas_filepath
+          #   value: "certs/root-ca.pem"
           # - name: bootstrap.memory_lock
           #   value: "true"
           # - name: discovery.type
@@ -168,6 +169,6 @@ spec:
       #     items:
       #     - key: action_groups.yml
       #       path: action_groups.yml
-      # imagePullSecrets:
-      # - name: registry-secret
+      imagePullSecrets:
+      - name: registry-secret
 ---
