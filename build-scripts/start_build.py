@@ -240,6 +240,12 @@ if __name__ == '__main__':
                 for dependency in chart.dependencies:
                     ready_charts = [ready_chart for ready_chart in build_ready_list if ready_chart.name == dependency["name"] and ready_chart.version == dependency["version"]]
                     if len(ready_charts) == 0:
+                        # print("###############################")
+                        # print("")
+                        # print(chart.name)
+                        # print("")
+                        # print(f"Dependency not ready: {dependency}")
+                        # print("")
                         chart.dependencies_ready = False
                         break
                 if chart.dependencies_ready:

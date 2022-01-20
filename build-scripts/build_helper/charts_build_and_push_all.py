@@ -262,7 +262,7 @@ class HelmChart:
                     if "image:" in line:
                         line = line.split("image:")
                         if "#" in line[0]:
-                            print("Commented -> skip")
+                            print(f"{yaml_file}: Image line Commented -> skip")
                             continue
                         elif "}}" in line[1]:
                             docker_container = line[1].split(" }}/")[-1].lower()
