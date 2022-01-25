@@ -105,6 +105,11 @@ def handle_logs(logs):
             print(json.dumps(log, indent=4, sort_keys=True))
 
 
+def status_update():
+    print("$$$$$$$$$$$$$$$$$$$$$$$", update_status)
+    return """<h1> Status is : {}</h1>""".format(update_status)
+
+
 def start_os_instance():
     return_value, logs = ci_playbooks.start_os_instance(
         username=username,
@@ -372,13 +377,12 @@ def launch():
         "user_request.json",
     )
 
-    # instance_ip_address = "10.128.130.133"
-    # instance_ip_address = "10.128.130.196"
     global update_status
     update_status = "Instance creation request Instantiated.....!!!!!!!!"
     status_update()
+    # instance_ip_address = "10.128.128.232"
     instance_ip_address = start_os_instance()
-    # global update_status
+
     update_status = "Instance created....!!!!!!!!"
     status_update()
     result = (
@@ -391,12 +395,15 @@ def launch():
         if result != "FAILED"
         else "FAILED"
     )
+    print(" RESULT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", result)
     result = print_success(instance_ip_address) if result != "FAILED" else "FAILED"
     result = run_algo_on_data(
         target_hosts=[instance_ip_address], user_request_file=user_request_file
-    )  # if result != "FAILED" else "FAILED"
-    result = delete_os_instance() if delete_instance else "SKIPPED"
-    # flask post status to host instances
+    )
+    print(
+        " NOT CALLING DELETE INSTANCE METHOD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    )
+    # result = delete_os_instance() if delete_instance else "SKIPPED"
 
 
 # tfdatodo: add charts values fetched from registry instead custom values

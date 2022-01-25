@@ -27,11 +27,11 @@ spec:
             value: 'http://www-int2.dkfz-heidelberg.de:80'
         resources:
           limits:
-            cpu: 500m
-            memory: 512Mi
+            cpu: 1000m
+            memory: 2512Mi
           requests:
-            cpu: 500m
-            memory: 256Mi
+            cpu: 1000m
+            memory: 2256Mi
         ports:
         - name: backend-http
           containerPort: 5000

@@ -110,6 +110,7 @@ def deploy_platform(
         hosts=target_hosts,
         extra_vars=extra_vars,
     )
+    print("return_value :", return_value)
     return return_value, logs
 
 
