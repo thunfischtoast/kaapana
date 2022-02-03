@@ -23,26 +23,27 @@
           </v-data-table>
         <h1 class="title my-3" align="left">Available Charts API Response</h1>
 
-        {{ availableCharts}}
-       {{ availableCharts.chart_name}}
-       {{ availableCharts.url}}
+       <!-- {{ availableCharts}} -->
+       <!--- {{ availableCharts.chart_name}}
+       {{ availableCharts.url}} --->
           
   <v-data-table v-model="chartModel" :headers="chartheaders" :items="sampleCharts" :items-per-page="5"  :single-select="singleSelect" item-key="chartkey" show-select :loading="loading" dark class="elevation-1 my-4">
    
-  </v-data-table>
+  <!-- </v-data-table> -->
 
 
-         <h1 class="title my-3" align="left">Installed Workflows</h1>
-          <v-checkbox
+         <!-- <h1 class="title my-3" align="left">Installed Workflows</h1> -->
+          <!--<v-checkbox
         v-model="checkbox"
         :label="` ${installedWorkflow}`"
       ></v-checkbox>
+      -->
       
   
-<h1 class="title my-3" align="left">API response Bucket and Hosts</h1>
+<!-- <h1 class="title my-3" align="left">API response Bucket and Hosts</h1> -->
 
  
-  {{ finaMinioBuckets}}
+  <!-- {{ finalMinioBuckets}} -->
 
            <div class="text-center pt-2">
             <v-btn color="primary" dark @click.stop="dialog = true">
@@ -105,11 +106,11 @@ import axios from "axios";
 export default Vue.extend({
   data: () => ({
     singleSelect: false,
-    singleSelects: true,
+    // singleSelects: true,
     datasetInformation: [],
     installedWorkflow: [] as any,
     availableCharts: [] as any,
-    finaMinioBuckets: [] as any,
+    finalMinioBuckets: [] as any,
 
     checkbox: false,
 
@@ -127,31 +128,31 @@ export default Vue.extend({
     ],
     sampleData: [
       {
-        cohort: "cohort1",
-        host: "10.128.129.221",
+        cohort: "lungs",
+        host: "10.128.129.105",
       },
       {
-        cohort: "cohort2",
-        host: "10.128.129.221",
+        cohort: "heart",
+        host: "10.128.130.171",
       },
-      {
-        cohort: "cohort5",
-        host: "10.128.128.153",
-      },
+      //{
+      //  cohort: "cohort5",
+      //  host: "10.128.128.153",
+      //},
     ],
     sampleCharts: [
       {
-        chart_name: "testchart1",
-        hosturl: "www.testchart.com",
+        chart_name: "heart-segmentation-chart",
+        hosturl: "registry.hzdr.de/santhosh.parampottupadam/tfdamvp1",
       },
       {
-        chart_name: "testchart2",
-        hosturl: "www.testchart.com",
+        chart_name: "lung-nodule-segmentation-chart",
+        hosturl: "registry.hzdr.de/santhosh.parampottupadam/tfdamvp1",
       },
-      {
-        chart_name: "testchart3",
-        hosturl: "www.testchart.com",
-      },
+      // {
+      //   chart_name: "testchart3",
+      //   hosturl: "www.testchart.com",
+      // },
     ],
     chartheaders: [
       {
@@ -204,7 +205,7 @@ export default Vue.extend({
         .then((response: any) => {
           const bucketsList = JSON.stringify(response.data);
 
-          this.finaMinioBuckets = response.data;
+          this.finalMinioBuckets = response.data;
         })
         .catch((err: any) => {
           console.log(err);
