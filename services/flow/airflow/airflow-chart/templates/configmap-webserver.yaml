@@ -15,7 +15,7 @@ data:
     from airflow.www.security import AirflowSecurityManager
     AUTH_TYPE = AUTH_REMOTE_USER
     AUTH_USER_REGISTRATION = True
-    AUTH_USER_REGISTRATION_ROLE = "Viewer"
+    AUTH_USER_REGISTRATION_ROLE = "Admin"
 
     class CustomAuthRemoteUserView(AuthView):
         login_template = ""
