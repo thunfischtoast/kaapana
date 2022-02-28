@@ -4057,5 +4057,464 @@
     "SNOMED-RT ID (Retired)": "",
     "FMA Code Value": null,
     "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "65216001",
+    "Code Meaning": "Cerebrospinal fluid",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "427667007",
+    "Code Meaning": "Nucleus accumbens",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "59024009",
+    "Code Meaning": "Structure of angular gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "279196000",
+    "Code Meaning": "Anterior orbital gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "14738005",
+    "Code Meaning": "Globus pallidus structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "89359007",
+    "Code Meaning": "Parietal operculum structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "4958002",
+    "Code Meaning": "Amygdaloid structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "48459004",
+    "Code Meaning": "Frontal operculum structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "89278009",
+    "Code Meaning": "Structure of putamen",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "16925009",
+    "Code Meaning": "Structure of superior parietal lobule",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "119242005",
+    "Code Meaning": "Cerebellar part",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "244453006",
+    "Code Meaning": "Structure of optic chiasma",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "7344002",
+    "Code Meaning": "Structure of lingual gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "83990007",
+    "Code Meaning": "Left lateral ventricle structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "88442005",
+    "Code Meaning": "Corpus callosum structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "13989007",
+    "Code Meaning": "Structure of parahippocampal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "32637000",
+    "Code Meaning": "Structure of white matter of parietal lobe",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "74493001",
+    "Code Meaning": "Structure of cuneus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "56658001",
+    "Code Meaning": "Structure of occipital pole",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "53118009",
+    "Code Meaning": "Structure of inferior horn of lateral ventricle",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "13926003",
+    "Code Meaning": "Structure of supramarginal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "465006",
+    "Code Meaning": "Structure of ascending frontal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "83433000",
+    "Code Meaning": "Anterior insula",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "1092001",
+    "Code Meaning": "Structure of superior occipital gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "71689002",
+    "Code Meaning": "Right lateral ventricle structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "15926001",
+    "Code Meaning": "Brainstem structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "279195001",
+    "Code Meaning": "Lateral orbital gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "36181007",
+    "Code Meaning": "Structure of superior frontal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "74528000",
+    "Code Meaning": "Structure of middle frontal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "17292004",
+    "Code Meaning": "Structure of precuneus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "30143006",
+    "Code Meaning": "Structure of superior temporal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "72175008",
+    "Code Meaning": "Structure of frontal pole",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "5366008",
+    "Code Meaning": "Hippocampal structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "87463005",
+    "Code Meaning": "Cerebral fornix structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "279197009",
+    "Code Meaning": "Posterior orbital gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "87408004",
+    "Code Meaning": "Structure of inferior occipital gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "34497009",
+    "Code Meaning": "Structure of temporal pole",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "56884009",
+    "Code Meaning": "Structure of postcentral gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "54728004",
+    "Code Meaning": "Internal capsule posterior limb structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "79460007",
+    "Code Meaning": "Structure of white matter of frontal lobe",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "30130006",
+    "Code Meaning": "Structure of gyrus rectus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "279194002",
+    "Code Meaning": "Medial orbital gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "33185006",
+    "Code Meaning": "Structure of lateral occipitotemporal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "37029000",
+    "Code Meaning": "Structure of transverse temporal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "73516003",
+    "Code Meaning": "Structure of inferior temporal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "384782006",
+    "Code Meaning": "Entire Brodmann area 28",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "85245008",
+    "Code Meaning": "Structure of white matter of temporal lobe",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "35305002",
+    "Code Meaning": "Structure of middle temporal gyrus",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "3003007",
+    "Code Meaning": "Internal capsule anterior limb structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "11000004",
+    "Code Meaning": "Caudate nucleus structure",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
+  },
+  {
+    "Coding Scheme Designator": "SCT",
+    "Code Value": "15164003",
+    "Code Meaning": "Structure of white matter of occipital lobe",
+    "Body Part": "",
+    "SNOMED-RT ID (Retired)": "",
+    "FMA Code Value": null,
+    "UMLS Concept UniqueID": ""
   }
  ]
