@@ -27,7 +27,17 @@
        <!--- {{ availableCharts.chart_name}}
        {{ availableCharts.url}} --->
           
-  <v-data-table v-model="chartModel" :headers="chartheaders" :items="sampleCharts" :items-per-page="5"  :single-select="singleSelect" item-key="chartkey" show-select :loading="loading" dark class="elevation-1 my-4">
+  <v-data-table 
+    v-model="chartModel" 
+    :headers="chartheaders" 
+    :items="sampleCharts" 
+    :items-per-page="5"  
+    :single-select="singleSelect" 
+    item-key="chartkey" 
+    show-select 
+    :loading="loading" dark 
+    class="elevation-1 my-4"
+  >
    
   <!-- </v-data-table> -->
 
