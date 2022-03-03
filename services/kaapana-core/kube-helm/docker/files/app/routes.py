@@ -21,6 +21,7 @@ def index():
 
 @app.route("/health-check")
 def health_check():
+    # TODO return JSON object
     return Response(f"Kube-Helm api is up and running!", 200)
 
 
@@ -84,6 +85,7 @@ def helm_delete_chart():
 
 @app.route("/helm-install-chart", methods=["POST"])
 def helm_add_custom_chart():
+    # TODO check if chart already exists and return https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/409
     print(request.json)
     try:
         resp, helm_command = utils.helm_install(request.json, app.config['NAMESPACE'])
@@ -160,6 +162,7 @@ def add_repo():
 def view_helm_env():
     try:
         resp = subprocess.check_output(f'{os.environ["HELM_PATH"]} env', stderr=subprocess.STDOUT, shell=True)
+        # TODO parse response to json object
         print(resp)
     except subprocess.CalledProcessError as e:
         return Response(
@@ -173,4 +176,4 @@ def view_chart_status():
     if status:
         return json.dumps(status)
     else:
-        return Response(f"Release not found", 500)
+        return Response(f"Release not found", 404)
