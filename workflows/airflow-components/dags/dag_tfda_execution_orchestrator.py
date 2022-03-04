@@ -18,7 +18,7 @@ pacs_port = 11112
 
 args = {
     'ui_visible': True,
-    'ui_forms': ui_forms,
+    # 'ui_forms': ui_forms,
     'owner': 'kaapana',
     'start_date': days_ago(0),
     'retries': 0,
