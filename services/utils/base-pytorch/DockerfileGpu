@@ -1,8 +1,8 @@
-FROM nvcr.io/nvidia/pytorch:22.02-py3
+FROM nvcr.io/nvidia/pytorch:22.03-py3
 
 LABEL REGISTRY="local-only"
 LABEL IMAGE="base-pytorch-gpu"
-LABEL VERSION="0.1.0"
+LABEL VERSION="22.03"
 LABEL CI_IGNORE="False"
 
 RUN apt-get update && apt-get install -y \
