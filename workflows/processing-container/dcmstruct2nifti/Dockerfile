@@ -3,7 +3,7 @@ FROM python:3.9-slim
 
 LABEL IMAGE="dcmstruct2nifti"
 LABEL VERSION="0.1.0"
-LABEL CI_IGNORE="False"
+LABEL CI_IGNORE="True"
 
 WORKDIR /
 # RUN apk update && apk add --no-cache python3-dev gcc libc-dev  jpeg-dev zlib-dev && pip3 install --upgrade pip

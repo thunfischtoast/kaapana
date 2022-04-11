@@ -1,7 +1,7 @@
 ---
 apiVersion: v1
-appVersion: "0.1.0"
-description: A Helm chart for Kubernetes
 name: openedc-chart
+description: A Helm chart for Kubernetes
 version: "0.1.0"
+appVersion: "0.1.0"
 
