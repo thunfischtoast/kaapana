@@ -28,8 +28,8 @@ spec:
             mountPath: /charts
 {{- range $collection := .Values.global.kaapana_collections }}
         - name: copy-{{ $collection.name }}
-          image: "{{ $.Values.global.registry_url }}/{{ $collection.name }}:{{ $collection.version }}"
-          imagePullPolicy: {{ $.Values.global.pull_policy_pods }}
+          image: "{{ .Values.global.registry_url }}/{{ $collection.name }}:{{ $collection.version }}"
+          imagePullPolicy: {{ .Values.global.pull_policy_pods }}
           env:
           - name: ACTION
             value: copy

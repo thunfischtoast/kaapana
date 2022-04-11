@@ -31,11 +31,11 @@ spec:
           imagePullPolicy:  {{ .Values.global.pull_policy_pods }}
           args:
         {{- if ne (.Values.global.https_port | default "443") "443" }}
-          - --login-url=https://{{ required "A valid hostname (or fqdn) is required!" $.Values.global.hostname }}:{{ .Values.global.https_port }}/auth/realms/kaapana/protocol/openid-connect/auth
-          - --oidc-issuer-url=https://{{ required "A valid hostname (or fqdn) is required!" $.Values.global.hostname }}:{{ .Values.global.https_port }}/auth/realms/kaapana
+          - --login-url=https://{{ required "A valid hostname (or fqdn) is required!" .Values.global.hostname }}:{{ .Values.global.https_port }}/auth/realms/kaapana/protocol/openid-connect/auth
+          - --oidc-issuer-url=https://{{ required "A valid hostname (or fqdn) is required!" .Values.global.hostname }}:{{ .Values.global.https_port }}/auth/realms/kaapana
         {{- else }}
-          - --login-url=https://{{ required "A valid hostname (or fqdn) is required!" $.Values.global.hostname }}/auth/realms/kaapana/protocol/openid-connect/auth
-          - --oidc-issuer-url=https://{{ required "A valid hostname (or fqdn) is required!" $.Values.global.hostname }}/auth/realms/kaapana
+          - --login-url=https://{{ required "A valid hostname (or fqdn) is required!" .Values.global.hostname }}/auth/realms/kaapana/protocol/openid-connect/auth
+          - --oidc-issuer-url=https://{{ required "A valid hostname (or fqdn) is required!" .Values.global.hostname }}/auth/realms/kaapana
         {{- end }}
           - --upstream=https://traefik:4443
           - --provider=keycloak-oidc

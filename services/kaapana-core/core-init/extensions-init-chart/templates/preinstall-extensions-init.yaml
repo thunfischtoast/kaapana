@@ -34,8 +34,8 @@ spec:
       containers:
 {{- range $extension := .Values.global.preinstall_extensions }}
       - name: preinstall-{{ uuidv4 | trunc 10 }}
-        image: {{  $.Values.global.registry_url }}/service_checker:1.1
-        imagePullPolicy:  {{ $.Values.global.pull_policy_pods }}
+        image: {{  .Values.global.registry_url }}/service_checker:1.1
+        imagePullPolicy:  {{ .Values.global.pull_policy_pods }}
         command: ["/bin/sh", "-c"]
         args: ["echo -e \"import requests;r=requests.post('http://kube-helm-service.kube-system.svc:5000/kube-helm-api/helm-install-chart', json={'name': '{{ $extension.name }}', 'version': '{{ $extension.version }}' });print(r)\" | python3"]
 {{- end }}

@@ -1,612 +1,367 @@
 #!/usr/bin/env python3
-import glob
+from glob import glob
 import os
 import json
 from subprocess import PIPE, run
 from time import time, sleep
 from shutil import which
+from build_helper.build_utils import BuildUtils
 
 suite_tag = "Container"
-def container_registry_login(container_registry, username, password):
-    print(f"-> Container registry-logout: {container_registry}")
-    command = [Container.container_engine, "logout", container_registry]
-    output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=5)
-    
-    if output.returncode != 0:
-        print("Something went wrong!")
-        print(f"Couldn't logout from registry {container_registry}")
-        print(f"Message: {output.stdout}")
-        print(f"Error:   {output.stderr}")
-        exit(1)
-
-    print(f"-> Container registry-login: {container_registry}")
-    command = [Container.container_engine, "login", container_registry, "--username", username, "--password", password]
-    output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=5)
+def container_registry_login(username, password):
+    BuildUtils.logger.info(f"-> Container registry-logout: {BuildUtils.default_registry}")
+    command = [Container.container_engine, "logout", BuildUtils.default_registry]
+    output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=10)
 
     if output.returncode != 0:
-        print("Something went wrong!")
-        print(f"Couldn't login into registry {container_registry}")
-        print(f"Message: {output.stdout}")
-        print(f"Error:   {output.stderr}")
+        BuildUtils.logger.error("Something went wrong!")
+        BuildUtils.logger.error(f"Couldn't logout from registry {BuildUtils.default_registry}")
+        BuildUtils.logger.error(f"Message: {output.stdout}")
+        BuildUtils.logger.error(f"Error:   {output.stderr}")
+        exit(1)
+
+    BuildUtils.logger.info(f"-> Container registry-login: {BuildUtils.default_registry}")
+    command = [Container.container_engine, "login", BuildUtils.default_registry, "--username", username, "--password", password]
+    output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=10)
+
+    if output.returncode != 0:
+        BuildUtils.logger.error("Something went wrong!")
+        BuildUtils.logger.error(f"Couldn't login into registry {BuildUtils.default_registry}")
+        BuildUtils.logger.error(f"Message: {output.stdout}")
+        BuildUtils.logger.error(f"Error:   {output.stderr}")
         exit(1)
 
 
-def get_timestamp():
-    return str(int(time() * 1000))
-
-
-def generate_image_version_list(container_list):
-    base_images_dict = {}
-
-    for container in container_list:
-        for base_image in container.base_images:
-            if base_image not in base_images_dict.keys():
-                base_images_dict[base_image] = []
-
-            base_images_dict[base_image].append(container.tag.replace(container.container_registry, "")[1:])
-
-    sorted_tags = sorted(base_images_dict, key=lambda k: len(base_images_dict[k]), reverse=True)
-
-    result_list = []
-    for sorted_tag in sorted_tags:
-        result_list.append({
-            "BASE_IMAGE": sorted_tag,
-            "TAGS": base_images_dict[sorted_tag]
-        })
-    file_path = os.path.join(kaapana_dir, "CI", "used_base_images.json")
-    with open(file_path, 'w+', encoding='utf-8') as f:
-        json.dump(result_list, f, ensure_ascii=False, indent=4, sort_keys=True)
-
-    print("############################# generate_image_version_list -> done.")
-
-
-def make_log(std_out, std_err):
-    std_out = std_out.split("\n")[-100:]
-    log = {}
-    len_std = len(std_out)
-    for i in range(0, len_std):
-        log[i] = std_out[i]
-
-    std_err = std_err.split("\n")
-    for err in std_err:
-        if err != "":
-            len_std += 1
-            log[len_std] = "ERROR: {}".format(err)
-
-    return log
-
-
-class Container:
-    container_engine = "docker"
-    used_tags_list = []
+class BaseImage:
+    registry = None
+    project = None
+    name = None
+    version = None
+    tag = None
+    local_image = None
+    present_in_build_tree = None
 
     def __eq__(self, other):
         return self.tag == other.tag
 
+    def get_dict(self):
+        base_img_dict = {
+            "name": self.name,
+            "version": self.version,
+            "tag": self.tag
+        }
+        return base_img_dict
+
+    def __init__(self, tag):
+        if ":" not in tag:
+            BuildUtils.logger.error(f"{tag}: Could not extract base-image version!")
+            BuildUtils.generate_issue(
+                component=suite_tag,
+                name=f"{tag}",
+                msg="Could not extract base-image version!",
+                level="ERROR"
+            )
+
+        self.local_image = False
+        if "local-only" in tag:
+            self.registry = "local-only"
+            self.project = ""
+            self.name = tag.split("/")[1].split(":")[0]
+            self.local_image = True
+        elif tag.count("/") == 0:
+            self.registry = "Dockerhub"
+            self.project = ""
+            self.name = tag.split(":")[0]
+        elif tag.count("/") == 1:
+            self.registry = "Dockerhub"
+            self.project = tag.split("/")[0]
+            self.name = tag.split("/")[1].split(":")[0]
+        elif tag.count("/") == 2:
+            self.registry = tag.split("/")[0]
+            self.project = tag.split("/")[1]
+            self.name = tag.split("/")[2].split(":")[0]
+        else:
+            BuildUtils.logger.error("Could not extract base-image!")
+            exit(1)
+
+        self.version = tag.split(":")[1]
+        self.tag = tag
+        self.present = None
+
+
+class Container:
+    container_engine = None
+    external_sources = None
+    default_registry = None
+    container_object_list = None
+    container_build = None
+    container_pushed = None
+
+    def __eq__(self, other):
+        if isinstance(self, str):
+            self_tag = self
+        else:
+            self_tag = self.tag
+
+        if isinstance(other, str):
+            other_tag = other
+        else:
+            other_tag = other.tag
+
+        return self_tag == other_tag
+
     def __str__(self):
-        return "tag: {} path: {} base_images: {}".format(self.tag, self.path, self.base_images)
+        return f"tag: {self.tag}"
 
     def get_dict(self):
         repr_obj = {
             "tag": self.tag,
             "path": self.path,
-            "base_images": self.base_images,
+            "base_images": [],
         }
+        for base_image in self.base_images:
+            repr_obj["base_images"].append(base_image.get_dict())
+
         return repr_obj
 
     def __init__(self, dockerfile):
-        self.maintainers = {}
-        self.container_registry = None
         self.image_name = None
         self.image_version = None
         self.tag = None
         self.path = dockerfile
         self.ci_ignore = False
-        self.error = False
         self.pending = False
-        self.dev = False
         self.airflow_component = False
         self.container_dir = os.path.dirname(dockerfile)
         self.log_list = []
         self.base_images = []
+        self.missing_base_images = None
+        self.registry = None
+        self.already_built = False
+        self.container_build = False
+        self.container_pushed = False
 
         if not os.path.isfile(dockerfile):
-            print("ERROR: Dockerfile not found.")
-            exit(1)
+            BuildUtils.logger.error(f"Dockerfile {dockerfile} not found.")
+            if Container.exit_on_error:
+                exit(1)
 
         with open(dockerfile, 'rt') as f:
             lines = f.readlines()
             for line in lines:
+
                 if line.__contains__('LABEL REGISTRY='):
-                    self.container_registry = line.split("=")[1].rstrip().strip().replace("\"", "")
+                    self.registry = line.split("=")[1].rstrip().strip().replace("\"", "")
                 elif line.__contains__('LABEL IMAGE='):
                     self.image_name = line.split("=")[1].rstrip().strip().replace("\"", "")
                 elif line.__contains__('LABEL VERSION='):
                     self.image_version = line.split("=")[1].rstrip().strip().replace("\"", "")
-                elif line.__contains__('FROM') and not line.__contains__('#ignore'):
-                    self.base_images.append(line.split("FROM ")[1].split(" ")[0].rstrip().strip().replace("\"", ""))
+                elif line.startswith('FROM') and not line.__contains__('#ignore'):
+                    base_img_tag = line.split("FROM ")[1].split(" ")[0].rstrip().strip().replace("\"", "")
+                    base_img_obj = BaseImage(tag=base_img_tag)
+                    self.base_images.append(base_img_obj)
+                    if base_img_obj not in BuildUtils.base_images_used:
+                        BuildUtils.base_images_used.append(base_img_obj)
                 elif line.__contains__('LABEL CI_IGNORE='):
                     self.ci_ignore = True if line.split("=")[1].rstrip().lower().replace("\"", "").replace("'", "") == "true" else False
 
-        if self.container_registry == None:
-            self.container_registry = default_registry
-
-        if self.image_version != None and self.image_version != "" and self.image_name != None and self.image_name != "":
-            self.tag = self.container_registry+"/"+self.image_name+":"+self.image_version
-            self.check_pending()
-
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "Containerr-Tag Extraction",
-                "log": "",
-                "loglevel": "DEBUG",
-                "timestamp": get_timestamp(),
-                "message": "Containerr-Tag extraction successful!",
-                "rel_file": self.path,
-                "container": self,
-            }
-            self.log_list.append(log_entry)
-
-            if "-vdev" in self.image_version:
-                self.dev = True
-
-            self.check_if_airflow_component()
+        if self.image_version == None and self.image_version == "" or self.image_name == None or self.image_name == "":
+            BuildUtils.logger.debug(f"{self.container_dir}: could not extract container infos!")
+            if Container.exit_on_error:
+                exit(1)
+            return
 
         else:
-            log_entry = {
-                "suite": suite_tag,
-                "test": dockerfile,
-                "step": "Containerr-Tag Extraction",
-                "log": "",
-                "loglevel": "WARN",
-                "timestamp": get_timestamp(),
-                "message": "Could not extract container info",
-                "rel_file": dockerfile,
-            }
-            self.log_list.append(log_entry)
-            self.error = True
-
-    def check_pending(self):
-        if self.tag in Container.used_tags_list:
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "Containerr-Tag Extraction",
-                "log": "",
-                "loglevel": "ERROR",
-                "timestamp": get_timestamp(),
-                "message": "This tag was already used by another Dockerfile!",
-                "rel_file": self.path,
-                "container": self,
-            }
-            self.log_list.append(log_entry)
-            self.pending = False
-            self.error = True
-        else:
-            for base_image in self.base_images:
-                # if base_image not in Container.used_tags_list:
-                if default_registry in base_image and base_image not in Container.used_tags_list:
-                    self.pending = True
-                else:
-                    Container.used_tags_list.append(self.tag)
-                    self.pending = False
-
-        return self.pending
-
-    def check_if_airflow_component(self):
-        if "." in os.path.basename(self.path):
-            airflow_components_path = "{}/airflow-components".format(os.path.dirname(os.path.dirname(os.path.dirname(self.path))))
-            sub_dirs = glob.glob("{}/*/".format(airflow_components_path))
-            sub_dirs = [sub_dir.split("/")[-2] for sub_dir in sub_dirs]
-
-            if "dags" not in sub_dirs and "plugins" not in sub_dirs:
-                log_entry = {
-                    "suite": suite_tag,
-                    "test": self.tag.replace(self.container_registry, "")[1:],
-                    "step": "Airflow Component",
-                    "log": "",
-                    "loglevel": "ERROR",
-                    "timestamp": get_timestamp(),
-                    "message": "Dockerfile not valid: filename with '.' and not a dag",
-                    "rel_file": self.path,
-                    "container": self,
-                }
-                self.log_list.append(log_entry)
-                self.airflow_component = False
-                self.error = True
-            else:
-                log_entry = {
-                    "suite": suite_tag,
-                    "test": self.tag.replace(self.container_registry, "")[1:],
-                    "step": "Airflow Component",
-                    "log": "",
-                    "loglevel": "DEBUG",
-                    "timestamp": get_timestamp(),
-                    "message": "Dockerfile is a valid airflow dag container.",
-                    "rel_file": self.path,
-                    "container": self,
-                }
-                self.log_list.append(log_entry)
-                self.container_dir = airflow_components_path
-                self.airflow_component = True
-        else:
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "Airflow Component",
-                "log": "",
-                "loglevel": "DEBUG",
-                "timestamp": get_timestamp(),
-                "message": "Dockerfile is no airflow component.",
-                "rel_file": self.path,
-                "container": self,
-            }
-            self.log_list.append(log_entry)
+            self.registry = self.registry if self.registry != None else Container.default_registry
+            self.tag = self.registry+"/"+self.image_name+":"+self.image_version
 
     def check_prebuild(self):
+        BuildUtils.logger.debug(f"{self.tag}: check_prebuild")
         os.chdir(self.container_dir)
         pre_build_script = os.path.dirname(self.path)+"/pre_build.sh"
         if os.path.isfile(pre_build_script):
             command = [pre_build_script]
             output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=3600)
-            log = make_log(std_out=output.stdout, std_err=output.stderr)
 
             if output.returncode == 0:
-                log_entry = {
-                    "suite": suite_tag,
-                    "test": self.tag.replace(self.container_registry, "")[1:],
-                    "step": "check_prebuild",
-                    "log": log,
-                    "loglevel": "DEBUG",
-                    "timestamp": get_timestamp(),
-                    "message": "pre_build.sh successful.",
-                    "rel_file": pre_build_script,
-                    "container": self,
-                }
-                yield log_entry
+                BuildUtils.logger.debug(f"{self.tag}: pre-build ok.")
 
             else:
-                log_entry = {
-                    "suite": suite_tag,
-                    "test": self.tag.replace(self.container_registry, "")[1:],
-                    "step": "check_prebuild",
-                    "log": log,
-                    "loglevel": "ERROR",
-                    "timestamp": get_timestamp(),
-                    "message": "pre_build.sh execution error.",
-                    "rel_file": pre_build_script,
-                    "container": self,
-                }
-                self.error = True
-                yield log_entry
+                BuildUtils.logger.error(f"{self.tag}: pre-build failed!")
+                BuildUtils.generate_issue(
+                    component=suite_tag,
+                    name=f"{self.tag}",
+                    msg="pre-build failed!",
+                    level="ERROR",
+                    output=output,
+                    path=pre_build_script
+                )
+
         else:
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "check_prebuild",
-                "log": "",
-                "loglevel": "DEBUG",
-                "timestamp": get_timestamp(),
-                "message": "No pre_build.sh found.",
-                "rel_file": pre_build_script,
-                "container": self,
-            }
-            yield log_entry
+            BuildUtils.logger.debug(f"{self.tag}: no pre-build script!")
 
     def build(self):
-        print("############################ Build Container: {}".format(self.tag))
-        startTime = time()
-        os.chdir(self.container_dir)
-        if http_proxy is not None:
-            command = [Container.container_engine, "build", "--build-arg", "http_proxy={}".format(http_proxy), "--build-arg", "https_proxy={}".format(http_proxy), "-t", self.tag, "-f", self.path, "."]
-        elif self.tag.split('/')[-1].startswith('dag'):
-            command = [Container.container_engine, "build", "--no-cache", "-t", self.tag, "-f", self.path, "."]
+        if Container.enable_build:
+            BuildUtils.logger.debug(f"{self.tag}: build")
+            if self.container_pushed:
+                BuildUtils.logger.debug(f"{self.tag}: already build -> skip")
+                return
+
+            startTime = time()
+            os.chdir(self.container_dir)
+            if BuildUtils.http_proxy is not None:
+                command = [Container.container_engine, "build", "--build-arg", f"http_proxy={BuildUtils.http_proxy}",
+                           "--build-arg", f"https_proxy={BuildUtils.http_proxy}", "-t", self.tag, "-f", self.path, "."]
+            else:
+                command = [Container.container_engine, "build", "-t", self.tag, "-f", self.path, "."]
+
+            output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000, env=dict(os.environ, DOCKER_BUILDKIT="1"))
+
+            if output.returncode != 0:
+                BuildUtils.logger.error(f"{self.tag}: build failed!")
+                BuildUtils.generate_issue(
+                    component=suite_tag,
+                    name=f"{self.tag}",
+                    msg="container build failed!",
+                    level="ERROR",
+                    output=output,
+                    path=self.container_dir
+                )
+            else:
+                self.already_built = True
+                hours, rem = divmod(time()-startTime, 3600)
+                minutes, seconds = divmod(rem, 60)
+                BuildUtils.logger.info("{}: Build-time: {:0>2}:{:0>2}:{:05.2f}".format(self.tag, int(hours), int(minutes), seconds))
+                self.container_build = True
         else:
-            command = [Container.container_engine, "build", "-t", self.tag, "-f", self.path, "."]
-
-        output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000, env=dict(os.environ, DOCKER_BUILDKIT="1"))
-        log = make_log(std_out=output.stdout, std_err=output.stderr)
-
-        if output.returncode != 0:
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "Container build",
-                "log": log,
-                "loglevel": "ERROR",
-                "timestamp": get_timestamp(),
-                "message": "Build failed!",
-                "rel_file": self.path,
-                "container": self,
-                "test_done": True,
-            }
-            self.error = True
-            yield log_entry
-
-        hours, rem = divmod(time()-startTime, 3600)
-        minutes, seconds = divmod(rem, 60)
-        print("############################ Build: {:0>2}:{:0>2}:{:05.2f} -> success".format(int(hours), int(minutes), seconds))
-        log_entry = {
-            "suite": suite_tag,
-            "test": self.tag.replace(self.container_registry, "")[1:],
-            "step": "Container build",
-            "log": "",
-            "loglevel": "DEBUG",
-            "timestamp": get_timestamp(),
-            "message": "Build successful",
-            "rel_file": self.path,
-            "container": self,
-        }
-        yield log_entry
+            BuildUtils.logger.debug(f"{self.tag}: build disabled")
 
     def push(self, retry=True):
-        print()
-        print("############################ Push Container: {}".format(self.tag))
+        if Container.enable_push:
+            BuildUtils.logger.debug(f"{self.tag}: push")
+            if self.container_pushed:
+                BuildUtils.logger.debug(f"{self.tag}: already pushed -> skip")
+                return
 
-        if self.container_registry == "local" or self.container_registry == "local-only":
-            print("############################ Push skipped -> local registry found!")
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "Container push",
-                "log": "",
-                "loglevel": "DEBUG",
-                "timestamp": get_timestamp(),
-                "message": "Push skipped -> local registry set",
-                "rel_file": self.path,
-                "container": self,
-                "test_done": True,
-            }
-            yield log_entry
-            return
+            if self.registry == "local" or self.registry == "local-only":
+                BuildUtils.logger.debug(" Push skipped -> local registry found!")
 
-        max_retires = 2
-        retries = 0
+            max_retires = 2
+            retries = 0
 
-        command = [Container.container_engine, "push", self.tag]
+            command = [Container.container_engine, "push", self.tag]
 
-        while retries < max_retires:
-            retries += 1
-            output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=9000)
-            if output.returncode == 0 or "configured as immutable" in output.stderr:
-                break
+            while retries < max_retires:
+                retries += 1
+                output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=9000)
+                if output.returncode == 0 or "configured as immutable" in output.stderr:
+                    break
 
-        log = make_log(std_out=output.stdout, std_err=output.stderr)
-        if output.returncode == 0 and ("Pushed" in output.stdout or "podman" in Container.container_engine):
-            print("############################ Push -> success")
-            print()
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "Container push",
-                "log": "",
-                "loglevel": "DEBUG",
-                "timestamp": get_timestamp(),
-                "message": "Push successful",
-                "rel_file": self.path,
-                "container": self,
-                "test_done": True,
-            }
-            yield log_entry
+            if output.returncode == 0 and ("Pushed" in output.stdout or "podman" in Container.container_engine):
+                BuildUtils.logger.info(f"{self.tag}: pushed")
+                self.container_pushed = True
 
-        elif output.returncode == 0:
-            print(
-                "############################ Push successful -> but nothing was changed")
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "Container push",
-                "log": "",
-                "loglevel": "DEBUG",
-                "timestamp": get_timestamp(),
-                "message": "Push successful, but nothing was changed!",
-                "rel_file": self.path,
-                "container": self,
-                "test_done": True,
-            }
-            yield log_entry
+            if output.returncode == 0:
+                BuildUtils.logger.info(f"{self.tag}: pushed -> nothing was changed.")
+                self.container_pushed = True
 
-        elif output.returncode != 0 and "configured as immutable" in output.stderr:
-            print(
-                "############################ Push -> immutable -> no -vdev version -> ok")
-            if not self.dev:
-                log_entry = {
-                    "suite": suite_tag,
-                    "test": self.tag.replace(self.container_registry, "")[1:],
-                    "step": "Container push",
-                    "log": "",
-                    "loglevel": "DEBUG",
-                    "timestamp": get_timestamp(),
-                    "message": "Push skipped -> image version immutable and no -vdev version!",
-                    "rel_file": self.path,
-                    "container": self,
-                    "test_done": True,
-                }
-                yield log_entry
+            elif output.returncode != 0 and "configured as immutable" in output.stderr:
+                BuildUtils.logger.info(f"{self.tag}: not pushed -> immutable!")
+                self.container_pushed = True
 
+            elif output.returncode != 0 and "read only mode" in output.stderr and retry:
+                BuildUtils.logger.info(f"{self.tag}: not pushed -> read only mode!")
+                self.container_pushed = True
+
+            elif output.returncode != 0 and "denied" in output.stderr and retry:
+                BuildUtils.logger.error(f"{self.tag}: not pushed -> access denied!")
+                BuildUtils.generate_issue(
+                    component=suite_tag,
+                    name=f"{self.tag}",
+                    msg="container pushed failed!",
+                    level="ERROR",
+                    output=output,
+                    path=self.container_dir
+                )
             else:
-                log_entry = {
-                    "suite": suite_tag,
-                    "test": self.tag.replace(self.container_registry, "")[1:],
-                    "step": "Container push",
-                    "log": log,
-                    "loglevel": "ERROR",
-                    "timestamp": get_timestamp(),
-                    "message": "Push failed! -> image version immutable and -vdev version!",
-                    "rel_file": self.path,
-                    "container": self,
-                    "test_done": True,
-                }
-                self.error = True
-                yield log_entry
-
-        elif output.returncode != 0 and "read only mode" in output.stderr and retry:
-            print("############################ Push -> read only mode -> RETRY!")
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "Container push",
-                "log": "",
-                "loglevel": "WARN",
-                "timestamp": get_timestamp(),
-                "message": "Push read only mode!",
-                "rel_file": self.path,
-                "container": "",
-            }
-            yield log_entry
-            self.push(retry=False)
+                BuildUtils.logger.error(f"{self.tag}: not pushed -> unknown reason!")
+                BuildUtils.generate_issue(
+                    component=suite_tag,
+                    name=f"{self.tag}",
+                    msg="container pushed failed!",
+                    level="ERROR",
+                    output=output,
+                    path=self.container_dir
+                )
 
         else:
-            print("############################ Push -> ERROR!")
-            log_entry = {
-                "suite": suite_tag,
-                "test": self.tag.replace(self.container_registry, "")[1:],
-                "step": "Container push",
-                "log": log,
-                "loglevel": "ERROR",
-                "timestamp": get_timestamp(),
-                "message": "Push failed!",
-                "rel_file": self.path,
-                "container": self,
-                "test_done": True,
-            }
-            self.error = True
-            yield log_entry
+            BuildUtils.logger.debug(f"{self.tag}: push disabled")
 
+    @staticmethod
+    def init_containers(container_engine, default_registry, enable_build=True, enable_push=True):
+        Container.default_registry = default_registry
+        Container.container_engine = container_engine
+        Container.enable_build = enable_build
+        Container.enable_push = enable_push
 
-def quick_check():
-    Container.used_tags_list = []
-    dockerfiles_small = glob.glob(kaapana_dir+"/**/dockerfile*", recursive=True)
-    for wrong in dockerfiles_small:
-        if "node_modules" in wrong or "venv" in wrong:
-            continue
-        log_entry = {
-            "suite": suite_tag,
-            "test": "Dockerfile checks",
-            "step": wrong,
-            "log": "",
-            "loglevel": "ERROR",
-            "timestamp": get_timestamp(),
-            "message": "Dockerfile not valid: filename must be capitalized",
-            "rel_file": wrong,
-        }
-        yield log_entry
+        BuildUtils.logger.debug("")
+        BuildUtils.logger.debug(" -> Container Init")
+        BuildUtils.logger.debug(f"Container engine: {Container.container_engine}")
+        if which(Container.container_engine) is None:
+            BuildUtils.logger.error(f"{Container.container_engine} was not found!")
+            BuildUtils.logger.error("Please install {Container.container_engine} on your system.")
+            if Container.exit_on_error:
+                exit(1)
 
-    dockerfiles = glob.glob(kaapana_dir+"/**/Dockerfile*", recursive=True)
-    print("Found {} Dockerfiles".format(len(dockerfiles)))
+    @staticmethod
+    def collect_containers():
+        BuildUtils.logger.debug("")
+        BuildUtils.logger.debug(" collect_containers")
+        Container.container_object_list = []
+        Container.used_tags_list = []
 
-    containers_list = []
-    containers_pending_list = []
-    for dockerfile in dockerfiles:
-        if ("templates_and_examples" in dockerfile) or ("venv" in dockerfile):
-            continue
+        dockerfiles_found = glob(BuildUtils.kaapana_dir+"/**/Dockerfile*", recursive=True)
+        BuildUtils.logger.info("")
+        BuildUtils.logger.info(f"-> Found {len(dockerfiles_found)} Dockerfiles @Kaapana")
 
-        container = Container(dockerfile)
-        for log_entry in container.log_list:
-            yield log_entry
+        if BuildUtils.external_source_dirs != None and len(BuildUtils.external_source_dirs) > 0:
+            for external_source in BuildUtils.external_source_dirs:
+                BuildUtils.logger.info("")
+                BuildUtils.logger.info(f"-> adding external sources: {external_source}")
+                dockerfiles_found.extend(glob(external_source+"/**/Dockerfile*", recursive=True))
+                BuildUtils.logger.info(f"Found {len(dockerfiles_found)} Dockerfiles")
+                BuildUtils.logger.info("")
 
-        if container.error:
-            continue
+        if len(dockerfiles_found) != len(set(dockerfiles_found)):
+            BuildUtils.logger.warning("")
+            BuildUtils.logger.warning("-> Duplicate Dockerfiles found!")
 
-        else:
-            log_entry = {
-                "suite": suite_tag,
-                "test": container.tag.replace(container.container_registry, "")[1:],
-                "step": "Containerr-Tag Check",
-                "log": "",
-                "loglevel": "DEBUG",
-                "timestamp": get_timestamp(),
-                "message": "Container tag ok!",
-                "rel_file": container.path,
-                "container": container,
-            }
-            yield log_entry
+        dockerfiles_found = set(dockerfiles_found)
 
-            if container.pending:
-                containers_pending_list.append(container)
-            else:
-                containers_list.append(container)
+        for dockerfile in dockerfiles_found:
+            container = Container(dockerfile)
+            Container.container_object_list.append(container)
 
-    max_tries = 5
-    try_count = 0
+        Container.container_object_list = Container.check_base_containers(Container.container_object_list)
+        return Container.container_object_list
 
-    while try_count <= max_tries:
-        try_count += 1
-        pending_copy = containers_pending_list.copy()
-        for pending_container in pending_copy:
-            if not pending_container.check_pending():
-                containers_list.append(pending_container)
-                container.used_tags_list.append(container.tag)
-                containers_pending_list.remove(pending_container)
+    @staticmethod
+    def check_base_containers(container_object_list):
+        BuildUtils.logger.debug("")
+        BuildUtils.logger.debug(" check_base_containers")
+        BuildUtils.logger.debug("")
+        for container in container_object_list:
+            container.missing_base_images = []
+            for base_image in container.base_images:
+                if base_image.local_image and base_image.tag not in Container.container_object_list:
+                    container.missing_base_images.append(base_image)
+                    BuildUtils.logger.error("")
+                    BuildUtils.logger.error(f"-> {container.container_id} - base_image missing: {base_image.tag}")
+                    BuildUtils.logger.error("")
+                    if Container.exit_on_error:
+                        exit(1)
 
-    for not_resolved in containers_pending_list:
-        log_entry = {
-            "suite": suite_tag,
-            "test": not_resolved.tag.replace(not_resolved.container_registry, "")[1:],
-            "step": "Base-Image Check",
-            "log": "",
-            "loglevel": "WARN",
-            "timestamp": get_timestamp(),
-            "message": "Could not resolve base image: {}".format(not_resolved.base_images),
-            "rel_file": not_resolved.path,
-            "container": "",
-        }
-
-        if not_resolved.tag not in Container.used_tags_list:
-            containers_list.append(not_resolved)
-            container.used_tags_list.append(not_resolved.tag)
-
-        yield log_entry
-
-    i = 0
-    list_size_containers = len(containers_list)
-    while i < list_size_containers:
-        container = containers_list[i]
-        if container.container_registry.lower() == "local-only":
-            containers_list.insert(0, containers_list.pop(i))
-            i += 1
-            continue
-
-        for base_image in container.base_images:
-            base_image_registry = base_image.split("/")[0]
-            if base_image_registry == default_registry:
-                containers_list.insert(len(containers_list)-1, containers_list.pop(i))
-                list_size_containers -= 1
-                i -= 1
-                continue
-
-        i += 1
-    yield containers_list
-
-
-def start_container_build(config):
-    global kaapana_dir, http_proxy, default_registry
-    kaapana_dir, http_proxy, container_engine, default_registry = config
-    Container.container_engine = container_engine
-
-    if which(Container.container_engine) is None:
-        print(f"{Container.container_engine} was not found!")
-        print("Please install {Container.container_engine} on your system.")
-        exit(1)
-    
-    print("")
-    print(f"Container engine: {Container.container_engine}")
-    print("")
-    sleep(2)
-
-    logs = []
-    for log in quick_check():
-        if type(log) != dict:
-            containers_list = log
-        else:
-            logs.append(log)
-
-    print()
-    print("Process {} containers...".format(len(containers_list)))
-    print()
-
-    return [containers_list, logs]
+        return container_object_list
 
 
 if __name__ == '__main__':

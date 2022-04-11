@@ -1,6 +1,6 @@
 ---
 dependencies:
-  - name: base
+  - name: base-starter
     version: "0.1.1"
     repository: file://deps/base
   - name: landing-page-kaapana-chart

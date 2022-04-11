@@ -25,7 +25,7 @@ spec:
           mountPath: /charts
 {{- range $collection := .Values.global.kaapana_collections }}
       - name: remove-{{ $collection.name }}
-        image: "{{ $.Values.global.registry_url }}/{{ $collection.name }}:{{ $collection.version }}"
+        image: "{{ .Values.global.registry_url }}/{{ $collection.name }}:{{ $collection.version }}"
         imagePullPolicy: Never
         env:
         - name: ACTION
