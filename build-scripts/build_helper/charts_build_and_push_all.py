@@ -435,6 +435,7 @@ class HelmChart:
 
         try_count = 0
         max_tries = 3
+
         os.chdir(chart_dir)
         command = ["helm", "dep", "up"]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=60)
@@ -605,20 +606,36 @@ class HelmChart:
             target_dir = join(BuildUtils.build_dir, chart.name)
         else:
             target_dir = join(parent_chart_dir, "charts", chart.name)
-
+        
         shutil.copytree(
             src=chart.chart_dir,
             dst=target_dir
         )
+        chart.build_chart_dir = target_dir
+        chart.build_chartfile = join(target_dir,"Chart.yaml")
         requirements_path = join(target_dir, "requirements.yaml")
-        if os.path.exists(requirements_path):
-            os.remove(requirements_path)
+        if exists(requirements_path):
+            with open(str(requirements_path)) as f:
+                requirements_yaml = yaml.safe_load(f)
+            if requirements_yaml != None and "dependencies" in requirements_yaml and requirements_yaml["dependencies"] != None: 
+                for dependency in requirements_yaml["dependencies"]:
+                    if "repository" in dependency:
+                        del dependency["repository"]
+
+            with open(requirements_path, 'w') as outfile:
+                yaml.dump(requirements_yaml, outfile, default_flow_style=False)
+
+        deps_path = join(target_dir, "deps")
+        if os.path.exists(deps_path):
+            shutil.rmtree(deps_path)
 
         for dep_chart in chart.dependencies_list:
             HelmChart.create_build_version(chart=dep_chart, parent_chart_dir=target_dir)
-            dep_chart.dep_up()
-            dep_chart.lint_chart()
-            dep_chart.lint_kubeval()
+            assert exists(dep_chart.build_chartfile)
+            tmp_build_chart = HelmChart(chartfile=dep_chart.build_chartfile)
+            tmp_build_chart.dep_up()
+            tmp_build_chart.lint_chart()
+            tmp_build_chart.lint_kubeval()
 
         return target_dir
 
@@ -628,13 +645,12 @@ class HelmChart:
         build_order_bottom_up = BuildUtils.get_build_order()
 
         for platform_chart in HelmChart.build_tree:
-            platform_build_dir = HelmChart.create_build_version(chart=platform_chart)
-            build_chart_file = join(platform_build_dir, "Chart.yaml")
-            assert exists(build_chart_file)
-            build_platform_chart = HelmChart(chartfile=build_chart_file)
+            HelmChart.create_build_version(chart=platform_chart)
+            assert exists(platform_chart.build_chartfile)
+            build_platform_chart = HelmChart(chartfile=platform_chart.build_chartfile)
             build_platform_chart.make_package()
             build_platform_chart.push()
-            BuildUtils.logger.info(f"{build_platform_chart.chart_id}: DONE")
+            BuildUtils.logger.info(f"{platform_chart.chart_id}: DONE")
 
         BuildUtils.logger.info("Start container build...")
         for build_entry in build_order_bottom_up:

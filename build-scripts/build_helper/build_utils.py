@@ -100,7 +100,7 @@ class BuildUtils:
 
     @staticmethod
     def generate_containers_info():
-        unused_containers_json_path = join(BuildUtils.build_dir, "unused_containers.json")
+        unused_containers_json_path = join(BuildUtils.build_dir, "build_unused_containers.json")
         BuildUtils.logger.debug("")
         BuildUtils.logger.debug("Collect unused containers:")
         BuildUtils.logger.debug("")
@@ -111,7 +111,7 @@ class BuildUtils:
         with open(unused_containers_json_path, 'w') as fp:
             json.dump(unused_container, fp, indent=4)
 
-        base_images_json_path = join(BuildUtils.build_dir, "base_images.json")
+        base_images_json_path = join(BuildUtils.build_dir, "build_base_images.json")
         base_images=[]
         BuildUtils.logger.debug("")
         BuildUtils.logger.debug("Collect base-images:")
@@ -122,7 +122,7 @@ class BuildUtils:
         with open(base_images_json_path, 'w') as fp:
             json.dump(base_images, fp, indent=4)
 
-        all_containers_json_path = join(BuildUtils.build_dir, "containers_all.json")
+        all_containers_json_path = join(BuildUtils.build_dir, "build_containers_all.json")
         BuildUtils.logger.debug("")
         BuildUtils.logger.debug("Collect all containers present:")
         BuildUtils.logger.debug("")
@@ -131,7 +131,7 @@ class BuildUtils:
             BuildUtils.logger.info(f"{container.tag}")
             all_container.append(container.get_dict())
 
-        all_containers_json_path = join(BuildUtils.build_dir, "containers_all.json")
+        all_containers_json_path = join(BuildUtils.build_dir, "build_containers_all.json")
         with open(all_containers_json_path, 'w') as fp:
             json.dump(all_container, fp, indent=4)
 
