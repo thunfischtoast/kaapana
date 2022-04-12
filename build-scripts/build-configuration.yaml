@@ -9,5 +9,5 @@ log_level: "INFO" # DEBUG, INFO, WARN or ERROR
 build_only: false
 platform_filter: "" # comma sperated platform-chart-names
 external_source_dirs: "/home/jonas/projects/racoon-repo" # comma sperated paths 
-exit_on_error: true
+exit_on_error: false
 disable_linting: false

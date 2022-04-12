@@ -31,7 +31,6 @@ def container_registry_login(username, password):
         BuildUtils.logger.error(f"Error:   {output.stderr}")
         exit(1)
 
-
 class BaseImage:
     registry = None
     project = None
@@ -159,9 +158,10 @@ class Container:
                 elif line.startswith('FROM') and not line.__contains__('#ignore'):
                     base_img_tag = line.split("FROM ")[1].split(" ")[0].rstrip().strip().replace("\"", "")
                     base_img_obj = BaseImage(tag=base_img_tag)
-                    self.base_images.append(base_img_obj)
-                    if base_img_obj not in BuildUtils.base_images_used:
-                        BuildUtils.base_images_used.append(base_img_obj)
+                    if base_img_obj not in self.base_images:
+                        self.base_images.append(base_img_obj)
+                        if base_img_obj not in BuildUtils.base_images_used:
+                            BuildUtils.base_images_used.append(base_img_obj)
                 elif line.__contains__('LABEL CI_IGNORE='):
                     self.ci_ignore = True if line.split("=")[1].rstrip().lower().replace("\"", "").replace("'", "") == "true" else False
 

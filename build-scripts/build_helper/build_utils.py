@@ -99,14 +99,14 @@ class BuildUtils:
             BuildUtils.logger.debug(json.dumps(issue, indent=4, sort_keys=True))
 
     @staticmethod
-    def generate_containers_info():
+    def generate_component_usage_info():
         unused_containers_json_path = join(BuildUtils.build_dir, "build_unused_containers.json")
         BuildUtils.logger.debug("")
         BuildUtils.logger.debug("Collect unused containers:")
         BuildUtils.logger.debug("")
         unused_container=[]
         for container in BuildUtils.container_images_unused:
-            BuildUtils.logger.info(f"{container.tag}")
+            BuildUtils.logger.debug(f"{container.tag}")
             unused_container.append(container.get_dict())
         with open(unused_containers_json_path, 'w') as fp:
             json.dump(unused_container, fp, indent=4)
@@ -117,7 +117,7 @@ class BuildUtils:
         BuildUtils.logger.debug("Collect base-images:")
         BuildUtils.logger.debug("")
         for base_image in BuildUtils.base_images_used:
-            BuildUtils.logger.info(f"{base_image.tag}")
+            BuildUtils.logger.debug(f"{base_image.tag}")
             base_images.append(base_image.get_dict())
         with open(base_images_json_path, 'w') as fp:
             json.dump(base_images, fp, indent=4)
@@ -128,12 +128,35 @@ class BuildUtils:
         BuildUtils.logger.debug("")
         all_container=[]
         for container in BuildUtils.container_images_available:
-            BuildUtils.logger.info(f"{container.tag}")
+            BuildUtils.logger.debug(f"{container.tag}")
             all_container.append(container.get_dict())
 
-        all_containers_json_path = join(BuildUtils.build_dir, "build_containers_all.json")
         with open(all_containers_json_path, 'w') as fp:
             json.dump(all_container, fp, indent=4)
+
+        all_charts_json_path = join(BuildUtils.build_dir, "build_charts_all.json")
+        BuildUtils.logger.debug("")
+        BuildUtils.logger.debug("Collect all charts present:")
+        BuildUtils.logger.debug("")
+        all_charts=[]
+        for chart in BuildUtils.charts_available:
+            BuildUtils.logger.debug(f"{chart.chart_id}")
+            all_charts.append(chart.get_dict())
+
+        with open(all_charts_json_path, 'w') as fp:
+            json.dump(all_charts, fp, indent=4)
+
+        unused_charts_json_path = join(BuildUtils.build_dir, "build_charts_unused.json")
+        BuildUtils.logger.debug("")
+        BuildUtils.logger.debug("Collect all charts present:")
+        BuildUtils.logger.debug("")
+        unused_charts=[]
+        for chart in BuildUtils.charts_unused:
+            BuildUtils.logger.debug(f"{chart.chart_id}")
+            unused_charts.append(chart.get_dict())
+
+        with open(unused_charts_json_path, 'w') as fp:
+            json.dump(unused_charts, fp, indent=4)
 
 if __name__ == '__main__':
     print("Please use the 'start_build.py' script to launch the build-process.")

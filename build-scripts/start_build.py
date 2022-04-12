@@ -6,14 +6,12 @@ import os
 import logging
 import getpass
 from os.path import join, dirname, basename, exists, isfile, isdir
-from glob import glob
 from time import time
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from argparse import ArgumentParser
-from build_helper.charts_build_and_push_all import HelmChart
-from build_helper.containers_build_and_push_all import Container, container_registry_login
-from build_helper.charts_build_and_push_all import init_helm_charts, helm_registry_login
+from build_helper.charts_helper import HelmChart, init_helm_charts, helm_registry_login, generate_tree_viz
+from build_helper.container_helper import Container, container_registry_login
 from build_helper.build_utils import BuildUtils
 
 build_dir = join(dirname(dirname(os.path.realpath(__file__))), "build")
@@ -260,7 +258,8 @@ if __name__ == '__main__':
     logger.info("")
 
     HelmChart.generate_platform_build_tree()
-    BuildUtils.generate_containers_info()
+    generate_tree_viz(HelmChart.build_tree)
+    BuildUtils.generate_component_usage_info()
     HelmChart.build_platforms()
 
     if len(BuildUtils.issues_list) > 0:

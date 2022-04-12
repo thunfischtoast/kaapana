@@ -23,9 +23,16 @@ def generate_node(chart_object, tree, parent):
     if len(chart_object.chart_containers) > 0:
         containers_node_id = f"{node_id}-containers"
         tree.create_node("containers", containers_node_id, parent=node_id)
-        for container_id, container_info in chart_object.chart_containers.items():
-            container_node_id = f"{node_id}-{container_id}"
-            tree.create_node(container_info, container_node_id, parent=containers_node_id)
+        for container in chart_object.chart_containers:
+            container_node_id = f"{node_id}-{container.image_name}-{container.image_version}"
+            tree.create_node(container.tag, container_node_id, parent=containers_node_id)
+            
+            if len(container.base_images) > 0:
+                base_images_node_id = f"{container_node_id}-base-images"
+                tree.create_node("base-images", base_images_node_id, parent=container_node_id)
+            for base_image in container.base_images:
+                base_img_node_id = f"{container_node_id}-{base_image.name}-{container.image_version}"
+                tree.create_node(f"{base_image.name}-{base_image.version}", base_img_node_id, parent=base_images_node_id)
 
     if len(chart_object.dependencies_list) > 0:
         charts_node_id = f"{node_id}-charts"
@@ -35,31 +42,26 @@ def generate_node(chart_object, tree, parent):
     return tree
 
 
-def generate_tree_viz(all_chart_objects):
-    tree = Tree()
-    root_node_id = "ROOT"
-    tree.create_node(root_node_id, root_node_id.lower())
-    for chart_object in all_chart_objects:
-        tree = generate_node(chart_object=chart_object, tree=tree, parent=root_node_id.lower())
+def generate_tree_viz(charts_build_tree):
 
-    tree_json_path = join(BuildUtils.build_dir, "tree.txt")
-    tree.save2file(tree_json_path)
-    BuildUtils.logger.info("")
-    BuildUtils.logger.info("")
-    BuildUtils.logger.info("BUILD TREE")
-    BuildUtils.logger.info("")
-    with open(tree_json_path, "r") as file:
-        for line in file:
-            BuildUtils.logger.info(line.strip('\n'))
+    for platform in charts_build_tree:
+        tree = Tree()
+        root_node_id = platform.name
+        tree.create_node(root_node_id, root_node_id.lower())
+        for chart_object in platform.dependencies_list:
+            tree = generate_node(chart_object=chart_object, tree=tree, parent=root_node_id.lower())
 
-    # from networkx.drawing.nx_pydot import graphviz_layout
+        tree_json_path = join(BuildUtils.build_dir, f"tree-{platform.name}.txt")
+        tree.save2file(tree_json_path)
+        BuildUtils.logger.info("")
+        BuildUtils.logger.info("")
+        BuildUtils.logger.info("BUILD TREE")
+        BuildUtils.logger.info("")
+        with open(tree_json_path, "r") as file:
+            for line in file:
+                BuildUtils.logger.info(line.strip('\n'))
 
-    # tree = nx.bfs_tree(g, "ROOT")
-    # plt.figure(1,figsize=(50,50))
-    # pos = graphviz_layout(tree, prog="dot")
-    # nx.draw(tree, pos,with_labels=True)
-    # plt.show()
-    BuildUtils.logger.info("")
+        BuildUtils.logger.info("")
 
 
 def check_chart_containers(images_to_be_build, images_missing, chart_object):
@@ -190,6 +192,15 @@ class HelmChart:
             return self == other.chart_id
         elif isinstance(self, HelmChart) and isinstance(other, str):
             return self.chart_id == other
+
+    def get_dict(self):
+        chart_dict = {
+            "name": self.name,
+            "version": self.version,
+            "chart_id": self.chart_id
+        }
+        return chart_dict
+
 
     def __init__(self, chartfile):
         self.name = None
@@ -366,6 +377,10 @@ class HelmChart:
 
     def check_container_use(self):
         BuildUtils.logger.debug(f"{self.chart_id}: check_container_use")
+        if len(self.chart_containers) > 0:
+            BuildUtils.logger.debug(f"{self.chart_id}: check_container_use already done -> skip")
+            return
+
         self.chart_containers = []
 
         template_dirs = (f"{self.chart_dir}/templates/*.yaml", f"{self.chart_dir}/crds/*.yaml")  # the tuple of file types
@@ -405,10 +420,16 @@ class HelmChart:
                         else:
                             container_tag = line.replace("{{.Values.global.registry_url}}", BuildUtils.default_registry)
                             containers_found = [x for x in BuildUtils.container_images_available if x.tag == container_tag]
+                            BuildUtils.logger.error(f"container_found: {container_tag}")
                             if len(containers_found) == 1:
+                                container_found = containers_found[0]
                                 BuildUtils.logger.debug(f"{self.chart_id}: container found: {container_tag}")
-                                self.chart_containers.append(containers_found[0])
-                                BuildUtils.build_graph.add_edge(f"chart:{self.chart_id}", f"container:{container_tag}")
+                                if container_found not in self.chart_containers:
+                                    self.chart_containers.append(container_found)
+                                    BuildUtils.build_graph.add_edge(f"chart:{self.chart_id}", f"container:{container_tag}")
+                                    for base_image in container_found.base_images:
+                                        if base_image.local_image:
+                                            BuildUtils.build_graph.add_edge(f"container:{container_tag}", f"container:{base_image.tag}")
                             else:
                                 BuildUtils.logger.error(f"Chart container needed {container_tag}")
                                 BuildUtils.logger.error(f"Chart container issue - found: {len(containers_found)}")
