@@ -244,9 +244,6 @@ class Container:
                     BuildUtils.logger.debug(f"{self.tag}: already pushed -> skip")
                     return
 
-                if self.local_image or self.registry == "local" or self.registry == "local-only":
-                    BuildUtils.logger.debug(" Push skipped -> local registry found!")
-
                 max_retires = 2
                 retries = 0
 
@@ -294,7 +291,8 @@ class Container:
                         output=output,
                         path=self.container_dir
                     )
-
+            else:
+                BuildUtils.logger.debug(f"{self.tag}: push skipped -> local registry found")
         else:
             BuildUtils.logger.debug(f"{self.tag}: push disabled")
 
