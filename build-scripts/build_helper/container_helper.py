@@ -95,6 +95,7 @@ class Container:
     container_object_list = None
     container_build = None
     container_pushed = None
+    local_image = None
 
     def __eq__(self, other):
         if isinstance(self, str):
@@ -139,6 +140,7 @@ class Container:
         self.already_built = False
         self.container_build = False
         self.container_pushed = False
+        self.local_image = False
 
         if not os.path.isfile(dockerfile):
             BuildUtils.logger.error(f"Dockerfile {dockerfile} not found.")
@@ -167,13 +169,19 @@ class Container:
 
         if self.image_version == None and self.image_version == "" or self.image_name == None or self.image_name == "":
             BuildUtils.logger.debug(f"{self.container_dir}: could not extract container infos!")
-            if BuildUtils.exit_on_error:
-                exit(1)
+            BuildUtils.generate_issue(
+                component=suite_tag,
+                name=f"{self.container_dir}",
+                msg="could not extract container infos!",
+                level="ERROR",
+            )
             return
 
         else:
             self.registry = self.registry if self.registry != None else Container.default_registry
             self.tag = self.registry+"/"+self.image_name+":"+self.image_version
+            if "local-only" in self.tag:
+                self.local_image = True
 
     def check_prebuild(self):
         BuildUtils.logger.debug(f"{self.tag}: check_prebuild")
