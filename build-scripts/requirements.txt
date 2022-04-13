@@ -2,6 +2,3 @@ pyyaml
 treelib
 networkx[default]
 jinja2
-pygraphviz
-pydot
-#sudo apt-get install graphviz graphviz-dev python3-dev

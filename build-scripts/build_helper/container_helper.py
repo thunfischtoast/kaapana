@@ -142,7 +142,7 @@ class Container:
 
         if not os.path.isfile(dockerfile):
             BuildUtils.logger.error(f"Dockerfile {dockerfile} not found.")
-            if Container.exit_on_error:
+            if BuildUtils.exit_on_error:
                 exit(1)
 
         with open(dockerfile, 'rt') as f:
@@ -167,7 +167,7 @@ class Container:
 
         if self.image_version == None and self.image_version == "" or self.image_name == None or self.image_name == "":
             BuildUtils.logger.debug(f"{self.container_dir}: could not extract container infos!")
-            if Container.exit_on_error:
+            if BuildUtils.exit_on_error:
                 exit(1)
             return
 
@@ -310,7 +310,7 @@ class Container:
         if which(Container.container_engine) is None:
             BuildUtils.logger.error(f"{Container.container_engine} was not found!")
             BuildUtils.logger.error("Please install {Container.container_engine} on your system.")
-            if Container.exit_on_error:
+            if BuildUtils.exit_on_error:
                 exit(1)
 
     @staticmethod
@@ -358,7 +358,7 @@ class Container:
                     BuildUtils.logger.error("")
                     BuildUtils.logger.error(f"-> {container.container_id} - base_image missing: {base_image.tag}")
                     BuildUtils.logger.error("")
-                    if Container.exit_on_error:
+                    if BuildUtils.exit_on_error:
                         exit(1)
 
         return container_object_list
