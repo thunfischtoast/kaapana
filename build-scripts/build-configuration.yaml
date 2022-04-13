@@ -5,6 +5,7 @@ default_registry: "registry.hzdr.de/jonas.scherer/kaapana"
 # default_container_registry: "registry.hzdr.de/kaapana/racoon"
 #default_container_registry: "registry.hzdr.de/kaapana/kaapana-dev"
 container_engine: "docker" # docker or podman
+enable_build_kit: false
 log_level: "INFO" # DEBUG, INFO, WARN or ERROR
 build_only: false
 platform_filter: "" # comma sperated platform-chart-names
