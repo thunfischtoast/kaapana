@@ -10,4 +10,4 @@ build_only: false
 platform_filter: "" # comma sperated platform-chart-names
 external_source_dirs: "" # comma sperated paths 
 exit_on_error: false
-disable_linting: false
+enable_linting: false

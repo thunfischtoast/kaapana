@@ -71,7 +71,7 @@ if __name__ == '__main__':
     parser.add_argument("-bo", "--build-only", dest="build_only", default=None, action='store_true', help="Just building the containers and charts -> no pushing")
     parser.add_argument("-kd", "--kaapana-dir", dest="kaapaa_dir", default=None, help="Kaapana repo path.")
     parser.add_argument("-ll", "--log-level", dest="log_level", default=None, help="Set log-level.")
-    parser.add_argument("-dl", "--disbale-linting", dest="disable_linting", default=None, help="Disbale Helm Chart lint & kubeval.")
+    parser.add_argument("-el", "--enable-linting", dest="enable_linting", default=None, help="Enable Helm Chart lint & kubeval.")
     parser.add_argument("-ee", "--exit-on-error", dest="exit_on_error", default=None, help="Stop build-process if error occurs.")
     parser.add_argument("-pf", "--plartform-filter", dest="platform_filter", default=None, help="Specify platform-chart-names to be build (comma seperated).")
     parser.add_argument("-es", "--external-sources", dest="external_source_dirs", default=None, help="External dirs to search for containers and charts.")
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     conf_platform_filter = configuration["platform_filter"].split(",") if configuration["platform_filter"].replace(" ","") != "" else []
     conf_external_source_dirs = configuration["external_source_dirs"].split(",") if configuration["external_source_dirs"].replace(" ","") != "" else []
     conf_exit_on_error = configuration["exit_on_error"]
-    conf_disable_linting = configuration["disable_linting"]
+    conf_enable_linting = configuration["enable_linting"]
 
     registry_user = args.username
     registry_pwd = args.password
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     build_only = args.build_only if args.build_only != None else conf_build_only
     external_source_dirs = args.external_source_dirs.split(",") if args.external_source_dirs != None else conf_external_source_dirs
     log_level = args.log_level if args.log_level != None else conf_log_level
-    disable_linting = args.disable_linting if args.disable_linting != None else conf_disable_linting
+    enable_linting = args.enable_linting if args.enable_linting != None else conf_enable_linting
     exit_on_error = args.exit_on_error if args.exit_on_error != None else conf_exit_on_error
     platform_filter = args.platform_filter.split(",") if args.platform_filter != None else conf_platform_filter
 
@@ -127,8 +127,8 @@ if __name__ == '__main__':
             logger.error("-----------------------------------------------------------")
             exit(1)
 
-    charts_lint = False if disable_linting else True
-    charts_kubeval = False if disable_linting else True
+    charts_lint = True if enable_linting else False
+    charts_kubeval = True if enable_linting else False
     charts_push = False if build_only else True
     containers_push = False if build_only else True
     container_build = True
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     logger.info(f"{build_only=}")
     logger.info(f"{external_source_dirs=}")
     logger.info(f"{log_level=}")
-    logger.info(f"{disable_linting=}")
+    logger.info(f"{enable_linting=}")
     logger.info(f"{exit_on_error=}")
     logger.info(f"{platform_filter=}")
     logger.info(f"{charts_kubeval=}")

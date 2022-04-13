@@ -251,6 +251,16 @@ class Container:
                 if self.container_pushed:
                     BuildUtils.logger.debug(f"{self.tag}: already pushed -> skip")
                     return
+                
+                if not self.container_build:
+                    BuildUtils.logger.warning(f"{self.tag}: push skipped -> container not build!")
+                    BuildUtils.generate_issue(
+                        component=suite_tag,
+                        name=f"{self.tag}",
+                        msg="Push skipped -> container not build!",
+                        level="WARNING",
+                        path=self.container_dir
+                    )
 
                 max_retires = 2
                 retries = 0
