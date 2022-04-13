@@ -420,7 +420,6 @@ class HelmChart:
                         else:
                             container_tag = line.replace("{{.Values.global.registry_url}}", BuildUtils.default_registry)
                             containers_found = [x for x in BuildUtils.container_images_available if x.tag == container_tag]
-                            BuildUtils.logger.error(f"container_found: {container_tag}")
                             if len(containers_found) == 1:
                                 container_found = containers_found[0]
                                 BuildUtils.logger.debug(f"{self.chart_id}: container found: {container_tag}")

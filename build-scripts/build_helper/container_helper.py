@@ -238,61 +238,62 @@ class Container:
 
     def push(self, retry=True):
         if Container.enable_push:
-            BuildUtils.logger.debug(f"{self.tag}: push")
-            if self.container_pushed:
-                BuildUtils.logger.debug(f"{self.tag}: already pushed -> skip")
-                return
+            if not self.local_image:
+                BuildUtils.logger.debug(f"{self.tag}: push")
+                if self.container_pushed:
+                    BuildUtils.logger.debug(f"{self.tag}: already pushed -> skip")
+                    return
 
-            if self.registry == "local" or self.registry == "local-only":
-                BuildUtils.logger.debug(" Push skipped -> local registry found!")
+                if self.local_image or self.registry == "local" or self.registry == "local-only":
+                    BuildUtils.logger.debug(" Push skipped -> local registry found!")
 
-            max_retires = 2
-            retries = 0
+                max_retires = 2
+                retries = 0
 
-            command = [Container.container_engine, "push", self.tag]
+                command = [Container.container_engine, "push", self.tag]
 
-            while retries < max_retires:
-                retries += 1
-                output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=9000)
-                if output.returncode == 0 or "configured as immutable" in output.stderr:
-                    break
+                while retries < max_retires:
+                    retries += 1
+                    output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=9000)
+                    if output.returncode == 0 or "configured as immutable" in output.stderr:
+                        break
 
-            if output.returncode == 0 and ("Pushed" in output.stdout or "podman" in Container.container_engine):
-                BuildUtils.logger.info(f"{self.tag}: pushed")
-                self.container_pushed = True
+                if output.returncode == 0 and ("Pushed" in output.stdout or "podman" in Container.container_engine):
+                    BuildUtils.logger.info(f"{self.tag}: pushed")
+                    self.container_pushed = True
 
-            if output.returncode == 0:
-                BuildUtils.logger.info(f"{self.tag}: pushed -> nothing was changed.")
-                self.container_pushed = True
+                if output.returncode == 0:
+                    BuildUtils.logger.info(f"{self.tag}: pushed -> nothing was changed.")
+                    self.container_pushed = True
 
-            elif output.returncode != 0 and "configured as immutable" in output.stderr:
-                BuildUtils.logger.info(f"{self.tag}: not pushed -> immutable!")
-                self.container_pushed = True
+                elif output.returncode != 0 and "configured as immutable" in output.stderr:
+                    BuildUtils.logger.info(f"{self.tag}: not pushed -> immutable!")
+                    self.container_pushed = True
 
-            elif output.returncode != 0 and "read only mode" in output.stderr and retry:
-                BuildUtils.logger.info(f"{self.tag}: not pushed -> read only mode!")
-                self.container_pushed = True
+                elif output.returncode != 0 and "read only mode" in output.stderr and retry:
+                    BuildUtils.logger.info(f"{self.tag}: not pushed -> read only mode!")
+                    self.container_pushed = True
 
-            elif output.returncode != 0 and "denied" in output.stderr and retry:
-                BuildUtils.logger.error(f"{self.tag}: not pushed -> access denied!")
-                BuildUtils.generate_issue(
-                    component=suite_tag,
-                    name=f"{self.tag}",
-                    msg="container pushed failed!",
-                    level="ERROR",
-                    output=output,
-                    path=self.container_dir
-                )
-            else:
-                BuildUtils.logger.error(f"{self.tag}: not pushed -> unknown reason!")
-                BuildUtils.generate_issue(
-                    component=suite_tag,
-                    name=f"{self.tag}",
-                    msg="container pushed failed!",
-                    level="ERROR",
-                    output=output,
-                    path=self.container_dir
-                )
+                elif output.returncode != 0 and "denied" in output.stderr and retry:
+                    BuildUtils.logger.error(f"{self.tag}: not pushed -> access denied!")
+                    BuildUtils.generate_issue(
+                        component=suite_tag,
+                        name=f"{self.tag}",
+                        msg="container pushed failed!",
+                        level="ERROR",
+                        output=output,
+                        path=self.container_dir
+                    )
+                else:
+                    BuildUtils.logger.error(f"{self.tag}: not pushed -> unknown reason!")
+                    BuildUtils.generate_issue(
+                        component=suite_tag,
+                        name=f"{self.tag}",
+                        msg="container pushed failed!",
+                        level="ERROR",
+                        output=output,
+                        path=self.container_dir
+                    )
 
         else:
             BuildUtils.logger.debug(f"{self.tag}: push disabled")
