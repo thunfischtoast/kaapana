@@ -223,7 +223,7 @@ class Container:
             else:
                 command = [Container.container_engine, "build", "-t", self.tag, "-f", self.path, "."]
 
-            output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000, env=dict(os.environ, DOCKER_BUILDKIT="1"))
+            output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000, env=dict(os.environ, DOCKER_BUILDKIT=f"{BuildUtils.enable_build_kit}"))
 
             if output.returncode != 0:
                 BuildUtils.logger.error(f"{self.tag}: build failed!")

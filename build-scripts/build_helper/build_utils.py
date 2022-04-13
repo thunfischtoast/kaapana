@@ -19,6 +19,7 @@ class BuildUtils:
     issues_list = None
     exit_on_error = True
     build_graph = None
+    enable_build_kit = None
     
     @staticmethod
     def add_container_images_available(container_images_available):
@@ -31,7 +32,7 @@ class BuildUtils:
         BuildUtils.charts_unused = charts_available.copy()
 
     @staticmethod
-    def init(kaapana_dir, build_dir, external_source_dirs, platform_filter, default_registry, http_proxy, logger,exit_on_error):
+    def init(kaapana_dir, build_dir, external_source_dirs, platform_filter, default_registry, http_proxy, logger,exit_on_error,enable_build_kit):
         BuildUtils.logger = logger
         BuildUtils.kaapana_dir = kaapana_dir
         BuildUtils.build_dir = build_dir
@@ -44,6 +45,7 @@ class BuildUtils:
         BuildUtils.build_graph = nx.DiGraph(directed=True)
         BuildUtils.build_graph.add_node("ROOT")
         BuildUtils.base_images_used = []
+        BuildUtils.enable_build_kit = enable_build_kit
 
     @staticmethod
     def get_timestamp():

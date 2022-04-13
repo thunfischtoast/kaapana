@@ -109,6 +109,7 @@ if __name__ == '__main__':
     conf_external_source_dirs = configuration["external_source_dirs"].split(",") if configuration["external_source_dirs"].replace(" ","") != "" else []
     conf_exit_on_error = configuration["exit_on_error"]
     conf_enable_linting = configuration["enable_linting"]
+    conf_enable_build_kit = 1 if "enable_build_kit" in configuration and configuration["enable_build_kit"] else 0
 
     registry_user = args.username
     registry_pwd = args.password
@@ -207,7 +208,8 @@ if __name__ == '__main__':
         default_registry=default_registry,
         http_proxy=http_proxy,
         exit_on_error=exit_on_error,
-        logger=logger
+        logger=logger,
+        enable_build_kit = conf_enable_build_kit
     )
 
 
