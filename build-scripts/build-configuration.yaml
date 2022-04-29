@@ -1,6 +1,6 @@
 http_proxy: ""
-container_engine: "docker"         # podman or docker
-default_container_registry: "registry.hzdr.de/markus.bujotzek/kaapana-markusdev"     # empty for local build or registry-url like 'dktk-jip-registry.dkfz.de/kaapana' or 'registry.hzdr.de/kaapana/kaapana'
+container_engine: ""         # podman or docker
+default_container_registry: ""     # empty for local build or registry-url like 'dktk-jip-registry.dkfz.de/kaapana' or 'registry.hzdr.de/kaapana/kaapana'
 log_level: "WARN"
 build_containers: true
 push_containers: true
