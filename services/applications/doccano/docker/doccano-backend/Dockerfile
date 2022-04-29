@@ -19,15 +19,16 @@ ENV PYTHONUNBUFFERED 1
 
 COPY --from=build-stage /doccano/backend /backend/
 COPY --from=build-stage /doccano/Pipfile* /backend/
+COPY files/requirements.txt ./
 
 # hadolint ignore=DL3013
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat=1.* \
     libpq-dev=11.* \
     unixodbc-dev=2.* \
     g++=4:* \
- && pip install --no-cache-dir pipenv==2020.11.15 \
+ # && pip install --no-cache-dir pipenv==2020.11.15 \
+ && pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt \
  && pipenv install --system --deploy \
  && pip uninstall -y pipenv virtualenv-clone virtualenv \
  && apt-get clean \

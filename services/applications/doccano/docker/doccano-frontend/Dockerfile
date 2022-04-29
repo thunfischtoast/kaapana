@@ -5,13 +5,17 @@ LABEL VERSION="sha-0489118"
                    
 LABEL CI_IGNORE="False"
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git \
+  && git config --global url."https://".insteadOf git:// \
+  && git clone https://github.com/klauskades/doccano.git doccano && cd doccano && git checkout 8044a025c699eb7a75bde5fad921923e8ef78b4e
 
-# git hack to replace git:// with https:// -> dkfz proxy 
-RUN git config --global url."https://".insteadOf git://
+# RUN apk add --no-cache git
 
-RUN git clone https://github.com/klauskades/doccano.git doccano && cd doccano && git checkout 8044a025c699eb7a75bde5fad921923e8ef78b4e
-# && git checkout bf3f3e647fbf00749deebe571326d8d728805639
+# # git hack to replace git:// with https:// -> dkfz proxy 
+# RUN git config --global url."https://".insteadOf git://
+
+# RUN git clone https://github.com/klauskades/doccano.git doccano && cd doccano && git checkout 8044a025c699eb7a75bde5fad921923e8ef78b4e
+# # && git checkout bf3f3e647fbf00749deebe571326d8d728805639
 
 FROM node:16.11.1-alpine3.13 AS frontend-builder
 
@@ -27,7 +31,7 @@ COPY files/nuxt.config.js /app/
 
 WORKDIR /app
 RUN apk add --no-cache git
-
+	
 RUN git config --global url."https://".insteadOf git://
 RUN apk add -U --no-cache python3 make g++ \
   && yarn install

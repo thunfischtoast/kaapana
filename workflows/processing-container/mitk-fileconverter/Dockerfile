@@ -15,7 +15,7 @@ ENV FORCE_SINGLE_FILE false
 ENV FILECONVERTER /src/MitkFileConverter.sh
 
 COPY files/requirements.txt /src
-RUN pip3 install -r /src/requirements.txt
+RUN pip3 install --upgrade pip && pip3 install -r /src/requirements.txt
 
 COPY files/mitk_fileconverter.py /mitk_fileconverter.py
 CMD ["python3","-u", "/mitk_fileconverter.py"]

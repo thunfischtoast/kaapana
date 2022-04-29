@@ -10,7 +10,7 @@ WORKDIR /app
 RUN apk update && apk add gcc postgresql-dev python3-dev musl-dev
 
 COPY files/requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY files/ ./
 RUN chmod +x boot.sh

@@ -18,10 +18,10 @@ RUN apk add --no-cache ca-certificates bash git openssh curl \
     && chmod +x /usr/local/bin/helm \
     && chmod g+rwx /root \
     && mkdir /config \
-    && chmod g+rwx /config    
+    && chmod g+rwx /config
     
 COPY files/requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY files/ ./
 RUN chmod +x boot.sh

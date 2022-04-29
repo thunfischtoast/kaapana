@@ -15,13 +15,15 @@ COPY files/LoginPage.tsx /gitcode/console/portal-ui/src/screens/LoginPage/LoginP
 
 WORKDIR /app
 # COPY ./portal-ui/package.json ./
-RUN cp  /gitcode/console/portal-ui/package.json ./
+RUN cp  /gitcode/console/portal-ui/package.json ./ && cp /gitcode/console/portal-ui/yarn.lock ./ \
+     && cp  /gitcode/console/portal-ui/yarn.lock ./ \
+     && yarn install \
+     && cp -r  /gitcode/console/portal-ui/* .
 # COPY ./portal-ui/yarn.lock ./
-RUN cp  /gitcode/console/portal-ui/yarn.lock ./
-RUN yarn install
-
+# RUN cp  /gitcode/console/portal-ui/yarn.lock ./
+# RUN yarn install
 # COPY ./portal-ui .
-RUN cp -r  /gitcode/console/portal-ui/* .
+# RUN cp -r  /gitcode/console/portal-ui/* .
 
 RUN make build-static
 

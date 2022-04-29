@@ -10,7 +10,7 @@ RUN mkdir /dashboards
 COPY files/init_meta.py /init_meta.py
 COPY files/requirements.txt ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 
 CMD [ "python","-u", "/init_meta.py" ]

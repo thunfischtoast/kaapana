@@ -5,7 +5,7 @@ LABEL VERSION="2021-02-18"
 LABEL CI_IGNORE="False"
 
 COPY files/requirements.txt /src
-RUN pip3 install -r /src/requirements.txt
+RUN pip3 install --upgrade pip && pip3 install -r /src/requirements.txt
 
 ENV BATCHES_INPUT_DIR /input
 ENV OPERATOR_IN_DIR initial-input

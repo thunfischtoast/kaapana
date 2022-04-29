@@ -6,10 +6,11 @@ LABEL CI_IGNORE="False"
 
 WORKDIR /app
 
-RUN apk add gcc musl-dev libffi-dev openssl-dev python3-dev
-
 COPY files/requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+
+RUN apk add gcc musl-dev libffi-dev openssl-dev python3-dev \
+  && pip install --upgrade pip && pip install -r requirements.txt \
+  && rm -rf /var/cache/apt/*
 
 COPY files/ ./
 RUN chmod +x boot.sh

@@ -4,7 +4,9 @@ LABEL IMAGE="service_checker"
 LABEL VERSION="1.1"
 LABEL CI_IGNORE="False"
 
-RUN pip install requests
+COPY files/requirements.txt requirements.txt
+
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY files/service_checker.py /service_checker/service_checker.py
 

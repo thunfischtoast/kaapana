@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 COPY files/requirements.txt /usr/src/app/
-RUN python3 -m pip install pip --upgrade && python3 -m pip install --no-cache-dir wheel
+RUN python3 -m pip install pip --upgrade && python3 -m pip install --no-cache-dir wheel==0.37.1
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 

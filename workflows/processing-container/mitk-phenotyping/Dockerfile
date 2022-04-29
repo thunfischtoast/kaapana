@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY files/requirements.txt /
-RUN python3 -m pip install --no-cache-dir -r /requirements.txt && rm /requirements.txt 
+RUN python3 -m pip install --upgrade pip && python3 -m pip install --no-cache-dir -r /requirements.txt && rm /requirements.txt 
 
 WORKDIR /src
 RUN wget --no-check-certificate https://www.mitk.org/download/kaapana/phenotyping/MITK-v2021.02-linux-x86_64.tar.gz -O /src/mitk.tar.gz \

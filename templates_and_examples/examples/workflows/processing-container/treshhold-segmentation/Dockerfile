@@ -5,7 +5,7 @@ LABEL VERSION="0.1.0"
 LABEL CI_IGNORE="False"
 
 COPY files/requirements.txt /
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY files/process.py /
 
 

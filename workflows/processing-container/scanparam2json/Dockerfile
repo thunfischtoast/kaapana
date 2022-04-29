@@ -5,7 +5,7 @@ LABEL VERSION="0.1.0"
 LABEL CI_IGNORE="True"
 
 COPY files/requirements.txt /
-RUN pip3 install -r requirements.txt
+RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
 
 COPY files/scanparam2json.py /
 
