@@ -36,6 +36,15 @@ const routes = [
         },
     },
     {
+        name: 'data-selection',
+        path: '/data-selection',
+        component: () => import('@/views/DataSelection.vue'),
+        title: 'Data Selection',
+        permissions: {
+            isPublic: false,
+        },
+    },
+    {
         name: 'results-browser',
         path: '/results-browser',
         component: () => import('@/views/ResultsBrowser.vue'),

@@ -38,6 +38,12 @@
           v-list-item-content
             v-list-item-title Federated
           v-list-item-icon
+        v-list-item(:to="'/data-selection'", v-if="isAuthenticated")
+          v-list-item-action
+            v-icon mdi-vector-triangle
+          v-list-item-content
+            v-list-item-title Data Selection
+          v-list-item-icon
         v-list-item(:to="'/extensions'", v-if="isAuthenticated")
           v-list-item-action
             v-icon mdi-apps
