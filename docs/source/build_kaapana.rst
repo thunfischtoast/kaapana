@@ -26,7 +26,7 @@ We expect the sudo systemctl restart snapd
 
          | :code:`sudo apt update && sudo apt install -y curl git python3 python3-pip`
 
-      .. tab:: Centos
+      .. tab:: AlmaLinux
 
          | :code:`sudo yum install -y curl git python3 python3-pip`
 
@@ -101,11 +101,6 @@ If you **don't** have access to the Kaapana binaries directly, then you need to 
 | The complete build will take **~1h** (depending on the system)! 
 | Currently Kaapana supports two different **build-modes**:
 
-#. **Local build**
-
-   | By choosing this option you will need **no external container registry** to install the platform.
-   | All containers will be build and used locally on the server.
-
 #. **Container registry**
 
    | This option will use a remote container registry.
@@ -124,28 +119,12 @@ Before you start the build-process, you should have a look at the build-configur
 
 .. tabs::
 
-   .. tab:: Local build
-
-      .. code-block:: python
-         :emphasize-lines: 2,3,4,5,6,7,8,9,10,11
-
-         http_proxy: ""
-         default_container_registry: ""
-         log_level: "WARN"
-         build_containers: true
-         push_containers: false
-         push_dev_containers_only: false
-         build_charts: true
-         push_charts: false
-         create_package: true
-
    .. tab:: Private registry
 
       | You need to login first: :code:`docker login <registry-url>`.
       | Then you must adjust the configuration as follows:
 
       .. code-block:: python
-         :emphasize-lines: 2,3,4,5,6,7,8,9,10,11
 
          http_proxy: ""
          default_container_registry: "<registry-url>" (e.g. registry.gitlab.com/<user>/<project> .)

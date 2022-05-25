@@ -357,6 +357,7 @@ Add the following lines to ``files/requirements.yaml``
 Run ``helm dep up`` to update helm dependencies. You should now see ``hello-world-chart-0.1.0.tgz`` file inside the ``/charts`` folder.
 Next, build and push the docker container 
 ::
+   
    docker build -t <docker-registry>/<docker-repo>/kaapana-stab-extensions:0.1.0 .
    docker push <docker-registry>/<docker-repo>/kaapana-stab-extensions:0.1.0
 

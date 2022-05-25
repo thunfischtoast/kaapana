@@ -6,6 +6,6 @@ sphinx_rtd_theme==1.0.0
 sphinxcontrib-mermaid==0.7.1 
 sphinx-tabs==3.3.1
 rst2pdf==0.99
-
+apache-airflow==2.2.5
 # apt requirements
 # sudo apt-get install texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended latexmk lmodern texlive-xetex

@@ -311,22 +311,22 @@ def check_dag_exists(session, dag_id):
 @kaapanaApi.route('/api/dagids/<dag_id>', methods=['GET'])
 @csrf.exempt
 def get_dag_runs(dag_id):
-    """
-    .. http:get:: /trigger/<dag_id>
-        Get the run_ids for a dag_id, ordered by execution date
-        **Example request**:
-        .. sourcecode:: http
-            GET /trigger/make_fit
-            Host: localhost:7357
-        **Example response**:
-        .. sourcecode:: http
-            HTTP/1.1 200 OK
-            Content-Type: application/json
-            {
-              "dag_id": "daily_processing",
-              "run_ids": ["my_special_run", "normal_run_17"]
-            }
-    """
+    # """
+    # .. http-get:: /trigger/<dag_id>
+    #     Get the run_ids for a dag_id, ordered by execution date
+    #     **Example request**:
+    #     .. sourcecode:: http
+    #         GET /trigger/make_fit
+    #         Host: localhost:7357
+    #     **Example response**:
+    #     .. sourcecode:: http
+    #         HTTP/1.1 200 OK
+    #         Content-Type: application/json
+    #         {
+    #           "dag_id": "daily_processing",
+    #           "run_ids": ["my_special_run", "normal_run_17"]
+    #         }
+    # """
     session = settings.Session()
 
     error_response = check_dag_exists(session, dag_id)
