@@ -1,116 +1,107 @@
-<template lang="pug">
-  .workflow-applications
-    v-container(grid-list-lg text-left)
-      v-card
-        v-card-title
-          | List of applications started in a workflow &nbsp;
-          v-tooltip(bottom='')
-            template(v-slot:activator='{ on, attrs }')
-              v-icon(color='primary' dark='' v-bind='attrs' v-on='on')
-                | mdi-information-outline
-            span If a workflow has started an application, you will find here the corresponding url to the application. Once you are done you can here finish the manual interaction which will continue the workflow.
-          v-spacer
-          v-text-field(v-model='search' append-icon='mdi-magnify' label='Search' single-line='' hide-details='')
-        v-data-table.elevation-1(
-          :headers="headers",
-          :items="launchedAppLinks",
-          :items-per-page="20",
-          :loading="loading",
-          sort-by='releaseName',
-          loading-text="Waiting a few seconds..."
-        )
-          template(v-slot:item.links="{ item }")
-            span {{ item.releaseName }} &nbsp;
-              a(:href='link', target='_blank' v-for="link in item.links" :key="item.link")
-                v-icon(color='primary') mdi-open-in-new
-          template(v-slot:item.successful="{ item }")
-            v-icon(v-if="item.successful==='yes'" color='green') mdi-check-circle
-            v-icon(v-if="item.successful==='no'" color='red') mdi-alert-circle
-          template(v-slot:item.releaseName="{ item }")
-            v-btn(
-              @click="deleteChart(item.releaseName)",
-              color="primary",
-            ) Finished manual interaction
+<template>
+  <div>
+    <div v-for="[_, propertyValues] in Object.entries(properties)">
+      <FilterDropdown
+          :label="propertyValues['displayName']"
+          :options="propertyValues['options']"
+          v-model="propertyValues['selected']"
+      />
+    </div>
+    <Button @click="evaluateQuery">Get Patients</Button>
+  </div>
+
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import request from '@/request';
-import { mapGetters } from "vuex";
-import kaapanaApiService from '@/common/kaapanaApi.service'
+import FilterDropdown from "@/components/FilterDropdown.vue";
 
-export default Vue.extend({
-  data: () => ({
-    loading: true,
-    launchedAppLinks: [] as any,
-    headers: [
-      {
-        text: "Name",
-        align: "start",
-        value: "links",
-      },
-      {
-        text: "Helm Status",
-        align: "start",
-        value: "helmStatus",
-      },
-      {
-        text: "Kube Status",
-        align: "start",
-        value: "kubeStatus",
-      },
-      {
-        text: "Ready",
-        align: "start",
-        value: "successful",
-      },
-      { text: "Action", value: "releaseName" },
-    ],
-  }),
-  mounted() {
-    this.getHelmCharts()
+const _props = {
+  "00080020 StudyDate_date": {
+    displayName: "Study Date",
+    key: "key_as_string",
+    options: [],
+    selected: []
   },
-  computed: {
-    ...mapGetters(['currentUser', 'isAuthenticated', "commonData", "launchApplicationData", "availableApplications"])
+  "00080021 SeriesDate_date": {
+    displayName: "Series Date",
+    key: "key_as_string",
+    options: [],
+    selected: []
+  },
+  "00100010 PatientName_keyword_alphabetic.keyword": {
+    displayName: "Patient Name",
+    key: "key",
+    options: [],
+    selected: []
+  }
+}
+export default {
+  components: {
+    FilterDropdown
+  },
+  data: () => ({
+    baseUrl: "https://" + window.location.href.split("//")[1].split("/")[0],
+    data: null,
+    properties: _props
+  }),
+  created() {
+    fetch(this.baseUrl + "/elasticsearch/meta-index/_search/")
+        .then(response => response.json())
+        .then(data => this.data = data);
 
+    Object.entries(this.properties).forEach(([id, value]) => this.getUniqueValues(id, value))
   },
   methods: {
+    evaluateQuery() {
 
-    getHelmCharts() {
-      kaapanaApiService
-          .helmApiGet("/pending-applications", {})
-          .then((response: any) => {
-            this.launchedAppLinks = response.data;
-            this.loading = false;
-          })
-          .catch((err: any) => {
-            this.loading = false;
-            console.log(err);
-          });
-    },
+      const data = {
+        "query": {
+          "match": Object.fromEntries(
+              Object.entries(this.properties)
+                  .filter(([_, value]) => value['selected'].length > 0)
+                  .map(([id, value]) => [id, value['selected'].join(" ")])
+          )
+        }
+      }
+      console.log(JSON.stringify(data))
 
-    deleteChart(releaseName: any) {
-      let params = {
-        release_name: releaseName,
-      };
-      this.loading = true;
-      kaapanaApiService
-          .helmApiGet("/helm-delete-chart", params)
-          .then((response: any) => {
-            setTimeout(() => {
-              this.getHelmCharts();
-            }, 1000);
-          })
-          .catch((err: any) => {
-            this.getHelmCharts();
-            this.loading = false;
-            console.log(err);
-          });
+      fetch(this.baseUrl + "/elasticsearch/meta-index/_search#/", {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data),
+      })
+          .then(response => response.json())
+          .then(data => data)
+          .catch(error => console.log('error', error));
     },
+    getUniqueValues(id, value) {
+      const data = {
+        "size": 0,
+        "aggs": {
+          "langs": {
+            "terms": {
+              "field": id,
+              "size": 500
+            }
+          }
+        }
+      }
+
+      fetch(this.baseUrl + "/elasticsearch/meta-index/_search#/", {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data),
+      })
+          .then(response => response.json())
+          .then(data =>
+              this.properties[id]['options'] = data["aggregations"]["langs"]["buckets"]
+                  .map(element => element[value["key"]])
+          ).catch(error => console.log('error', error));
+    }
   }
-})
+};
 </script>
-
-<style lang="scss">
-a {  text-decoration: none;}
-</style>
