@@ -21,22 +21,41 @@
     PATH: '/home/ubuntu/.local/bin:{{ ansible_env.PATH }}'
 
   tasks:
+    - name: Update submission tarfile name in MLCube config
+      replace:
+        path: /home/ubuntu/tarball/mlcube.yaml
+        regexp: 'tar_file: /home/ubuntu/tarball/'
+        replace: 'tar_file: /home/ubuntu/tarball/{{ subm_id }}.tar'
+
     - name: Run MedPerf client on the submission
-      shell: medperf --storage=medperf-env test -b {{ benchmark_id }}
-      args:
-        chdir: /home/ubuntu/medperf
+      shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity test -b {{ benchmark_id }} -m /home/ubuntu/tarball
+      # args:
+        # chdir: /home/ubuntu/medperf
 
     - name: Compress results file
       archive: 
-        path: /home/ubuntu/medperf/medperf-env/results/{{ benchmark_id }}
-        dest: "/home/ubuntu/medperf/medperf-env/results/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
+        path: /home/ubuntu/medperf-env/results #/{{ benchmark_id }}
+        dest: "/home/ubuntu/medperf-env/results/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
         format: zip
 
     - name: Copy results back to the parent host
       become: yes
       ## Currently Ansible doesn't directly support directory/recursive copying from remote to local
       fetch:
-        src: "/home/ubuntu/medperf/medperf-env/results/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
+        src: "/home/ubuntu/medperf-env/results/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
         dest: "{{ subm_results_path }}/"
         flat: yes
-        
+    
+    - name: Get name/s of singularity .sif file/s to be copied back to host
+      find: 
+        paths: "/home/ubuntu/tarball/workspace/.image"
+        recurse: no 
+        patterns: "*.sif"
+      register: files_to_copy
+
+    - name: Copy singularity file/s back to parent host
+      fetch: 
+        src: "{{ item.path }}"
+        dest: /home/ubuntu/singularity_images/
+        flat: yes
+      with_items: "{{ files_to_copy.files }}"

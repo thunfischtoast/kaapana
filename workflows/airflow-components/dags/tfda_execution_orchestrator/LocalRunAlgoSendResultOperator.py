@@ -26,7 +26,7 @@ class LocalRunAlgoSendResultOperator(KaapanaPythonBaseOperator):
         
         subm_id = kwargs["dag_run"].conf["subm_id"]
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
-        benchmark_id = "3"
+        benchmark_id = "1"
 
         extra_vars = f"target_host={iso_env_ip} remote_username=ubuntu subm_id={subm_id} benchmark_id={benchmark_id} subm_results_path={subm_results_path}"
         command = ["ansible-playbook", playbook_path, "--extra-vars", extra_vars]

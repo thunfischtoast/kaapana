@@ -1,0 +1,16 @@
+---
+- hosts: localhost
+  strategy: free
+  gather_facts: yes
+  vars:
+    #TODO: change hardcoded
+    ansible_ssh_private_key_file: ~/.ssh/tfda_iso.pem
+  environment:
+    PATH: '/home/ubuntu/.local/bin:{{ ansible_env.PATH }}'
+
+  tasks:
+    - name: Update submission tarfile name in MLCube config
+      replace:
+        path: /home/ubuntu/tarball/mlcube.yaml
+        regexp: 'tar_file: /home/ubuntu/tarball/'
+        replace: 'tar_file: /home/ubuntu/tarball/{{ subm_id }}.tar'

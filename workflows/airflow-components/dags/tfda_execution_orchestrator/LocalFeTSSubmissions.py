@@ -93,7 +93,7 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
             for subm in syn.getSubmissions(task_id):      
                 subm_id = subm["id"]
                 if subm_id not in subm_dict or subm_dict.get(subm_id) != "success":
-                    print("Pulling container...")
+                    print(f"Pulling container with submission ID: {subm_id}...")
                     tarball_file = os.path.join(tarball_path, f"{subm_id}.tar")
                     if os.path.exists(tarball_file):
                         print(f"Submission tarball already exists locally... deleting it now to pull latest!!")

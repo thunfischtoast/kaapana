@@ -29,7 +29,7 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         tarball_path = os.path.join(operator_dir, "tarball")
         test_data_path = os.path.join(operator_dir, "data", "test_data")
 
-        extra_vars = f"target_host={iso_env_ip} remote_username=root tarball_path={tarball_path} filename={subm_id}.tar test_data_path={test_data_path}"
+        extra_vars = f"target_host={iso_env_ip} remote_username=root tarball_path={tarball_path} subm_id={subm_id} test_data_path={test_data_path}"
         command = ["ansible-playbook", platform_install_playbook_path, "--extra-vars", extra_vars]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')
