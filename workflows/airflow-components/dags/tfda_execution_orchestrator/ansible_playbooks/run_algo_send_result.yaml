@@ -56,6 +56,6 @@
     - name: Copy singularity file/s back to parent host
       fetch: 
         src: "{{ item.path }}"
-        dest: /home/ubuntu/singularity_images/
+        dest: "{{ singularity_path }}"
         flat: yes
       with_items: "{{ files_to_copy.files }}"
