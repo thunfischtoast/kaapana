@@ -29,7 +29,7 @@ class LocalRunAlgoSendResultOperator(KaapanaPythonBaseOperator):
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
         benchmark_id = "1"
 
-        extra_vars = f"target_host={iso_env_ip} remote_username=ubuntu subm_id={subm_id} benchmark_id={benchmark_id} subm_results_path={subm_results_path} singularity_path={singularity_path}"
+        extra_vars = f"target_host={iso_env_ip} remote_username=ubuntu subm_id={subm_id} benchmark_id={benchmark_id} subm_results_path={subm_results_path} singularity_path={singularity_path}/"
         command = ["ansible-playbook", playbook_path, "--extra-vars", extra_vars]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')
