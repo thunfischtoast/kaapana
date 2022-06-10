@@ -8,7 +8,7 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-from challengeutils import utils
+# from challengeutils import utils
 
 from subprocess import PIPE, run
 from airflow.models import DagRun
@@ -132,9 +132,13 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                     sending_ts = datetime.now()
 
                     # Get Synapse user ID
-                    synapse_user_details = syn.getUserProfile(id=subm["userId"])
-                    cc_address = ""
-                    synapse_user_id = f"{synapse_user_details['userName']}@synapse.org"
+                    # synapse_user_details = syn.getUserProfile(id=subm["userId"])
+                    try:
+                        synapse_id = syn.getTeam(subm["userId"]).get('name')
+                    except sc.core.exceptions.SynapseHTTPError:
+                        synapse_id = syn.getUserProfile(subm["userId"]).get('userName')
+                    cc_address = "maximilian.zenk@dkfz-heidelberg.de, kaushal.parekh@dkfz-heidelberg.de, santhosh.parampottupadam@dkfz-heidelberg.de"
+                    synapse_email_id = f"{synapse_id}@synapse.org"
 
                     if dag_state["state"] == "failed":
                         print(f"**************** The evaluation of submission with ID {subm_id} has FAILED ****************")
@@ -144,16 +148,17 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                         <html>
                             <head></head>
                             <body>
-                                Hi,<br><br>
-                                The result from the evaluation of the submission (ID: {}) is FAILED.<br>
-                                Sorry!<br><br>
+                                Dear {},<br><br>
+                                Thank you for your submission (ID: {}) to the FeTS challenge 2022 task 2! We tested your container on the toy dataset and got the following result:<br>
+                                Unfortunately, the evaluation of your container was not successful; please check the logs and contact m.zenk@dkfz-heidelberg.de if you have problems identifying the issue, including [FeTS support] in the email’s subject.<br>
+                                <br><br>
                                 Yours sincerely,<br>
-                                The TFDA Team <br>
+                                The FeTS challenge organizers <br>
                             </body>
                         </html>
-                        """.format(subm_id)
+                        """.format(synapse_id, subm_id)
                         utils.change_submission_status(syn, subm_id, status="INVALID")
-                        self.send_email(email_address=synapse_user_id, cc_address=cc_address, message=message, filepath="", subm_id=subm_id)
+                        self.send_email(email_address=synapse_email_id, cc_address=cc_address, message=message, filepath=f"{subm_results_path}/logs_{subm_id}_{sending_ts.strftime('%Y-%m-%d')}.zip", subm_id=subm_id)
                     if dag_state["state"] == "success":
                         print(f"**************** The evaluation of submission with ID {subm_id} was SUCCESSFUL ****************")
                         subm_dict[subm_id] = "success"
@@ -162,16 +167,17 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                         <html>
                             <head></head>
                             <body>
-                                Hi,<br><br>
-                                The result from the evaluation of the submission (ID: {}) is attached to the email.<br>
-                                Thanks!<br><br>
-                                Yours sincerely,<br>
-                                The TFDA Team <br>
+                                Dear {},<br><br>
+                                Thank you for your submission (ID: {}) to the FeTS challenge 2022 task 2! We tested your container on the toy dataset and got the following result:<br>
+                                Great, there were no fatal errors during the evaluation of your container! However, to make sure everything ran correctly, please check the results file and compare it with your local results. If there are any differences, make sure your results are reproducible locally.<br>
+                                <br><br>
+                                Cheers!<br>
+                                The FeTS challenge organizers <br>
                             </body>
                         </html>
-                        """.format(subm_id)
+                        """.format(synapse_id, subm_id)
                         utils.change_submission_status(syn, subm_id, status="ACCEPTED")
-                        self.send_email(email_address=synapse_user_id, cc_address=cc_address, message=message, filepath=f"{subm_results_path}/results_{subm_id}_{sending_ts.strftime('%Y-%m-%d')}.zip", subm_id=subm_id)
+                        self.send_email(email_address=synapse_email_id, cc_address=cc_address, message=message, filepath=f"{subm_results_path}/results_{subm_id}_{sending_ts.strftime('%Y-%m-%d')}.zip", subm_id=subm_id)
                 else:
                     print("Submission already SUCCESSFULLY evaluated!!!!")
 

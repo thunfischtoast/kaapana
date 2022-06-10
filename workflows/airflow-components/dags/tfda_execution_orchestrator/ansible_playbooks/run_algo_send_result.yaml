@@ -29,13 +29,19 @@
 
     - name: Run MedPerf client on the submission
       shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity test -b {{ benchmark_id }} -m /home/ubuntu/tarball
-      # args:
-        # chdir: /home/ubuntu/medperf
-
-    - name: Compress results file
+    
+    - name: Create an archive of results into a zip file
       archive: 
-        path: /home/ubuntu/medperf-env/results #/{{ benchmark_id }}
+        path: 
+        - /home/ubuntu/medperf-env/results #/{{ benchmark_id }}
         dest: "/home/ubuntu/medperf-env/results/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
+        format: zip
+    
+    - name: Create an archive of logs into a zip file
+      archive: 
+        path: 
+        - /home/ubuntu/medperf-env/logs
+        dest: "/home/ubuntu/medperf-env/results/logs_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
         format: zip
 
     - name: Copy results back to the parent host
