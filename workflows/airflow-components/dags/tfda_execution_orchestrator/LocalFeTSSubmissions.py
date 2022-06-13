@@ -26,7 +26,7 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
         print("SENDING EMAIL: {}".format(email_address))
         # print("MESSAGE: {}".format(message))
         print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
-        from_address = "m.zenk@dkfz-heidelberg.de"
+        from_address = ""
         sending_ts = datetime.now()
 
         sub = f'FeTS 2022 Evaluation Result for Submission (ID: {subm_id})'
@@ -137,7 +137,7 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                         synapse_id = syn.getTeam(subm["userId"]).get('name')
                     except sc.core.exceptions.SynapseHTTPError:
                         synapse_id = syn.getUserProfile(subm["userId"]).get('userName')
-                    cc_address = "maximilian.zenk@dkfz-heidelberg.de, kaushal.parekh@dkfz-heidelberg.de, santhosh.parampottupadam@dkfz-heidelberg.de"
+                    cc_address = ""
                     synapse_email_id = f"{synapse_id}@synapse.org"
 
                     subm_results_file = f"{subm_results_path}/results_{subm_id}_{sending_ts.strftime('%Y-%m-%d')}.zip"
