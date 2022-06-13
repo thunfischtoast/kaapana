@@ -105,8 +105,8 @@
         flavor: "{{ instance_flavor }}"
         key_name: "{{ ssh_key }}"
         region_name: regionOne
-        terminate_volume: True
         boot_from_volume: True
+        terminate_volume: True
         security_groups: default
         delete_fip: yes
         # auto_ip: yes
