@@ -10,6 +10,7 @@ from tfda_execution_orchestrator.LocalCopyDataAndAlgoOperator import LocalCopyDa
 from tfda_execution_orchestrator.LocalRunAlgoSendResultOperator import LocalRunAlgoSendResultOperator
 from tfda_execution_orchestrator.LocalDeleteIsoEnvOperator import LocalDeleteIsoEnvOperator
 from kaapana.operators.LocalWorkflowCleanerOperator import LocalWorkflowCleanerOperator
+from airflow.operators.python_operator import PythonOperator
 
 log = LoggingMixin().log
 
@@ -40,7 +41,21 @@ create_iso_env = LocalCreateIsoInstanceOperator(dag=dag)
 # deploy_platform = LocalDeployPlatformOnIsoEnvOperator(dag=dag)
 copy_data_algo = LocalCopyDataAndAlgoOperator(dag=dag)
 run_algo_send_result = LocalRunAlgoSendResultOperator(dag=dag)
-delete_iso_inst = LocalDeleteIsoEnvOperator(dag=dag)
+delete_iso_inst = LocalDeleteIsoEnvOperator(dag=dag, trigger_rule="all_done")
 clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True)
 
-delete_iso_inst >> create_iso_env >> copy_data_algo >> run_algo_send_result >> clean
+def final_status(**kwargs):
+    for task_instance in kwargs['dag_run'].get_task_instances():
+        if task_instance.current_state() != "success" and \
+                task_instance.task_id != kwargs['task_instance'].task_id:
+            raise Exception("Task {} failed. Failing this DAG run".format(task_instance.task_id))
+
+final_status = PythonOperator(
+    task_id='final_status',
+    provide_context=True,
+    python_callable=final_status,
+    trigger_rule="all_done", # Ensures this task runs even if upstream fails
+    dag=dag,
+)
+
+create_iso_env >> copy_data_algo >> run_algo_send_result >> delete_iso_inst >> clean >> final_status
