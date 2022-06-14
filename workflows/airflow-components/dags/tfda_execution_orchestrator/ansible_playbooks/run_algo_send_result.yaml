@@ -29,6 +29,7 @@
 
     - name: Run MedPerf client on the submission
       shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity test -b {{ benchmark_id }} -m /home/ubuntu/tarball
+      ignore_errors: yes
     
     - name: Check if logs exist
       stat:
@@ -39,23 +40,30 @@
       copy:
         src: /home/ubuntu/medperf-env/logs/medperf.log
         dest: /home/ubuntu/medperf-env/results/medperf.log
+        remote_src: yes
       when: log_file_check.stat.exists
-    
+
     - name: Create an archive of results into a zip file
       archive: 
         path: 
         - /home/ubuntu/medperf-env/results #/{{ benchmark_id }}
-        dest: "/home/ubuntu/medperf-env/results/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
+        dest: "/home/ubuntu/medperf-env/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
         format: zip
-        
+
     - name: Copy results back to the parent host
       become: yes
       ## Currently Ansible doesn't directly support directory/recursive copying from remote to local
       fetch:
-        src: "/home/ubuntu/medperf-env/results/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
+        src: "/home/ubuntu/medperf-env/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
         dest: "{{ subm_results_path }}/"
         flat: yes
     
+    - name: Check if actually result files exist
+      find:
+        path: /home/ubuntu/medperf-env/results
+      register: result_files
+      failed_when: result_files.matched <= 1
+
     - name: Get name/s of singularity .sif file/s to be copied back to host
       find: 
         paths: "/home/ubuntu/tarball/workspace/.image"

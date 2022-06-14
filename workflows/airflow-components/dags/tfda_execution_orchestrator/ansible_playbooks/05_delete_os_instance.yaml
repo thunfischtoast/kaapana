@@ -17,12 +17,7 @@
         - "{{ os_username }}"
         - "{{ os_password }}"
         - "{{ os_instance_name }}"
-
-    # - name: Get password from env...
-    #   set_fact:
-    #     password: "{{ lookup('env','CI_PASSWORD') or password }}"
-    #   when: username == "jip-ci-kaapana" and password | length == 0
-    
+        
     - name: check if instance exists
       environment: 
         OS_TENANT_ID: "{{ os_project_id }}"
