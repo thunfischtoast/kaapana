@@ -44,7 +44,7 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
         os_password = ""
         os_image = "fc7590a9-8a70-487d-922a-80648f4b11d1"
         # os_ssh_key = "kaapana"
-        os_volume_size = "150"
+        os_volume_size = "200"
         os_instance_flavor = "dkfz.gpu-V100S-16CD"
 
         extra_vars = f"os_project_name={os_project_name} os_project_id={os_project_id} os_username={os_username} os_password={os_password} os_instance_name={os_instance_name} os_image={os_image} os_volume_size={os_volume_size} os_instance_flavor={os_instance_flavor}"        
