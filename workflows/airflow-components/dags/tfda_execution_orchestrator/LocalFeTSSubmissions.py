@@ -187,9 +187,9 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                 else:
                     print("Submission already SUCCESSFULLY evaluated!!!!")
 
-        print("Saving submission dict...")
-        with open(subm_dict_path, "w") as fp_:
-            json.dump(subm_dict, fp_)
+            print("Saving submission dict...")
+            with open(subm_dict_path, "w") as fp_:
+                json.dump(subm_dict, fp_)
 
     def __init__(self,
                  dag,
