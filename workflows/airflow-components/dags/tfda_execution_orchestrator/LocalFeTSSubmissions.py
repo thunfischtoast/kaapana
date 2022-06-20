@@ -68,6 +68,7 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
         subm_logs_path = os.path.join(base_dir, "data", "subm_logs")
         tarball_path = os.path.join(base_dir, "tarball")
         subm_results_path = os.path.join(base_dir, "subm_results")
+        singularity_images_path = os.path.join(base_dir, "singularity_images")
         tasks = [("fets_2022_test_queue", 9615030)]
 
         subm_dict = {}
@@ -184,6 +185,11 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                         """.format(synapse_id, subm_id)
                         utils.change_submission_status(syn, subm_id, status="ACCEPTED")
                         self.send_email(email_address=synapse_email_id, cc_address=cc_address, message=message, filepath=subm_results, subm_id=subm_id)
+
+                        # Rename singularity file that was copied from isolated instance
+                        singularity_file = os.path.join(singularity_images_path, "dockersynapseorgsyn31437293fets22modellatest.sif")
+                        singularity_file_rename = os.path.join(singularity_images_path, f"{subm_id}.sif")
+                        os.rename(singularity_file, "")
                 else:
                     print("Submission already SUCCESSFULLY evaluated!!!!")
 
