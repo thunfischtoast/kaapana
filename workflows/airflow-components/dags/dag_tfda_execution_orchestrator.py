@@ -42,7 +42,7 @@ create_iso_env = LocalCreateIsoInstanceOperator(dag=dag)
 copy_data_algo = LocalCopyDataAndAlgoOperator(dag=dag)
 run_algo_send_result = LocalRunAlgoSendResultOperator(dag=dag)
 delete_iso_inst = LocalDeleteIsoEnvOperator(dag=dag, trigger_rule="all_done")
-clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True)
+clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True, trigger_rule="all_done")
 
 def final_status(**kwargs):
     for task_instance in kwargs['dag_run'].get_task_instances():
