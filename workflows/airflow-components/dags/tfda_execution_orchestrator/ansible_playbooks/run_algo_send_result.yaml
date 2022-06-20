@@ -27,6 +27,9 @@
         regexp: 'tar_file: /home/ubuntu/tarball/'
         replace: 'tar_file: /home/ubuntu/tarball/{{ subm_id }}.tar'
 
+    - name: Run Mini conda Installation for Cuda Support
+      shell: bash /home/ubuntu/Miniconda3-py38_4.12.0-Linux-x86_64.sh -b -p /home/ubuntu/miniconda3
+
     - name: Run MedPerf client on the submission
       shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity test -b {{ benchmark_id }} -m /home/ubuntu/tarball
       ignore_errors: yes
@@ -61,8 +64,11 @@
     - name: Check if actually result files exist
       find:
         path: /home/ubuntu/medperf-env/results
+        patterns: 'result.yaml'
+        file_type: file
+        recurse: yes
       register: result_files
-      failed_when: result_files.matched <= 1
+      failed_when: result_files.matched == 0
 
     - name: Get name/s of singularity .sif file/s to be copied back to host
       find: 
