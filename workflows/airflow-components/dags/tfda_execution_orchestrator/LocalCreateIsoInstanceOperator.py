@@ -17,31 +17,21 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         scripts_dir = os.path.join(operator_dir, "scripts")
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
-        print(f'Playbooks directory is {playbooks_dir}, and scripts are in {scripts_dir}, and directory is {operator_dir}')
-        # run_dir = os.path.join(WORKFLOW_DIR, kwargs['dag_run'].run_id)
-        # batch_input_dir = os.path.join(run_dir, self.operator_in_dir)
-        # print('input_dir', batch_input_dir)
+        # print(f'Playbooks directory is {playbooks_dir}, and scripts are in {scripts_dir}, and directory is {operator_dir}')
 
-        # batch_output_dir = os.path.join(run_dir, self.operator_out_dir)  # , project_name)
-        # if not os.path.exists(batch_output_dir):
-        #     os.makedirs(batch_output_dir)
-
-        # for file_path in glob.glob(os.path.join(batch_input_dir, '*.zip')):
-        #     with zipfile.ZipFile(file_path, 'r') as zip_ref:
-        #         zip_ref.extractall(batch_output_dir)
-
-        playbook_path = os.path.join(
-        playbooks_dir, "00_start_openstack_instance.yaml"
-        )
+        playbook_path = os.path.join(playbooks_dir, "00_start_"+self.platformType+"_instance.yaml")
         if not os.path.isfile(playbook_path):
             print("playbook yaml not found.")
             exit(1)
         
+        ### following is hardcoded, need to fix
+        ## platform specific params
         os_project_name = "E230-TFDA"
         os_project_id = "f4a5b8b7adf3422d85b28b06f116941c"
         os_instance_name = "tfda-airflow-iso-envt"
         os_username = ""
         os_password = ""
+        ## machine specific params, could be platform agnostic
         os_image = "c34f31bf-57a8-4189-9eee-d2efc18415eb"
         # os_ssh_key = "kaapana"
         os_volume_size = "200"
@@ -53,10 +43,7 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
         print(f'STD OUTPUT LOG is {output.stdout}')
         if output.returncode == 0:
             print(f'Iso Instance created successfully!')
-            ## extract ip address from stdout
-            # ip_addr_string = re.findall('isolated_env_ip: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', output.stdout)
             ip_addr_string = re.findall(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', output.stdout)
-            # ip_address = re.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', ip_addr_string)
             print(f'IP address of new TFDA isolated instance is: {ip_addr_string[-1]}')
             ti.xcom_push(key="iso_env_ip", value=ip_addr_string[-1])
         else:
@@ -65,6 +52,7 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
 
     def __init__(self,
                  dag,
+                 platformType = "openstack",
                  **kwargs):
 
         super().__init__(
