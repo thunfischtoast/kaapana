@@ -99,7 +99,7 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                     if os.path.exists(tarball_file):
                         print(f"Submission tarball already exists locally... deleting it now to pull latest!!")
                         os.remove(tarball_file)
-                    command2 = ["skopeo", "copy", f"docker://{subm['dockerRepositoryName']}:latest", f"docker-archive:{tarball_file}", "--additional-tag", f"{subm_id}:latest"]
+                    command2 = ["skopeo", "copy", f"docker://{subm['dockerRepositoryName']}}@{subm['dockerDigest']}", f"docker-archive:{tarball_file}", "--additional-tag", f"{subm_id}:latest"]
                     output2 = run(command2, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
                     if output2.returncode != 0:
                         print(f"Error while trying to download container! Skipping... ERROR LOGS:\n {output2.stderr} ")
@@ -189,7 +189,7 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                         # Rename singularity file that was copied from isolated instance
                         singularity_file = os.path.join(singularity_images_path, "dockersynapseorgsyn31437293fets22modellatest.sif")
                         singularity_file_rename = os.path.join(singularity_images_path, f"{subm_id}.sif")
-                        os.rename(singularity_file, "")
+                        os.rename(singularity_file, singularity_file_rename)
                 else:
                     print("Submission already SUCCESSFULLY evaluated!!!!")
 
