@@ -30,9 +30,13 @@
     - name: Run Mini conda Installation for Cuda Support
       shell: bash /home/ubuntu/Miniconda3-py38_4.12.0-Linux-x86_64.sh -b -p /home/ubuntu/miniconda3
 
+    - debug: msg="{{ '%H:%M:%S' | strftime }}"
+    
     - name: Run MedPerf client on the submission
       shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity test -b {{ benchmark_id }} -m /home/ubuntu/tarball
       ignore_errors: yes
+    
+    - debug: msg="{{ '%H:%M:%S' | strftime }}"
     
     - name: Check if logs exist
       stat:
