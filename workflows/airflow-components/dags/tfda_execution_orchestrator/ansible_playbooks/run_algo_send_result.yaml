@@ -30,10 +30,14 @@
     - name: Run Mini conda Installation for Cuda Support
       shell: bash /home/ubuntu/Miniconda3-py38_4.12.0-Linux-x86_64.sh -b -p /home/ubuntu/miniconda3
 
-    - debug: msg="{{ '%H:%M:%S' | strftime }}"
+    - name: Convert docker to singularity using MLCube
+      shell: mlcube configure --platform=singularity --mlcube=/home/ubuntu/tarball/mlcube.yaml
+      ignore_errors: yes
+    
+    - debug: msg="{{ '%H:%M:%S' | strftime }}"    
     
     - name: Run MedPerf client on the submission
-      shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity test -b {{ benchmark_id }} -m /home/ubuntu/tarball
+      shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity --log=debug --infer-timeout=600 test -b {{ benchmark_id }} -m /home/ubuntu/tarball
       ignore_errors: yes
     
     - debug: msg="{{ '%H:%M:%S' | strftime }}"
