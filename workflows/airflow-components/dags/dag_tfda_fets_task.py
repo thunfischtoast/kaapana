@@ -27,7 +27,7 @@ dag = DAG(
     # schedule_interval="0 0 1 * *",
 )
 
-evaluate_submissions = LocalFeTSSubmissions(dag=dag)
+evaluate_submissions = LocalFeTSSubmissions(dag=dag, execution_timeout=timedelta(hours=24))
 clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True)
 
 evaluate_submissions >> clean
