@@ -24,7 +24,7 @@ dag = DAG(
     dag_id="dag-tfda-fets-task",
     default_args=args,
     ## TODO clarify frequency for scheduler
-    # schedule_interval="0 0 1 * *",
+    schedule_interval= None#"0 0 1 * *",
 )
 
 evaluate_submissions = LocalFeTSSubmissions(dag=dag, execution_timeout=timedelta(hours=24))
