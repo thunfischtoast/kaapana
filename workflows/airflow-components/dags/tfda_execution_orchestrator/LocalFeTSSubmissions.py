@@ -8,7 +8,8 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-from challengeutils import utils
+from synapseclient import Project, Folder, File, Link
+from challengeutils import permissions #, utils
 
 from subprocess import PIPE, run
 from airflow.models import DagRun
@@ -99,7 +100,7 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                     if os.path.exists(tarball_file):
                         print(f"Submission tarball already exists locally... deleting it now to pull latest!!")
                         os.remove(tarball_file)
-                    command2 = ["skopeo", "copy", f"docker://{subm['dockerRepositoryName']}}@{subm['dockerDigest']}", f"docker-archive:{tarball_file}", "--additional-tag", f"{subm_id}:latest"]
+                    command2 = ["skopeo", "copy", f"docker://{subm['dockerRepositoryName']}@{subm['dockerDigest']}", f"docker-archive:{tarball_file}", "--additional-tag", f"{subm_id}:latest"]
                     output2 = run(command2, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
                     if output2.returncode != 0:
                         print(f"Error while trying to download container! Skipping... ERROR LOGS:\n {output2.stderr} ")
@@ -144,8 +145,27 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                     subm_results_file = f"{subm_results_path}/results_{subm_id}_{sending_ts.strftime('%Y-%m-%d')}.zip"
                     if os.path.exists(subm_results_file):
                         subm_results = subm_results_file
+                        try:
+                            print("Uploading results to Synpase...")
+                            syn_usr_folder = Folder(f"{subm['userId']}", parent="syn32166204")
+                            syn_usr_folder = syn.store(syn_usr_folder)
+
+                            syn_subm_folder = Folder(f"{subm_id}", parent=syn_usr_folder)
+                            syn_subm_folder = syn.store(syn_subm_folder)
+                            
+                            print("Update permissions for folders containing submissions...")
+                            permissions.set_entity_permissions(syn, entity=syn_subm_folder, principalid=subm['userId'], permission_level="download")
+
+                            push_results = File(subm_results_file, description=f"Results/logs for submission: {subm_id}", parent=syn_subm_folder)
+                            push_results = syn.store(push_results)
+                            
+                            syn_subm_res_link = f"https://www.synapse.org/#!Synapse:{syn_subm_folder['id']}"
+                        except:
+                            print("Could not upload results files to Synapse, no link will be provided to the users...")
+                            syn_subm_res_link = "Sorry! Unfortunately, result files couldn't be uploaded for your submission. Please contact the administrator..."
                     else:
                         subm_results = None
+                        syn_subm_res_link = "Sorry! Unfortunately, result files were not generated for your submission. Please contact the administrator..."
                     
                     if dag_state["state"] == "failed":
                         print(f"**************** The evaluation of submission with ID {subm_id} has FAILED ****************")
@@ -157,13 +177,15 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                             <body>
                                 Dear {},<br><br>
                                 Thank you for your submission (ID: {}) to the FeTS challenge 2022 task 2! We tested your container on the toy dataset and got the following result:<br>
-                                Unfortunately, the evaluation of your container was not successful; please check the attached logs and contact m.zenk@dkfz-heidelberg.de if you have problems identifying the issue, including [FeTS support] in the email’s subject.<br>
+                                Unfortunately, the evaluation of your container was not successful; please follow the following Synapse link and download the logs: <br><br>
+                                <a href="{}"</a> <br><br>
+                                If you have problems identifying the issue, please contact m.zenk@dkfz-heidelberg.de by including [FeTS support] in the email’s subject.<br>
                                 <br><br>
                                 Yours sincerely,<br>
                                 The FeTS challenge organizers <br>
                             </body>
                         </html>
-                        """.format(synapse_id, subm_id)
+                        """.format(synapse_id, subm_id, syn_subm_res_link)
                         utils.change_submission_status(syn, subm_id, status="INVALID")
                         self.send_email(email_address=synapse_email_id, cc_address=cc_address, message=message, filepath=subm_results, subm_id=subm_id)
                     if dag_state["state"] == "success":
@@ -176,13 +198,15 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                             <body>
                                 Dear {},<br><br>
                                 Thank you for your submission (ID: {}) to the FeTS challenge 2022 task 2! We tested your container on the toy dataset and got the following result:<br>
-                                Great, there were no fatal errors during the evaluation of your container! However, to make sure everything ran correctly, please check the attached results and compare them with your local results. If there are any differences, make sure your results are reproducible locally.<br>
+                                Great, there were no fatal errors during the evaluation of your container! However, to make sure everything ran correctly, please visit the following Synapse link, download the results and compare them with your local results:<br><br>
+                                <a href="{}"</a> <br><br>
+                                If there are any differences, make sure your results are reproducible locally.<br>
                                 <br><br>
                                 Cheers!<br>
                                 The FeTS challenge organizers <br>
                             </body>
                         </html>
-                        """.format(synapse_id, subm_id)
+                        """.format(synapse_id, subm_id, syn_subm_res_link)
                         utils.change_submission_status(syn, subm_id, status="ACCEPTED")
                         self.send_email(email_address=synapse_email_id, cc_address=cc_address, message=message, filepath=subm_results, subm_id=subm_id)
 
@@ -193,7 +217,7 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                 else:
                     print("Submission already SUCCESSFULLY evaluated!!!!")
 
-                print("Saving submission dict...")
+                print(f"Saving submission dict: {subm_dict}...")
                 with open(subm_dict_path, "w") as fp_:
                     json.dump(subm_dict, fp_)
 
