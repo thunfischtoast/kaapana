@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from synapseclient import Project, Folder, File, Link
-from challengeutils import permissions utils
+from challengeutils import permissions, utils
 
 from subprocess import PIPE, run
 from airflow.models import DagRun
