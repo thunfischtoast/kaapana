@@ -105,13 +105,23 @@
             span(v-if="item.multiinstallable === 'yes'") Delete
             span(v-if="item.multiinstallable === 'no'") Uninstall
           v-btn(
-            @click="installChart(item)",
+            @click="getFormInfo(item)",
             color="primary",
             min-width = "160px",
             v-if="item.installed === 'no' && item.successful !== 'pending'"
-          ) 
+          )
             span(v-if="item.multiinstallable === 'yes'") Launch
-            span(v-if="item.multiinstallable === 'no'") Install
+            span(v-if="item.multiinstallable === 'no'") Install  
+            
+            v-dialog(v-model="popUpDialog" :retain-focus="false" max-width="600px")
+              template(v-slot:activator="{ on }")
+              v-card
+                v-card-title Setup Extension
+                v-card-text
+                  v-form(class="px-3")
+                    v-text-field( label="Chart Name" v-model="popUpChartName")
+                    v-btn(color="primary", @click="submitForm()") Submit
+          
           v-btn(
             color="primary",
             min-width = "160px",
@@ -128,6 +138,7 @@ import { mapGetters } from "vuex";
 import kaapanaApiService from "@/common/kaapanaApi.service";
 
 export default Vue.extend({
+  components: { },
   data: () => ({
     loading: true,
     polling: 0,
@@ -135,6 +146,9 @@ export default Vue.extend({
     search: "",
     extensionExperimental: "Stable",
     extensionKind: "All",
+    popUpDialog: false,
+    popUpItem: undefined,
+    popUpChartName: "",
     headers: [
       {
         text: "Name",
@@ -278,6 +292,19 @@ export default Vue.extend({
           this.loading = false;
           console.log(err);
         });
+    },
+
+    getFormInfo(item: any) {
+      // TODO: update some other info in Value yaml files
+      console.log("get form info for", item.name)
+      this.popUpDialog = true;
+      this.popUpItem = item;
+    },
+
+    submitForm() {
+      this.popUpDialog = false
+      console.log("submit form item", this.popUpItem.name)
+      this.installChart(this.popUpItem)
     },
 
     installChart(item: any) {
