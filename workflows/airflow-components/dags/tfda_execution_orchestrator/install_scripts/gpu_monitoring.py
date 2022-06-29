@@ -21,7 +21,11 @@ def print_gpu_memory_every_5secs():
         This function calls itself every 1 secs and print the gpu_memory.
     """
     Timer(1.0, print_gpu_memory_every_5secs).start()
-    print(get_gpu_memory())
+    ## openstack gpu instance takes 1104 default GPU memory, so deducting that from actual usage
+    print(get_gpu_memory()[0]-1104)
+    if get_gpu_memory()[0]-1104 > 3000:
+        print('GPU Memory usage exceeded 3000 MB')
+        os._exit(0)
 
 print_gpu_memory_every_5secs()
 
