@@ -30,6 +30,9 @@ dependencies:
   - name: mitk-flow-workflow
     version: "2022.04"
     repository: file://../../../../data-processing/processing-pipelines/mitk-flow/extension/mitk-flow-workflow
+  - name: m2aia-workbench-chart
+    version: "2022.01.00"
+    repository: file://../../../../services/applications/m2aia-workbench/m2aia-workbench-chart
   - name: mitk-workbench-chart
     version: "2022.04"
     repository: file://../../../../services/applications/mitk-workbench/mitk-workbench-chart
