@@ -33,14 +33,44 @@
     - name: Convert docker to singularity using MLCube
       shell: mlcube configure --platform=singularity --mlcube=/home/ubuntu/tarball/mlcube.yaml
       ignore_errors: yes
+
+    - name: Monitor GPU process
+      shell: python3 /home/ubuntu/gpu_and_ram_monitoring.py
+      async: 700
+      poll: 0
+      register: gpu_and_ram_monitor
+      ignore_errors: yes
     
-    - debug: msg="{{ '%H:%M:%S' | strftime }}"    
+    # - debug: msg="{{ '%H:%M:%S' | strftime }}"    
     
     - name: Run MedPerf client on the submission
       shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity --log=debug --infer-timeout=600 test -b {{ benchmark_id }} -m /home/ubuntu/tarball
+      async: 650
+      poll: 0
       ignore_errors: yes
     
-    - debug: msg="{{ '%H:%M:%S' | strftime }}"
+    # - debug: msg="{{ '%H:%M:%S' | strftime }}"
+
+    - name: Get job ID of GPU monitoring task
+      async_status:
+        jid: "{{ gpu_and_ram_monitor.ansible_job_id }}"
+      register: monitor_job_result
+      until: monitor_job_result.finished
+      retries: 350
+      delay: 2
+      ignore_errors: yes
+    
+    - name: Kill process running Medperf if GPU consumption exceeds preset value
+      command: pkill -f "/opt/conda/bin/python3"
+      when: monitor_job_result.finished
+      ignore_errors: yes
+    
+    - name: Add failed log to medperf.log if GPU memory consumption exceeded
+      lineinfile:
+        path: /home/ubuntu/medperf-env/logs/medperf.log
+        line: "{{ '%Y-%m-%d %H:%M:%S,999' | strftime }} | ERROR: Medperf Evaluation failed due to exceeding GPU/RAM memory consumption limit, see above logs for more details..."
+      when: monitor_job_result.finished
+      ignore_errors: yes
     
     - name: Check if logs exist
       stat:

@@ -2,7 +2,13 @@ import subprocess as sp
 import os
 from threading import Thread , Timer
 import sched, time
+from datetime import datetime
+
 ram_used = 0
+gpu_limit = 11000
+ram_limit = 40
+medperf_logfile = "/home/ubuntu/medperf-env/logs/medperf.log"
+
 def get_gpu_memory():
     output_to_list = lambda x: x.decode('ascii').split('\n')[:-1]
     ACCEPTABLE_AVAILABLE_MEMORY = 7024
@@ -27,26 +33,25 @@ def get_ram_usage():
     return ram_used
 
 
-def get_gpu_and_ram_usage():
+def monitor_gpu_and_ram_usage():
     """
-        This function calls itself every 1 secs and print the gpu_memory and ram.
+        This function calls itself every sec and prints the GPU and RAM memory consumption. Upon exceeding, it logs the information to medperf.log file and exits.
     """
-    Timer(1.0, get_gpu_and_ram_usage).start()
+    Timer(1.0, monitor_gpu_and_ram_usage).start()
     Timer(1.0, get_ram_usage).start()
     print(get_gpu_memory()[0]-1104)
     print(ram_used)
-    #print('----------------')
-    if get_gpu_memory()[0]-1104 > 11000 or ram_used > 40 :
-        if get_gpu_memory()[0]-1104 > 11000:
-            print (f'GPU Memory usage exceeded 11 GB, value is: {(get_gpu_memory()[0]-1104)/1000} GB' )
-        else:
-            print(f'RAM usage exceeded 40 GB, value in is: {ram_used} GB')
+    if get_gpu_memory()[0]-1104 > gpu_limit or ram_used > ram_limit:
+        if get_gpu_memory()[0]-1104 > gpu_limit:
+            now = datetime.now()
+            with open(medperf_logfile, "a") as logfile:
+                logfile.write(f"{now.strftime('%Y-%m-%d %H:%M:%S,%f')[:-3]} | ERROR: GPU Memory usage exceeded {gpu_limit} GB, value is: {(get_gpu_memory()[0]-1104)/1000} GB")
+        elif ram_used > ram_limit:
+            now = datetime.now()
+            with open(medperf_logfile, "a") as logfile:
+                logfile.write(f"{now.strftime('%Y-%m-%d %H:%M:%S,%f')[:-3]} | ERROR: RAM usage exceeded {ram_limit} GB, value is: {ram_used} GB")
         
         os._exit(0)
         
 
-get_gpu_and_ram_usage()
-
-"""
-Do stuff.
-"""
+monitor_gpu_and_ram_usage()
