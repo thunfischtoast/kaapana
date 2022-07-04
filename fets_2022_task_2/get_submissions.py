@@ -15,7 +15,8 @@ import requests
 import numpy as np
 import synapseclient as sc
 from synapseclient import Evaluation
-from challengeutils import utils
+from synapseclient import Project, Folder, File, Link
+from challengeutils import utils, permissions
 
 synapse_user = ""
 registry_pwd = ""
@@ -103,24 +104,51 @@ if __name__ == "__main__":
         docker_client = docker.from_env()
         # synapse_user = input("Enter Synapse User: ")
         syn = sc.login(email=synapse_user, apiKey=API_KEY)
+        
         # utils.change_submission_status(syn, "9720351", status="ACCEPTED")
-        # utils.delete_submission(syn, "9720605")
+        # utils.delete_submission(syn, "9721684")
+        # del_file = syn.delete("syn32167347")
 
         # evaluation_id = "9615030"
-        # my_submission_entity = "syn30613408"
+        # my_submission_entity = "syn30324641"
         # print("\nSubmit container to queue for evaluation...")
         # submission = syn.submit(
         #     evaluation = evaluation_id,
         #     entity = my_submission_entity,
-        #     name = "brats-scan-20") # An arbitrary name for your submission
+        #     name = "nnunet-v3", # An arbitrary name for your submission
+        #     dockerTag="v3") 
         #     # team = "TFDA") # Optional, can also pass a Team object or id
 
         print("\nChecking for new submissions...")
         for task_name, task_id in tasks:
             print(f"Checking {task_name}...")
             # task_dir = os.path.join(base_dir, task_name)
-            for subm in syn.getSubmissions(task_id):
+            for subm in syn.getSubmissions(task_id, status="RECEIVED"):
+                # command2 = ["skopeo", "copy", f"docker://{subm['dockerRepositoryName']}:latest", f"docker-archive:{tarball_file}", "--additional-tag", f"{subm_id}:latest"]
+                # output2 = run(command2, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
                 synapse_user_details = syn.getUserProfile(id=subm["userId"])
+
+
+                ## Push file to synapse in folders
+                data_folder = Folder(f'{subm["userId"]}', parent="syn32166204")
+                data_folder = syn.store(data_folder)
+
+                subm_folder = Folder(f'{subm["id"]}', parent=data_folder)
+                subm_folder = syn.store(subm_folder)
+
+                permissions.set_entity_permissions(syn, entity=subm_folder, principalid=subm['userId'], permission_level="download")
+
+                push_results = File("/home/ubuntu/kaapana/delete.log", description='Results and logs', parent=subm_folder)
+                push_results = syn.store(push_results)
+
+                # entity_link = syn.get(subm_folder['id'], followLink=True)
+                link = f"https://www.synapse.org/#!Synapse:{subm_folder['id']}"
+
+                try:
+                    name = syn.getTeam(subm["userId"]).get('name')
+                except sc.core.exceptions.SynapseHTTPError:
+                    name = syn.getUserProfile(subm["userId"]).get('userName')
+                print(f"Submission contributors are: {subm.get('contributors')}")
                 if subm["id"] not in subm_dict:
                     print("Logging into container registry!!!")                    
                     # registry_pwd = getpass.getpass("docker registry password: ")

@@ -92,7 +92,7 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
         print("Checking for new submissions...")
         for task_name, task_id in tasks:
             print(f"Checking {task_name}...")
-            for subm in syn.getSubmissions(task_id):      
+            for subm in syn.getSubmissions(task_id, status="RECEIVED"):      
                 subm_id = subm["id"]
                 if subm_id not in subm_dict or subm_dict.get(subm_id) != "success":
                     print(f"Pulling container with submission ID: {subm_id}...")
