@@ -10,7 +10,7 @@
         name: "{{ target }}"
         groups: os_server
 
-- name: Copy data and algorithm chart to isolated environment
+- name: Copy algorithm chart to isolated environment
   hosts: os_server
   strategy: free
   remote_user: "{{ remote_username }}"

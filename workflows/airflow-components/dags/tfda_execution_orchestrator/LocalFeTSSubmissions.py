@@ -70,7 +70,8 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
         tarball_path = os.path.join(base_dir, "tarball")
         subm_results_path = os.path.join(base_dir, "subm_results")
         singularity_images_path = os.path.join(base_dir, "singularity_images")
-        tasks = [("fets_2022_test_queue", 9615030)]
+        # tasks = [("fets_2022_test_queue", 9615030)]
+        tasks = [("FeTS 2022 Task 2 Docker Submissions Queue", 9615036)]
 
         subm_dict = {}
         subm_dict_path = os.path.join(subm_logs_path, "subm_dict.json")
@@ -138,12 +139,12 @@ class LocalFeTSSubmissions(KaapanaPythonBaseOperator):
                         subm_results = subm_results_file
                         try:
                             print("Uploading results to Synpase...")
-                            syn_usr_folder = Folder(f"{subm['userId']}", parent="syn32166204")
+                            syn_usr_folder = Folder(f"{subm['userId']}", parent="syn32177645")
                             syn_usr_folder = syn.store(syn_usr_folder)
-
+                            
                             ## Update permissions for folders containing submissions
                             permissions.set_entity_permissions(syn, entity=syn_usr_folder, principalid=subm['userId'], permission_level="download")
-                            
+
                             syn_subm_folder = Folder(f"{subm_id}", parent=syn_usr_folder)
                             syn_subm_folder = syn.store(syn_subm_folder)                            
 

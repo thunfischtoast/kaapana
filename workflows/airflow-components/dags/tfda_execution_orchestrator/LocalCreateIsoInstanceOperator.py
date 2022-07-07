@@ -10,14 +10,12 @@ from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
 
 class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
-
     def start(self, ds, ti, **kwargs):
         print("Starting an isolated environment...")
 
         operator_dir = os.path.dirname(os.path.abspath(__file__))
-        scripts_dir = os.path.join(operator_dir, "scripts")
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
-        # print(f'Playbooks directory is {playbooks_dir}, and scripts are in {scripts_dir}, and directory is {operator_dir}')
+        # print(f'Playbooks directory is {playbooks_dir}, and directory is {operator_dir}')
 
         playbook_path = os.path.join(playbooks_dir, "00_start_"+self.platformType+"_instance.yaml")
         if not os.path.isfile(playbook_path):
@@ -37,7 +35,7 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
         os_volume_size = "200"
         os_instance_flavor = "dkfz.gpu-V100S-16CD"
 
-        extra_vars = f"os_project_name={os_project_name} os_project_id={os_project_id} os_username={os_username} os_password={os_password} os_instance_name={os_instance_name} os_image={os_image} os_volume_size={os_volume_size} os_instance_flavor={os_instance_flavor}"        
+        extra_vars = f"os_project_name={os_project_name} os_project_id={os_project_id} os_username={os_username} os_password={os_password} os_instance_name={os_instance_name} os_image={os_image} os_volume_size={os_volume_size} os_instance_flavor={os_instance_flavor}"
         command = ["ansible-playbook", playbook_path, "--extra-vars", extra_vars]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')
@@ -61,3 +59,4 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
             python_callable=self.start,
             **kwargs
         )
+        self.platformType = platformType

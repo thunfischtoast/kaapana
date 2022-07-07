@@ -17,7 +17,7 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         print(f'Playbooks directory is {playbooks_dir}, and scripts are in {scripts_dir}, and directory is {operator_dir}')
         
         platform_install_playbook_path = os.path.join(
-        playbooks_dir, "copy_data_algo_to_iso_env.yaml"
+        playbooks_dir, "copy_algo_to_iso_env.yaml"
         )
         if not os.path.isfile(platform_install_playbook_path):
             print("Playbook yaml file not found.")

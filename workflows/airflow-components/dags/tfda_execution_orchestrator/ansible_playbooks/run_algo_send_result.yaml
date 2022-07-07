@@ -65,12 +65,12 @@
       when: monitor_job_result.finished
       ignore_errors: yes
     
-    - name: Add failed log to medperf.log if GPU memory consumption exceeded
-      lineinfile:
-        path: /home/ubuntu/medperf-env/logs/medperf.log
-        line: "{{ '%Y-%m-%d %H:%M:%S,999' | strftime }} | ERROR: Medperf Evaluation failed due to exceeding GPU/RAM memory consumption limit, see above logs for more details..."
-      when: monitor_job_result.finished
-      ignore_errors: yes
+    # - name: Add failed log to medperf.log if GPU memory consumption exceeded
+    #   lineinfile:
+    #     path: /home/ubuntu/medperf-env/logs/medperf.log
+    #     line: "{{ '%Y-%m-%d %H:%M:%S,999' | strftime }} | ERROR: Medperf Evaluation failed due to exceeding GPU/RAM memory consumption limit, see above logs for more details..."
+    #   when: monitor_job_result.finished
+    #   ignore_errors: yes
     
     - name: Check if logs exist
       stat:
