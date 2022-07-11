@@ -289,7 +289,7 @@ class DockerContainer:
         startTime = time()
         os.chdir(self.container_dir)
         if http_proxy is not None:
-            command = ["docker", "build", "--build-arg", "http_proxy={}".format(http_proxy), "--build-arg", "https_proxy={}".format(http_proxy), "-t", self.tag, "-f", self.path, "."]
+            command = ["docker", "build", "--build-arg", f"http_proxy={http_proxy}", "--build-arg", f"https_proxy={http_proxy}", "-t", self.tag, "-f", self.path, "."]
         else:
             command = ["docker", "build", "-t", self.tag, "-f", self.path, "."]
 
