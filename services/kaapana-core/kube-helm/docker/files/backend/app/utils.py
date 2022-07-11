@@ -325,6 +325,7 @@ def helm_search_repo(keywords_filter):
         for helm_package in helm_packages:
             chart = helm_show_chart(package=helm_package)
             if 'keywords' in chart and (set(chart['keywords']) & keywords_filter):
+                chart = add_extension_params(chart)
                 charts_cached[f'{chart["name"]}-{chart["version"]}'] = chart
 
     return charts_cached
@@ -533,3 +534,13 @@ def execute_update_extensions():
                 message = f"We had troubles updating the extensions"
         
     return install_error, message
+
+def add_extension_params(chart):
+    """
+    Add 'extension_params' to chart object, if a valid field exists in chart values.
+    """
+    vals = helm_show_values(chart["name"], chart["version"])
+    if "extension_params" in vals:
+        # TODO: validate the parameter field
+        chart["extension_params"] = vals["extension_params"]
+    return chart
