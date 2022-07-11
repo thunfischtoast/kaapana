@@ -97,6 +97,13 @@
             span Experimental extension or DAG, not tested yet!
         template(v-slot:item.installed="{ item }")
           v-btn(
+            color="primary",
+            min-width = "160px",
+            disabled=true,
+            v-if="item.successful === 'pending'"
+          ) 
+            span() Pending
+          v-btn(
             @click="deleteChart(item)",
             color="primary",
             min-width = "160px",
@@ -122,36 +129,32 @@
                     template(v-for="(param, key) in item.extension_params")
                       v-text-field(
                         v-if="param.type == 'string'"
-                        :label="param.default"
-                        value="param.default"
+                        :label="key + ':' + param.definition + ' [default: ' + param.default + ']' "
                         v-model="popUpExtension[key]"
                         clearable
+                        :rules="popUpRulesStr"
                       )
                       v-select(
                         v-if="param.type == 'list_single'"
                         :items="param.value"
-                        :item-text="param.default"
-                        :label="key + ':' + param.definition"
+                        :label="key + ':' + param.definition + ' [default: ' + param.default + ']' "
                         v-model="popUpExtension[key]"
+                        :rules="popUpRulesSingleList"
+                        clearable
                       )
                       v-select(
                         v-if="param.type == 'list_multi'"
                         multiple
                         :items="param.value"
                         :item-text="param.default"
-                        :label="key + ':' + param.definition"
+                        :label="key + ':' + param.definition + ' [default: ' + param.default + ']' "
                         v-model="popUpExtension[key]"
+                        :rules="popUpRulesMultiList"
+                        clearable
                       )
                       
                     v-btn(color="primary", @click="submitForm()") Submit
 
-          v-btn(
-            color="primary",
-            min-width = "160px",
-            disabled=true,
-            v-if="item.successful === 'pending'"
-          ) 
-            span() Pending
 </template>
 
 <script lang="ts">
@@ -173,6 +176,15 @@ export default Vue.extend({
     popUpItem: {} as any,
     popUpChartName: "",
     popUpExtension: {} as any,
+    popUpRulesStr: [
+      v => v && v.length > 0 || 'Empty string field'
+    ],
+    popUpRulesSingleList: [
+      v => v && v.length > 0 || "Empty single-selectable list field" 
+    ],
+    popUpRulesMultiList: [
+      v => v.length > 0 || "Empty multi-selectable list field" 
+    ],
     headers: [
       {
         text: "Name",
@@ -339,8 +351,12 @@ export default Vue.extend({
     },
 
     submitForm() {
-      this.popUpDialog = false
-      this.installChart(this.popUpItem)
+      if (this.$refs.popUpForm.validate()) {
+        this.popUpDialog = false
+        this.installChart(this.popUpItem)
+        this.resetFormInfo()
+      }
+      
     },
 
     installChart(item: any) {
