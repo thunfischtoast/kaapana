@@ -113,15 +113,38 @@
             span(v-if="item.multiinstallable === 'yes'") Launch
             span(v-if="item.multiinstallable === 'no'") Install  
             
-            v-dialog(v-model="popUpDialog" :retain-focus="false" max-width="600px")
+            v-dialog(v-if="item.extension_params !== undefined" v-model="popUpDialog" :retain-focus="false" max-width="600px")
               template(v-slot:activator="{ on }")
               v-card
-                v-card-title Setup Extension
+                v-card-title Setup Extension {{ popUpItem.name }}
                 v-card-text
-                  v-form(class="px-3")
-                    v-text-field( label="Chart Name" v-model="popUpChartName")
+                  v-form(ref="popUpForm" class="px-3")
+                    template(v-for="(param, key) in item.extension_params")
+                      v-text-field(
+                        v-if="param.type == 'string'"
+                        :label="param.default"
+                        value="param.default"
+                        v-model="popUpExtension[key]"
+                        clearable
+                      )
+                      v-select(
+                        v-if="param.type == 'list_single'"
+                        :items="param.value"
+                        :item-text="param.default"
+                        :label="key + ':' + param.definition"
+                        v-model="popUpExtension[key]"
+                      )
+                      v-select(
+                        v-if="param.type == 'list_multi'"
+                        multiple
+                        :items="param.value"
+                        :item-text="param.default"
+                        :label="key + ':' + param.definition"
+                        v-model="popUpExtension[key]"
+                      )
+                      
                     v-btn(color="primary", @click="submitForm()") Submit
-          
+
           v-btn(
             color="primary",
             min-width = "160px",
@@ -144,11 +167,12 @@ export default Vue.extend({
     polling: 0,
     launchedAppLinks: [] as any,
     search: "",
-    extensionExperimental: "Stable",
+    extensionExperimental: "All",
     extensionKind: "All",
     popUpDialog: false,
-    popUpItem: undefined,
+    popUpItem: {} as any,
     popUpChartName: "",
+    popUpExtension: {} as any,
     headers: [
       {
         text: "Name",
@@ -294,25 +318,42 @@ export default Vue.extend({
         });
     },
 
+    resetFormInfo() {
+      if (this.$refs.popUpForm !== undefined) {
+        this.$refs.popUpForm.reset();
+      }
+    },
+
     getFormInfo(item: any) {
-      // TODO: update some other info in Value yaml files
-      console.log("get form info for", item.name)
-      this.popUpDialog = true;
-      this.popUpItem = item;
+      console.log("get form info for", item);
+      this.popUpDialog = false;
+      this.popUpItem = {} as any;
+
+      if (item["extension_params"] && Object.keys(item["extension_params"]).length > 0) {
+        this.popUpDialog = true;
+        this.popUpItem = item;
+        this.resetFormInfo()
+      } else {
+        this.installChart(item);
+      }
     },
 
     submitForm() {
       this.popUpDialog = false
-      console.log("submit form item", this.popUpItem.name)
       this.installChart(this.popUpItem)
     },
 
     installChart(item: any) {
       let payload = {
-        name: item.name,
-        version: item.version,
-        keywords: item.keywords,
-      };
+          name: item.name,
+          version: item.version,
+          keywords: item.keywords,
+        } as any;
+
+      if (Object.keys(this.popUpExtension).length > 0) {
+        payload["extension_params"] = this.popUpExtension
+      }
+
       this.loading = true;
       this.clearExtensionsInterval();
       this.startExtensionsInterval();
