@@ -3,47 +3,47 @@
   v-app#inspire
     v-navigation-drawer(clipped v-model="drawer" app)
       v-list(dense)
-        v-list-item(:to="'/'")
+        v-list-item(:to="'/'", v-if="isAuthenticated")
           v-list-item-action
-            v-icon mdi-home
+            v-icon mdi-apps
           v-list-item-content
-            v-list-item-title Home
+            v-list-item-title Extensions
           v-list-item-icon
-        v-list-group(:prepend-icon="section.icon" v-if="isAuthenticated && section.roles.indexOf(currentUser.role) > -1" v-for="(section, sectionKey) in externalWebpages" :key="section.id")
-          template(v-slot:activator)
-            v-list-item-title {{section.label}}
-          v-list-item(v-for="(subSection, subSectionKey) in section.subSections" :key="subSection.id" :to="{ name: 'ew-section-view', params: { ewSection: sectionKey, ewSubSection: subSectionKey }}")
-            v-list-item-title(v-text="subSection.label")
+        //- v-list-group(:prepend-icon="section.icon" v-if="isAuthenticated && section.roles.indexOf(currentUser.role) > -1" v-for="(section, sectionKey) in externalWebpages" :key="section.id")
+        //-   template(v-slot:activator)
+        //-     v-list-item-title {{section.label}}
+        //-   v-list-item(v-for="(subSection, subSectionKey) in section.subSections" :key="subSection.id" :to="{ name: 'ew-section-view', params: { ewSection: sectionKey, ewSubSection: subSectionKey }}")
+        //-     v-list-item-title(v-text="subSection.label")
         //- v-list-item(:to="'/data-upload'" v-if="isAuthenticated")
         //-   v-list-item-action
         //-     v-icon mdi-cloud-upload
         //-   v-list-item-content
         //-     v-list-item-title Data upload
         //-   v-list-item-icon
-        v-list-item(:to="'/pending-applications'" v-if="isAuthenticated")
-          v-list-item-action
-            v-icon mdi-gamepad-variant
-          v-list-item-content
-            v-list-item-title Pending applications
-          v-list-item-icon
-        v-list-item(:to="'/results-browser'", v-if="isAuthenticated && staticWebsiteAvailable")
-          v-list-item-action
-            v-icon mdi-file-tree
-          v-list-item-content
-            v-list-item-title Results browser
-          v-list-item-icon
-        v-list-item(:to="'/federated'", v-if="isAuthenticated && federatedBackendAvailable")
-          v-list-item-action
-            v-icon mdi-vector-triangle
-          v-list-item-content
-            v-list-item-title Federated
-          v-list-item-icon
-        v-list-item(:to="'/extensions'", v-if="isAuthenticated")
-          v-list-item-action
-            v-icon mdi-apps
-          v-list-item-content
-            v-list-item-title Extensions
-          v-list-item-icon
+        //- v-list-item(:to="'/pending-applications'" v-if="isAuthenticated")
+        //-   v-list-item-action
+        //-     v-icon mdi-gamepad-variant
+        //-   v-list-item-content
+        //-     v-list-item-title Pending applications
+        //-   v-list-item-icon
+        //- v-list-item(:to="'/results-browser'", v-if="isAuthenticated && staticWebsiteAvailable")
+        //-   v-list-item-action
+        //-     v-icon mdi-file-tree
+        //-   v-list-item-content
+        //-     v-list-item-title Results browser
+        //-   v-list-item-icon
+        //- v-list-item(:to="'/federated'", v-if="isAuthenticated && federatedBackendAvailable")
+        //-   v-list-item-action
+        //-     v-icon mdi-vector-triangle
+        //-   v-list-item-content
+        //-     v-list-item-title Federated
+        //-   v-list-item-icon
+        //- v-list-item(:to="'/extensions'", v-if="isAuthenticated")
+        //-   v-list-item-action
+        //-     v-icon mdi-apps
+        //-   v-list-item-content
+        //-     v-list-item-title Extensions
+        //-   v-list-item-icon
     v-app-bar(color="primary" dark dense clipped-left app)
       v-app-bar-nav-icon(@click.stop="drawer = !drawer")
       v-toolbar-title {{ commonData.name }}
