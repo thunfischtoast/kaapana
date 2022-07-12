@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 log = LoggingMixin().log
 
 args = {
-    "start_date": days_ago(0),
+    "start_date": "2022-07-12",
     "retries": 0,
     "retry_delay": timedelta(minutes=10),
     "catchup": False,
@@ -23,8 +23,7 @@ args = {
 dag = DAG(
     dag_id="dag-tfda-fets-task",
     default_args=args,
-    ## TODO clarify frequency for scheduler
-    schedule_interval= None#"0 0 1 * *",
+    schedule_interval="@daily",
 )
 
 evaluate_submissions = LocalFeTSSubmissions(dag=dag, execution_timeout=timedelta(hours=24))
