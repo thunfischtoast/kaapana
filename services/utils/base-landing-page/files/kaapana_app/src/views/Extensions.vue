@@ -177,13 +177,13 @@ export default Vue.extend({
     popUpChartName: "",
     popUpExtension: {} as any,
     popUpRulesStr: [
-      v => v && v.length > 0 || 'Empty string field'
+      (v: any) => v && v.length > 0 || 'Empty string field'
     ],
     popUpRulesSingleList: [
-      v => v && v.length > 0 || "Empty single-selectable list field" 
+      (v: any) => v && v.length > 0 || "Empty single-selectable list field" 
     ],
     popUpRulesMultiList: [
-      v => v.length > 0 || "Empty multi-selectable list field" 
+      (v: any) => v.length > 0 || "Empty multi-selectable list field" 
     ],
     headers: [
       {
@@ -332,12 +332,11 @@ export default Vue.extend({
 
     resetFormInfo() {
       if (this.$refs.popUpForm !== undefined) {
-        this.$refs.popUpForm.reset();
+        (this.$refs.popUpForm as Vue & { reset: () => any }).reset()
       }
     },
 
     getFormInfo(item: any) {
-      console.log("get form info for", item);
       this.popUpDialog = false;
       this.popUpItem = {} as any;
 
@@ -351,12 +350,35 @@ export default Vue.extend({
     },
 
     submitForm() {
-      if (this.$refs.popUpForm.validate()) {
+      // this is the same as `this.$refs.popUpForm.validate()` but it raises a build error
+      if ((this.$refs.popUpForm as Vue & { validate: () => boolean }).validate()) {
         this.popUpDialog = false
         this.installChart(this.popUpItem)
-        this.resetFormInfo()
       }
       
+    },
+
+    addExtensionParams(payload: any) {
+      let params = JSON.parse(JSON.stringify(this.popUpExtension))
+    
+      let res = {} as any
+      for (let key of Object.keys(params)) {
+        let v = params[key]
+        let s = "" as string
+        // TODO: if more types like Object etc will exist as well, check them here
+        if (Array.isArray(v) && v.length > 0) {
+          for (let vv of v) {
+            s += String(vv) + ","
+          }
+          s = s.slice(0, s.length - 1)
+        } else { // string or single selectable list item
+          s = v
+        }  
+
+        res[key] = s
+      }
+      payload["extension_params"] = res
+      return payload
     },
 
     installChart(item: any) {
@@ -367,12 +389,13 @@ export default Vue.extend({
         } as any;
 
       if (Object.keys(this.popUpExtension).length > 0) {
-        payload["extension_params"] = this.popUpExtension
+        payload = this.addExtensionParams(payload)
       }
 
       this.loading = true;
       this.clearExtensionsInterval();
       this.startExtensionsInterval();
+      console.log("install with payload", payload)
       kaapanaApiService
         .helmApiPost("/helm-install-chart", payload)
         .then((response: any) => {
