@@ -211,6 +211,10 @@ def helm_install(payload, helm_namespace=settings.helm_namespace, helm_command_a
     default_sets.pop('global.preinstall_extensions', None)
     default_sets.pop('global.kaapana_collections', None)
 
+    if 'extension_params' in payload:
+        for key, value in payload['extension_params'].items():
+            default_sets.update({f'global.{key}': value})
+
     print('Using default sets')
     print(json.dumps(default_sets, indent=4, sort_keys=True))
 
