@@ -6,12 +6,15 @@ from kaapana.operators.KaapanaBaseOperator import KaapanaBaseOperator, \
 
 class BprOperator(KaapanaBaseOperator):
     """
-    Regresses the body part a given slice is created from
+    Regresses the body part a given slice is from.
 
     The Body Part Regression (BPR) operator translates the anatomy in a
     radiologic volume into a machine-interpretable form. Each axial slice maps
     to a slice score. The slice scores monotonously increase with patient
     height.
+
+    Code: https://github.com/mic-dkfz/bodypartregression
+    Paper: https://arxiv.org/abs/2110.09148
 
     **Inputs:**
 
