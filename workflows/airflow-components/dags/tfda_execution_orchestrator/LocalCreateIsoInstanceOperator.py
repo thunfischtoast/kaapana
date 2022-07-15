@@ -4,6 +4,7 @@ import glob
 import zipfile
 from subprocess import PIPE, run
 import re
+import yaml
 
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
@@ -15,27 +16,26 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
 
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
-        # print(f'Playbooks directory is {playbooks_dir}, and directory is {operator_dir}')
-
         playbook_path = os.path.join(playbooks_dir, "00_start_"+self.platformType+"_instance.yaml")
         if not os.path.isfile(playbook_path):
-            print("playbook yaml not found.")
+            print("Playbook yaml not found!! Exiting now...")
             exit(1)
         
-        ### following is hardcoded, need to fix
-        ## platform specific params
-        os_project_name = "E230-TFDA"
-        os_project_id = "f4a5b8b7adf3422d85b28b06f116941c"
-        os_instance_name = "tfda-airflow-iso-envt"
-        os_username = ""
-        os_password = ""
-        ## machine specific params, could be platform agnostic
-        os_image = "e603c3c9-aaf4-45c4-8d7f-a7da76588079"
-        # os_ssh_key = "kaapana"
-        os_volume_size = "200"
-        os_instance_flavor = "dkfz.gpu-V100S-16CD"
+        config_filepath = os.path.join(operator_dir, "platform_specific_configs", "cloud_platform_config.yaml")
+        with open(config_filepath, "r") as stream:
+            platform_config = yaml.safe_load(stream)
+        
+        extra_vars = ""
+        if self.platformType == "openstack":
+            os_username = platform_config["configurations"][self.platformType]["username"]
+            os_password = platform_config["configurations"][self.platformType]["password"]
+            for key, value in platform_config["configurations"][self.platformType]["openstack"]["extra_vars"].items():
+                extra_vars += f"{key}={value} "
+            extra_vars = extra_vars.rstrip() # to remove blank space in the end 
+        else:
+            print(f"Sorry!! {self.platformType} is not yet supported. Exiting now...")
+            exit(1)
 
-        extra_vars = f"os_project_name={os_project_name} os_project_id={os_project_id} os_username={os_username} os_password={os_password} os_instance_name={os_instance_name} os_image={os_image} os_volume_size={os_volume_size} os_instance_flavor={os_instance_flavor}"
         command = ["ansible-playbook", playbook_path, "--extra-vars", extra_vars]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')
