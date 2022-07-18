@@ -21,10 +21,10 @@
   tasks:
     - name: Set algorithm container path
       set_fact: 
-        container_path: "{{ tarball_path }}/{{ subm_id }}.tar"
+        container_file_path: "{{ container_path }}/{{ subm_id }}{{ container_format }}"
     
     - name: Copy container file
       copy:
-        src: "{{ container_path }}"
-        dest: "/home/ubuntu/tarball"
+        src: "{{ container_file_path }}"
+        dest: "/home/ubuntu/tarball/workspace/.image/model.sif"
         # directory_mode: yes

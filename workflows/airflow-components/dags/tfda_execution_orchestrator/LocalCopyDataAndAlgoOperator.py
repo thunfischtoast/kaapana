@@ -26,10 +26,10 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         subm_id = kwargs["dag_run"].conf["subm_id"]
         print(f"Submission ID is: {subm_id}")
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
-        tarball_path = os.path.join(operator_dir, "tarball")
-        test_data_path = os.path.join(operator_dir, "data", "test_data")
+        container_path = os.path.join(operator_dir, "singularity_images")
+        container_format = ".sif"
 
-        extra_vars = f"target_host={iso_env_ip} remote_username=root tarball_path={tarball_path} subm_id={subm_id} test_data_path={test_data_path}"
+        extra_vars = f"target_host={iso_env_ip} remote_username=root container_path={container_path} subm_id={subm_id} container_format={container_format}"
         command = ["ansible-playbook", platform_install_playbook_path, "--extra-vars", extra_vars]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')

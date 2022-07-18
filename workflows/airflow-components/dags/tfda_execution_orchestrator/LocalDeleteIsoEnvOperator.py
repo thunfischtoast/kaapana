@@ -26,7 +26,7 @@ class LocalDeleteIsoEnvOperator(KaapanaPythonBaseOperator):
         
         os_project_name = "E230-TFDA"
         os_project_id = "f4a5b8b7adf3422d85b28b06f116941c"
-        os_instance_name = "tfda-airfl-iso-env-test"
+        os_instance_name = "tfda-brats-iso-envt"
         os_username = ""
         os_password = ""
         extra_vars = f"os_project_name={os_project_name} os_project_id={os_project_id} os_username={os_username} os_password={os_password} os_instance_name={os_instance_name}"
