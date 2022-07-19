@@ -2,7 +2,7 @@
 # # # ############# Build ###########
 # # # ###############################
 
-FROM node:lts-alpine3.10 as base
+FROM node:lts-alpine3.10 as build-stage
 
 WORKDIR /maintenance/app
 COPY files/kaapana_app/package*.json ./
@@ -10,8 +10,6 @@ RUN npm install
 
 COPY files/kaapana_app .
 
-
-FROM base  as build-stage
 
 LABEL IMAGE="maintenance-page-kaapana"
 LABEL VERSION="0.1.3"
