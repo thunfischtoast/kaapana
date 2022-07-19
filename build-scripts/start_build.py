@@ -49,7 +49,7 @@ if __name__ == '__main__':
     parser.add_argument("-el", "--enable-linting", dest="enable_linting", default=None, help="Enable Helm Chart lint & kubeval.")
     parser.add_argument("-sp", "--skip-push-no-changes", dest="skip_push_no_changes", default=None, help="Skip the image push if it didn't change.")
     parser.add_argument("-ee", "--exit-on-error", dest="exit_on_error", default=None, help="Stop build-process if error occurs.")
-    parser.add_argument("-pf", "--plartform-filter", dest="platform_filter", default=None, help="Specify platform-chart-names to be build (comma seperated).")
+    parser.add_argument("-pf", "--platform-filter", dest="platform_filter", default=None, help="Specify platform-chart-names to be build (comma seperated).")
     parser.add_argument("-es", "--external-sources", dest="external_source_dirs", default=None, help="External dirs to search for containers and charts.")
     args = parser.parse_args()
 
