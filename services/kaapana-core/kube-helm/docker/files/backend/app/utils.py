@@ -202,7 +202,11 @@ def helm_install(payload, helm_namespace=settings.helm_namespace, helm_command_a
     name = payload["name"]
     version = payload["version"]
 
-    release_values = helm_get_values("kaapana-platform-chart")
+    # TODO
+    # Instead of assuming there is only one platform running with a name like 
+    # '*-platform-chart', pass it as env var into kaapana-extensions-collection chart
+    platform_name: str = helm_ls(release_filter="platform-chart")[0]["name"]
+    release_values = helm_get_values(platform_name)
 
     default_sets = {}
     if 'global' in release_values:
