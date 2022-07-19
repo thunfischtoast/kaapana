@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+version: "0.1.4"
+appVersion: "0.1.4"
+name: base-platform-chart
+project_abbr: bp
+description: Base Kaapana Platform
+kaapana_type: "platform"
