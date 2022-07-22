@@ -125,13 +125,13 @@
               v-model="popUpDialog",
               :retain-focus="false",
               max-width="600px"
+              @click:outside="resetFormInfo()",
             )
-              template(v-slot:activator="{ on }")
               v-card
                 v-card-title Setup Extension {{ popUpItem.name }}
                 v-card-text
                   v-form.px-3(ref="popUpForm")
-                    template(v-for="(param, key) in item.extension_params")
+                    template(v-for="(param, key) in popUpItem.extension_params")
                       v-text-field(
                         v-if="param.type == 'string'",
                         :label="key + ':' + param.definition + ' [default: ' + param.default + ']'",
