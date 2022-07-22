@@ -548,7 +548,7 @@ def add_extension_params(chart):
     Add 'extension_params' to chart object, if a valid field exists in chart values.
     """
     vals = helm_show_values(chart["name"], chart["version"])
-    if "extension_params" in vals:
+    if (vals is not None) and "extension_params" in vals:
         # TODO: validate the parameter field
         chart["extension_params"] = vals["extension_params"]
     return chart
