@@ -1,26 +1,37 @@
 ## Cloud-Platform specific config parameters, which would be used to spin-up isolated instances
 
 configurations:
+  username: ""
+  password: ""
   platform:
     openstack:
-      username: ""
-      password: ""
-      extra_vars:
-        ## platform specific params
-        os_project_name: "E230-TFDA"
-        os_project_id: "f4a5b8b7adf3422d85b28b06f116941c"
-        os_instance_name: "tfda-airflow-iso-envt"
-        ## machine specific params, could be platform agnostic
-        os_image: "e603c3c9-aaf4-45c4-8d7f-a7da76588079"
-        # os_ssh_key: "tfda_iso"
-        os_volume_size: "200"
-        os_instance_flavor: "dkfz.gpu-V100S-16CD"
-    vmware:
-      username: ""
-      password: ""
-      extra_vars:
+      os_project_name: "E230-TFDA"
+      os_project_id: "f4a5b8b7adf3422d85b28b06f116941c"
+      dynamic_params:
+        kaapana_gpu:
+          # os_instance_name: "custom" -> TFDA will programatically assign inst name based on workflow name and flavour
+          os_image: "e603c3c9-aaf4-45c4-8d7f-a7da76588079"
+          os_volume_size: "200"
+          os_instance_flavor: "dkfz.gpu-V100S-16CD"
+        ubuntu_gpu:
+          # os_instance_name: "custom" -> TFDA will programatically assign inst name based on workflow name and flavour
+          os_image: "e603c3c9-aaf4-45c4-8d7f-a7da76588079"
+          os_volume_size: "200"
+          os_instance_flavor: "dkfz.gpu-V100S-16CD"
+        custom: # custom config -> operating sys, gpu memory, storage space (we provide available options)
+          # os_instance_name: "custom" -> TFDA will programatically assign inst name based on workflow name and flavour
+          os_image: ""
+          os_volume_size: ""
+          os_instance_flavor: ""
+    vmware: 
+      dynamic_params:
         var1: ""
         var2: ""
+    baremetal_kvm:
+      dynamic_params:
+        var1: ""
+        var2: ""
+      
 
 ## KVM
 
