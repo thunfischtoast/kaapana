@@ -295,7 +295,7 @@ function install_chart {
     echo "${GREEN}CHART_PATH $CHART_PATH${NC}"
     helm -n $HELM_NAMESPACE install --create-namespace $CHART_PATH \
     --set-string global.base_namespace="base" \
-    --set-string global.core_namespace="kube-system" \
+    --set-string global.core_namespace="base-kaapana" \
     --set-string global.credentials_registry_username="$CONTAINER_REGISTRY_USERNAME" \
     --set-string global.credentials_registry_password="$CONTAINER_REGISTRY_PASSWORD" \
     --set-string global.credentials_minio_username="$CREDENTIALS_MINIO_USERNAME" \
