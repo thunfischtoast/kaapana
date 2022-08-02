@@ -3,7 +3,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: cert-init
-  namespace: kube-system
+  namespace: {{ .Values.global.core_namespace }}
 spec:
   template:
     metadata:

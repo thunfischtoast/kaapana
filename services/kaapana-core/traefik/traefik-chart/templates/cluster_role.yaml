@@ -2,8 +2,8 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: traefik-ingress-controller
-  namespace: kube-system
+  name: traefik-ingress-controller-{{ .Values.global.core_namespace }}
+  namespace: {{ .Values.global.core_namespace }}
 rules:
   - apiGroups:
       - ""
@@ -51,14 +51,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: traefik-ingress-controller
-  namespace: kube-system
+  name: traefik-ingress-controller-{{ .Values.global.core_namespace }}
+  namespace: {{ .Values.global.core_namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: traefik-ingress-controller
+  name: traefik-ingress-controller-{{ .Values.global.core_namespace }}
 subjects:
   - kind: ServiceAccount
-    name: traefik-ingress-controller
-    namespace: kube-system
+    name: traefik-ingress-controller-{{ .Values.global.core_namespace }}
+    namespace: {{ .Values.global.core_namespace }}
 ---

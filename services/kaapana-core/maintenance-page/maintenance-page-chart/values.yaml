@@ -2,4 +2,4 @@
 global:
     pull_policy_pods: "IfNotPresent"
     base_namespace: "base"
-    core_namespace: "kube-system"
+    core_namespace: "base-kaapana"

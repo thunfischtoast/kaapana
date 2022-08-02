@@ -6,7 +6,7 @@ metadata:
   labels:
     k8s-app: kubernetes-dashboard
   name: kubernetes-dashboard
-  namespace: kube-system
+  namespace: {{ .Values.global.core_namespace }}
 spec:
   selector:
     app-name: kubernetes-dashboard
@@ -18,7 +18,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: kube-redirect
-  namespace: kube-system
+  namespace: {{ .Values.global.core_namespace }}
 spec:
   redirectRegex:
     regex: ^.*/kubernetes([^\/]*)$
@@ -28,10 +28,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubedashboard-ingress-ip
-  namespace: kube-system
+  namespace: {{ .Values.global.core_namespace }}
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-errorpages@kubernetescrd,kube-system-kube-redirect@kubernetescrd,kube-system-strip-prefix@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Values.global.core_namespace }}-errorpages@kubernetescrd,{{ .Values.global.core_namespace }}-kube-redirect@kubernetescrd,{{ .Values.global.core_namespace }}-strip-prefix@kubernetescrd
     ingress.kubernetes.io/auth-remove-header: 'true'
     ingress.kubernetes.io/custom-request-headers: "Authorization:||cookie:"
     kubernetes.io/ingress.global-static-ip-name: "kubernetes-ingress"

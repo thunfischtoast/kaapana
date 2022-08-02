@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres-keycloak
-  namespace: kube-system
+  namespace: {{ .Values.global.core_namespace }}
 spec:
   replicas: 1
   selector:

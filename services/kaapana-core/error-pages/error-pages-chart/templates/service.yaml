@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: error-pages-service
-  namespace: kube-system
+  namespace: {{ .Values.global.core_namespace }}
 spec:
   selector:
     app-name: error-pages
@@ -15,10 +15,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: error-pages-ingress-ip
-  namespace: kube-system
+  namespace: {{ .Values.global.core_namespace }}
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-errorpages@kubernetescrd,kube-system-strip-prefix@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Values.global.core_namespace }}-errorpages@kubernetescrd,{{ .Values.global.core_namespace }}-strip-prefix@kubernetescrd
     kubernetes.io/ingress.global-static-ip-name: "kubernetes-ingress"
 spec:
   rules:
