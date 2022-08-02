@@ -340,6 +340,7 @@ export default Vue.extend({
 
     resetFormInfo() {
       if (this.$refs.popUpForm !== undefined) {
+        this.popUpExtension = {} as any;
         (this.$refs.popUpForm as Vue & { reset: () => any }).reset();
       }
     },
@@ -354,7 +355,10 @@ export default Vue.extend({
       ) {
         this.popUpDialog = true;
         this.popUpItem = item;
-        this.resetFormInfo();
+        for (let key of Object.keys(item["extension_params"])) {
+          this.popUpExtension[key] = item["extension_params"][key]["default"]
+          
+        }
       } else {
         this.installChart(item);
       }
