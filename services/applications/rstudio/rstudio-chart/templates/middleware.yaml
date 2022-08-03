@@ -7,5 +7,5 @@ spec:
   stripPrefix:
     prefixes:
     - /rstudio
-    # forceSlash: true
+    forceSlash: true
 ---
