@@ -14,6 +14,18 @@ spec:
       labels:
         app-name: rstudio
     spec:
+      # initContainers:
+      # - name: volume-permissions
+      #   image: {{ .Values.global.registry_url }}/busybox:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__1.31
+      #   imagePullPolicy:  {{ .Values.global.pull_policy_pods }}
+      #   command: ["sh", "-c", "chmod 777 /home"]
+      #   volumeMounts:
+      #   - name: rstudio-data-vol
+      #     mountPath: /home
+      #   securityContext:
+      #     runAsUser: 0
+      # securityContext:
+      #   runAsUser: 1000
       containers:
       - name: rstudio-container
         image: {{  .Values.global.registry_url }}/rstudio:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__2022.07.1-554
@@ -31,6 +43,14 @@ spec:
         ports:
         - name: http-port
           containerPort: 8787
+        volumeMounts:
+          - name: rstudio-data-vol
+            mountPath: /home
+      volumes:
+      - name: rstudio-data-vol
+        hostPath:
+          path: {{ .Values.global.fast_data_dir }}/rstudio
+          type: DirectoryOrCreate
       imagePullSecrets:
       - name: registry-secret
 ---

@@ -33,5 +33,6 @@ COPY files/entrypoint.sh /entrypoint.sh
 
 ENV USER admin
 ENV PASSWORD admin
+ENV export LANGUAGE=en_US.UTF-8
 
 ENTRYPOINT ["/entrypoint.sh"]
