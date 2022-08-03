@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rstudio-config
+  namespace: {{ .Values.global.base_namespace }}
+data:
+   rserver.conf: |+
+    www-port=87
+    www-address=127.0.0.1
+    session-timeout-minutes=30
+

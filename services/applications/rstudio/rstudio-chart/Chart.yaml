@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+version: "2022.07.1-554"
+appVersion: "2022.07.1-554"
+name: rstudio-chart
+description: Kaapana extension for RStudio-Server (https://www.rstudio.com/products/rstudio/download-server/)
+keywords:
+- kaapanaapplication
+- kaapanaexperimental

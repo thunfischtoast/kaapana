@@ -60,3 +60,6 @@ dependencies:
   - name: openedc-chart
     version: 0.1.0
     repository: file://../../services/applications/openEDC/openedc-chart
+  - name: rstudio-chart
+    version: 2022.07.1-554
+    repository: file://../../services/applications/rstudio/rstudio-chart

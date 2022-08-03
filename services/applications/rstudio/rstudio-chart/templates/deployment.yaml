@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rstudio
+  namespace: {{ .Values.global.base_namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app-name: rstudio
+  template:
+    metadata:
+      labels:
+        app-name: rstudio
+    spec:
+      containers:
+      - name: rstudio-container
+        image: {{  .Values.global.registry_url }}/rstudio:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__2022.07.1-554
+        imagePullPolicy:  {{ .Values.global.pull_policy_pods }}
+        env:
+        - name: USER
+          value: admin
+        - name: PASSWORD
+          value: admin
+        resources:
+          requests:
+            memory: 500Mi
+          limits:
+            memory: 2000Mi
+        ports:
+        - name: http-port
+          containerPort: 8787
+      imagePullSecrets:
+      - name: registry-secret
+---

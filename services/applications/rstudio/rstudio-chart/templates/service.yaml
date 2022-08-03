@@ -2,35 +2,36 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: openedc-service
+  name: rstudio-service
   namespace: {{ .Values.global.base_namespace }}
 spec:
   selector:
-    app-name: openedc
+    app-name: rstudio
+  type: ClusterIP
   ports:
-    - port: 8080
-      targetPort: 80
-      name: openedc-http
+    - port: 8787
+      targetPort: 8787
+      name: rstudio-http
 ---
 apiVersion: networking.k8s.io/v1 
 kind: Ingress
 metadata:
-  name: openedc-ingress-ip
+  name: rstudio-ingress-ip
   namespace: {{ .Values.global.base_namespace }}
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-errorpages@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-errorpages@kubernetescrd,{{ .Values.global.base_namespace }}-rstudio-strip-prefix@kubernetescrd
     kubernetes.io/ingress.global-static-ip-name: "kubernetes-ingress"
 spec:
   rules:
   - host: 
     http:
       paths:
-      - path: /openedc
+      - path: /rstudio
         pathType: ImplementationSpecific
         backend:
           service:
-            name: openedc-service
+            name: rstudio-service
             port:
-              name: openedc-http
+              name: rstudio-http
 ---
