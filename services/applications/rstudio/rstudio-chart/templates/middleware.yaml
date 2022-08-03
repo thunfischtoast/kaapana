@@ -7,5 +7,6 @@ spec:
   stripPrefix:
     prefixes:
     - /rstudio
+    - /rst-api
     forceSlash: true
 ---

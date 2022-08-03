@@ -12,6 +12,9 @@ spec:
     - port: 8787
       targetPort: 8787
       name: rstudio-http
+    - port: 5000
+      targetPort: 5000
+      name: user-api-http
 ---
 apiVersion: networking.k8s.io/v1 
 kind: Ingress
@@ -34,4 +37,11 @@ spec:
             name: rstudio-service
             port:
               name: rstudio-http
+      - path: /rst-api
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: rstudio-service
+            port:
+              name: user-api-http
 ---
