@@ -11,6 +11,7 @@ from os.path import join, exists, basename
 
 home_dir = "/home"
 user_info_json_path = join(home_dir,"user_info.json")
+app = FastAPI(title="RStudio User API",root_path=os.getenv('APPLICATION_ROOT', '/rst-api'))
 
 def add_user(username,password):
      print(f"Creating user: {username}")
@@ -54,9 +55,6 @@ def add_user(username,password):
         print(f"Could not create user: {username}")
         print(e)                     
         return False
-
-app = FastAPI(title="RStudio User API",root_path=os.getenv('APPLICATION_ROOT', '/rst-api'))
-    
 
 @app.get("/")
 async def root():
