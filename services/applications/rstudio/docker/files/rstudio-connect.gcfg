@@ -1,0 +1,16 @@
+; /etc/rstudio-connect/rstudio-connect.gcfg
+[Authentication]
+Provider = "oauth2"
+
+[OAuth2]
+ClientId = "kaapana"
+ClientSecret = "uQBJzc2YDzjRfj2OCT79JDShojeqAK2R"
+OpenIDConnectIssuer = "http://keycloak-external-service.kube-system.svc:80/auth/realms/kaapana/.well-known/openid-configuration"
+RequireUsernameClaim = true
+; Enable this for a better user experience, unless
+; managing a large number of groups is a concern:
+;GroupsAutoProvision = true
+
+; When attempting to troubleshoot a problem relating to OpenID Connect, 
+; you can enable more verbose logging by enabling the following line
+;Logging = true

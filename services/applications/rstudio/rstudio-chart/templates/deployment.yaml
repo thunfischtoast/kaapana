@@ -46,11 +46,20 @@ spec:
         volumeMounts:
           - name: rstudio-data-vol
             mountPath: /home
+          - name: oidc-config
+            subPath: rserver.conf
+            mountPath: /etc/rstudio/rserver.conf
       volumes:
       - name: rstudio-data-vol
         hostPath:
           path: {{ .Values.global.fast_data_dir }}/rstudio
           type: DirectoryOrCreate
+      - name: oidc-config
+        configMap:
+          name: rstudio-config
+          items:
+          - key: rserver.conf
+            path: rserver.conf
       imagePullSecrets:
       - name: registry-secret
 ---

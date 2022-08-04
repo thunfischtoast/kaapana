@@ -35,7 +35,7 @@ RUN wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-2022.0
 COPY files/requirements.txt /
 RUN python3 -m pip install --no-cache-dir -r /requirements.txt && rm /requirements.txt
 
-COPY files/rserver.conf /etc/rstudio/rserver.conf
+# COPY files/rserver.conf /etc/rstudio/rserver.conf
 COPY files/logging.conf /etc/rstudio/logging.conf
 COPY files/entrypoint.sh /entrypoint.sh
 COPY files/user_api.py /src/user_api.py
