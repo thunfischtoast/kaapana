@@ -39,9 +39,7 @@
       async: 700
       poll: 0
       register: gpu_and_ram_monitor
-      ignore_errors: yes
-    
-    # - debug: msg="{{ '%H:%M:%S' | strftime }}"    
+      ignore_errors: yes   
     
     - name: Run MedPerf client on the submission
       shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity --log=debug --infer-timeout=600 test -b {{ benchmark_id }} -m /home/ubuntu/tarball
@@ -64,13 +62,6 @@
       command: pkill -f "/opt/conda/bin/python3"
       when: monitor_job_result.finished
       ignore_errors: yes
-    
-    # - name: Add failed log to medperf.log if GPU memory consumption exceeded
-    #   lineinfile:
-    #     path: /home/ubuntu/medperf-env/logs/medperf.log
-    #     line: "{{ '%Y-%m-%d %H:%M:%S,999' | strftime }} | ERROR: Medperf Evaluation failed due to exceeding GPU/RAM memory consumption limit, see above logs for more details..."
-    #   when: monitor_job_result.finished
-    #   ignore_errors: yes
     
     - name: Check if logs exist
       stat:
