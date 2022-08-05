@@ -9,12 +9,12 @@ configurations:
       os_project_id: "f4a5b8b7adf3422d85b28b06f116941c"
       dynamic_params:
         kaapana_gpu:
-          # os_instance_name: "custom" -> TFDA will programatically assign inst name based on workflow name and flavour
+          # os_instance_name: "kaapana-gpu" -> TFDA will programatically assign inst name based on workflow name and flavour
           os_image: "e603c3c9-aaf4-45c4-8d7f-a7da76588079"
           os_volume_size: "200"
           os_instance_flavor: "dkfz.gpu-V100S-16CD"
         ubuntu_gpu:
-          # os_instance_name: "custom" -> TFDA will programatically assign inst name based on workflow name and flavour
+          # os_instance_name: "ubuntu-gpu" -> TFDA will programatically assign inst name based on workflow name and flavour
           os_image: "e603c3c9-aaf4-45c4-8d7f-a7da76588079"
           os_volume_size: "200"
           os_instance_flavor: "dkfz.gpu-V100S-16CD"

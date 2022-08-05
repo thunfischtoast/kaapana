@@ -23,7 +23,7 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
             print("Playbook yaml file not found.")
             exit(1)
         
-        subm_id = kwargs["dag_run"].conf["subm_id"]
+        # config_filepath = kwargs["dag_run"].conf["subm_id"]
         print(f"Submission ID is: {subm_id}")
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
         tarball_path = os.path.join(operator_dir, "tarball")

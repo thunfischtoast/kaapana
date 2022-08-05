@@ -21,18 +21,18 @@
     PATH: '/home/ubuntu/.local/bin:{{ ansible_env.PATH }}'
 
   tasks:
-    - name: Update submission tarfile name in MLCube config
-      replace:
-        path: /home/ubuntu/tarball/mlcube.yaml
-        regexp: 'tar_file: /home/ubuntu/tarball/'
-        replace: 'tar_file: /home/ubuntu/tarball/{{ subm_id }}.tar'
+    # - name: Update submission tarfile name in MLCube config
+    #   replace:
+    #     path: /home/ubuntu/tarball/mlcube.yaml
+    #     regexp: 'tar_file: /home/ubuntu/tarball/'
+    #     replace: 'tar_file: /home/ubuntu/tarball/{{ subm_id }}.tar'
 
     - name: Run Mini conda Installation for Cuda Support
       shell: bash /home/ubuntu/Miniconda3-py38_4.12.0-Linux-x86_64.sh -b -p /home/ubuntu/miniconda3
 
-    - name: Convert docker to singularity using MLCube
-      shell: mlcube configure --platform=singularity --mlcube=/home/ubuntu/tarball/mlcube.yaml
-      ignore_errors: yes
+    # - name: Convert docker to singularity using MLCube
+    #   shell: mlcube configure --platform=singularity --mlcube=/home/ubuntu/tarball/mlcube.yaml
+    #   ignore_errors: yes
 
     - name: Monitor GPU process
       shell: python3 /home/ubuntu/gpu_and_ram_monitoring.py
@@ -41,11 +41,11 @@
       register: gpu_and_ram_monitor
       ignore_errors: yes   
     
-    - name: Run MedPerf client on the submission
-      shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity --log=debug --infer-timeout=600 test -b {{ benchmark_id }} -m /home/ubuntu/tarball
-      async: 650
-      poll: 0
-      ignore_errors: yes
+    # - name: Run MedPerf client on the submission
+    #   shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity --log=debug --infer-timeout=600 test -b {{ benchmark_id }} -m /home/ubuntu/tarball
+    #   async: 650
+    #   poll: 0
+    #   ignore_errors: yes
     
     # - debug: msg="{{ '%H:%M:%S' | strftime }}"
 
@@ -68,19 +68,19 @@
         path: /home/ubuntu/medperf-env/logs/medperf.log
       register: log_file_check
 
-    - name: Copy logs to results folder if available
-      copy:
-        src: /home/ubuntu/medperf-env/logs/medperf.log
-        dest: /home/ubuntu/medperf-env/results/medperf.log
-        remote_src: yes
-      when: log_file_check.stat.exists
+    # - name: Copy logs to results folder if available
+    #   copy:
+    #     src: /home/ubuntu/medperf-env/logs/medperf.log
+    #     dest: /home/ubuntu/medperf-env/results/medperf.log
+    #     remote_src: yes
+    #   when: log_file_check.stat.exists
 
-    - name: Create an archive of results into a zip file
-      archive: 
-        path: 
-        - /home/ubuntu/medperf-env/results #/{{ benchmark_id }}
-        dest: "/home/ubuntu/medperf-env/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
-        format: zip
+    # - name: Create an archive of results into a zip file
+    #   archive: 
+    #     path: 
+    #     - /home/ubuntu/medperf-env/results #/{{ benchmark_id }}
+    #     dest: "/home/ubuntu/medperf-env/results_{{ subm_id }}_{{ '%Y-%m-%d' | strftime }}.zip"
+    #     format: zip
 
     - name: Copy results back to the parent host
       become: yes

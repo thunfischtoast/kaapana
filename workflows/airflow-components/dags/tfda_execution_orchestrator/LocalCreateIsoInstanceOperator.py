@@ -21,17 +21,20 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
             print("Playbook yaml not found!! Exiting now...")
             exit(1)
         
-        config_filepath = os.path.join(operator_dir, "platform_specific_configs", "cloud_platform_config.yaml")
-        with open(config_filepath, "r") as stream:
-            platform_config = yaml.safe_load(stream)
+        platform_config = kwargs["dag_run"].conf["platform_config"]
+        print(f"**************************Platform config is: {platform_config}**************************")
         
         extra_vars = ""
+        os_username = platform_config["configurations"]["username"]
+        os_password = platform_config["configurations"]["password"]
+        extra_vars += f"os_username={os_username} os_password={os_password}"
         if self.platformType == "openstack":
-            os_username = platform_config["configurations"][self.platformType]["username"]
-            os_password = platform_config["configurations"][self.platformType]["password"]
-            for key, value in platform_config["configurations"][self.platformType]["openstack"]["extra_vars"].items():
-                extra_vars += f"{key}={value} "
-            extra_vars = extra_vars.rstrip() # to remove blank space in the end 
+            os_project_name = platform_config["configurations"]["platform"][self.platformType]["os_project_name"]
+            os_project_id = platform_config["configurations"]["platform"][self.platformType]["os_project_id"]
+            extra_vars += f" os_project_name={os_project_name} os_project_id={os_project_id}"
+            for key, value in platform_config["configurations"]["platform"][self.platformType]["dynamic_params"][self.platformFlavor].items():
+                extra_vars += f" {key}={value}"
+            # extra_vars = extra_vars.rstrip() # to remove blank space in the end 
         else:
             print(f"Sorry!! {self.platformType} is not yet supported. Exiting now...")
             exit(1)
@@ -51,6 +54,7 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
     def __init__(self,
                  dag,
                  platformType = "openstack",
+                 platformFlavor = "ubuntu_gpu"
                  **kwargs):
 
         super().__init__(
@@ -60,3 +64,4 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
             **kwargs
         )
         self.platformType = platformType
+        self.platformFlavor = platformFlavor

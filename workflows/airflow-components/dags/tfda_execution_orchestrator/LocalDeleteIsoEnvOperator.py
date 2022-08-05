@@ -24,6 +24,8 @@ class LocalDeleteIsoEnvOperator(KaapanaPythonBaseOperator):
             print("playbook yaml not found.")
             exit(1)
         
+        platform_config = kwargs["dag_run"].conf["platform_config"]
+
         os_project_name = "E230-TFDA"
         os_project_id = "f4a5b8b7adf3422d85b28b06f116941c"
         os_instance_name = "tfda-airfl-iso-env-test"
