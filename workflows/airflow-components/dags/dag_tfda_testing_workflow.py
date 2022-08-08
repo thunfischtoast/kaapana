@@ -4,7 +4,7 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
 from airflow.operators.bash_operator import BashOperator
-from tfda_execution_orchestrator.LocalTFDAMainOperator import LocalTFDAMainOperator
+from tfda_execution_orchestrator.LocalTFDATestingOperator import LocalTFDATestingOperator
 from kaapana.operators.LocalWorkflowCleanerOperator import LocalWorkflowCleanerOperator
 from datetime import datetime, timedelta
 
@@ -26,7 +26,7 @@ dag = DAG(
     schedule_interval="@daily",
 )
 
-tfda_workflow = LocalTFDAMainOperator(dag=dag, execution_timeout=timedelta(hours=24))
+tfda_workflow = LocalTFDATestingOperator(dag=dag, execution_timeout=timedelta(hours=24))
 clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True)
 
 tfda_workflow >> clean

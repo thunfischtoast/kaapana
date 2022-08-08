@@ -21,7 +21,7 @@ from kaapana.blueprints.kaapana_utils import generate_run_id
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
-class LocalTFDAMainOperator(KaapanaPythonBaseOperator):
+class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
     # def send_email(self, email_address, cc_address, message, filepath, subm_id):
     #     assert(email_address != "", "Please specify the recipient of the Email")
     #     print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
