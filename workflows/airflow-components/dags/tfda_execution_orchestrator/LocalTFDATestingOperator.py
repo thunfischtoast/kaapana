@@ -115,6 +115,10 @@ class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
                             print(exc)
 
                     self.conf["platform_config"] = platform_config
+
+                    # TODO:HARDCODE path : Need to Change with API results  (based on user chosen bucket)
+
+                    self.conf["user_selected_bucket"] = 'test_site_data'
                     dag_run_id = generate_run_id(self.trigger_dag_id)
                     try:
                         trigger(dag_id=self.trigger_dag_id, run_id=dag_run_id, conf=self.conf,

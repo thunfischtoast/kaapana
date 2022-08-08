@@ -27,4 +27,16 @@
       copy:
         src: "{{ container_path }}"
         dest: "/home/ubuntu/tarball"
+
+    - name: Copy user selected bucket to Iso
+      copy:
+        src: "{{ user_selected_data }}"
+        # the input data path will be /home/ubuntu/<USER_SELECTED_BUCKET>
+        dest: "/home/ubuntu"
+        directory_mode: yes
+
+    - name: Copy user shell script to Iso
+      copy:
+        src: "{{ user_input_algo_path }}"
+        dest: "/home/ubuntu"
         # directory_mode: yes

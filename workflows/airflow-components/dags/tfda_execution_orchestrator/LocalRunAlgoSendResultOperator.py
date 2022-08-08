@@ -14,8 +14,8 @@ class LocalRunAlgoSendResultOperator(KaapanaPythonBaseOperator):
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         scripts_dir = os.path.join(operator_dir, "scripts")
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
-        subm_results_path = os.path.join(operator_dir, "subm_results")
-        singularity_path = os.path.join(operator_dir, "singularity_images")
+        results_path = os.path.join(operator_dir, "results")
+        
         print(f'Playbooks directory is {playbooks_dir}, and scripts are in {scripts_dir}, and directory is {operator_dir}')
         
         playbook_path = os.path.join(
@@ -29,7 +29,7 @@ class LocalRunAlgoSendResultOperator(KaapanaPythonBaseOperator):
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
         benchmark_id = "1"
 
-        extra_vars = f"target_host={iso_env_ip} remote_username=ubuntu subm_id={subm_id} benchmark_id={benchmark_id} subm_results_path={subm_results_path} singularity_path={singularity_path}/"
+        extra_vars = f"target_host={iso_env_ip} remote_username=ubuntu results_path={results_path}"
         command = ["ansible-playbook", playbook_path, "--extra-vars", extra_vars]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')

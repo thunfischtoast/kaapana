@@ -150,6 +150,8 @@ spec:
           mountPath: /root/airflow/logs
         - name: modeldata
           mountPath: /models
+        - name: minio-buckets
+          mountPath: /root/airflow/miniobuckets
         # readinessProbe:
         #   initialDelaySeconds: 120
         #   timeoutSeconds: 5
@@ -217,6 +219,8 @@ spec:
           mountPath: /root/airflow/plugins
         - name: modeldata
           mountPath: /models
+        - name: minio-buckets
+          mountPath: /root/airflow/miniobuckets
         - name: ctpinput
           mountPath: /ctpinput
         - name: workflowdata
@@ -245,6 +249,10 @@ spec:
       - name: modeldata
         hostPath:
           path: {{ .Values.global.fast_data_dir }}/workflows/models
+          type: DirectoryOrCreate
+      - name: minio-buckets
+        hostPath:
+          path: {{ .Values.global.fast_data_dir }}/minio
           type: DirectoryOrCreate
       - name: ctpinput
         hostPath:
