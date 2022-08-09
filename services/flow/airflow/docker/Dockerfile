@@ -56,13 +56,11 @@ RUN chmod 600 /root/.ssh/tfda_iso.pem
 # COPY files/server_installation.sh /root/tfda_platform/server_installation.sh
 # COPY files/install_platform.sh /root/tfda_platform/install_platform.sh
 
-# SKOPEO Installation
-
-
-RUN echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_20.04/ /" |  tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
-RUN curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_20.04/Release.key |  apt-key add -
-RUN  apt-get update
-RUN  apt-get -y install skopeo
+## SKOPEO Installation
+# RUN echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_20.04/ /" |  tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+# RUN curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_20.04/Release.key |  apt-key add -
+# RUN  apt-get update
+# RUN  apt-get -y install skopeo
 
 
 ENTRYPOINT ["./bootstrap.sh"]
