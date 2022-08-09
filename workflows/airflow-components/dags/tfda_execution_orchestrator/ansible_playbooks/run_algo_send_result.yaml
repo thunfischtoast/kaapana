@@ -21,7 +21,7 @@
     PATH: '/home/ubuntu/.local/bin:{{ ansible_env.PATH }}'
 
   tasks:
-    - name: Check if logs exist
+    - name: Run user Shell script
       ## TODO: HARDCODED the user uploaded script name should be renamed to below file name or the extracted contents has to be pasted into below file name
       shell: bash /home/ubuntu/user_input_algo.sh
          

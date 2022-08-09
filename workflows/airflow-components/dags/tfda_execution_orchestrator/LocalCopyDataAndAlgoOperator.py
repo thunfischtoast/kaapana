@@ -23,14 +23,14 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         platform_install_playbook_path = os.path.join(
         playbooks_dir, "copy_algo_to_iso_env.yaml"
         )
-        user_input_algo_path = os.path.join(
-        platform_specific_config_path, "user_input_algo.sh"
+        user_input_commands_path = os.path.join(
+        platform_specific_config_path, "user_input_commands.sh"
         )
         if not os.path.isfile(platform_install_playbook_path):
             print("Playbook yaml file not found.")
             exit(1)
-        if not os.path.isfile(user_input_algo_path):
-            print("user_input_algo_path file not found.")
+        if not os.path.isfile(user_input_commands_path):
+            print("user_input_commands_path file not found.")
             exit(1)
 
         # config_filepath = kwargs["dag_run"].conf["subm_id"]
@@ -42,7 +42,7 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         tarball_path = os.path.join(operator_dir, "tarball")
         test_data_path = os.path.join(operator_dir, "data", "test_data")
 
-        extra_vars = f"target_host={iso_env_ip} remote_username=root tarball_path={tarball_path} user_selected_data={user_selected_bucket_path} user_input_algo_path={user_input_algo_path} "
+        extra_vars = f"target_host={iso_env_ip} remote_username=root tarball_path={tarball_path} user_selected_data={user_selected_bucket_path} user_input_commands_path={user_input_commands_path} "
         command = ["ansible-playbook", platform_install_playbook_path, "--extra-vars", extra_vars]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')

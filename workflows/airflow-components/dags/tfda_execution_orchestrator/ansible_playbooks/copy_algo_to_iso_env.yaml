@@ -37,6 +37,6 @@
 
     - name: Copy user shell script to Iso
       copy:
-        src: "{{ user_input_algo_path }}"
+        src: "{{ user_input_commands_path }}"
         dest: "/home/ubuntu"
         # directory_mode: yes
