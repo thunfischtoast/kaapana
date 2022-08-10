@@ -22,8 +22,9 @@
 
   tasks:
     - name: Run user Shell script
+      become: yes # -> not sure if a good idea to allow sudo to the shell script (actually, DON'T DO IT!)
       ## TODO: HARDCODED the user uploaded script name should be renamed to below file name or the extracted contents has to be pasted into below file name
-      shell: bash /home/ubuntu/user_input_algo.sh
+      shell: bash /home/ubuntu/user_input_commands.sh
          
     # - name: Update submission tarfile name in MLCube config
     #   replace:
@@ -34,23 +35,6 @@
     # - name: Run Mini conda Installation for Cuda Support
     #   shell: bash /home/ubuntu/Miniconda3-py38_4.12.0-Linux-x86_64.sh -b -p /home/ubuntu/miniconda3
 
-    # - name: Convert docker to singularity using MLCube
-    #   shell: mlcube configure --platform=singularity --mlcube=/home/ubuntu/tarball/mlcube.yaml
-    #   ignore_errors: yes
-
-    # - name: Monitor GPU process
-    #   shell: python3 /home/ubuntu/gpu_and_ram_monitoring.py
-    #   async: 700
-    #   poll: 0
-    #   register: gpu_and_ram_monitor
-    #   ignore_errors: yes   
-    
-    # - name: Run MedPerf client on the submission
-    #   shell: medperf --no-cleanup --storage=/home/ubuntu/medperf-env --platform=singularity --log=debug --infer-timeout=600 test -b {{ benchmark_id }} -m /home/ubuntu/tarball
-    #   async: 650
-    #   poll: 0
-    #   ignore_errors: yes
-    
     # - debug: msg="{{ '%H:%M:%S' | strftime }}"
 
     # - name: Get job ID of GPU monitoring task
@@ -61,23 +45,7 @@
     #   retries: 350
     #   delay: 2
     #   ignore_errors: yes
-    
-    # - name: Kill process running Medperf if GPU consumption exceeds preset value
-    #   command: pkill -f "/opt/conda/bin/python3"
-    #   when: monitor_job_result.finished
-    #   ignore_errors: yes
-    
-    # - name: Check if logs exist
-    #   stat:
-    #     path: /home/ubuntu/medperf-env/logs/medperf.log
-    #   register: log_file_check
-
-    # - name: Copy logs to results folder if available
-    #   copy:
-    #     src: /home/ubuntu/medperf-env/logs/medperf.log
-    #     dest: /home/ubuntu/medperf-env/results/medperf.log
-    #     remote_src: yes
-    #   when: log_file_check.stat.exists
+  
     - name: Check if actually result files exist
       find:
         path: /home/ubuntu/results
@@ -87,12 +55,12 @@
       register: result_files
       failed_when: result_files.matched == 0
 
-     - name: Create an archive of results into a zip file
-       archive: 
-         path: 
-         - /home/ubuntu/results
-         dest: "/home/ubuntu/results_{{ '%Y-%m-%d' | strftime }}.zip"
-         format: zip
+    - name: Create an archive of results into a zip file
+      archive: 
+        path: 
+        - /home/ubuntu/results
+        dest: "/home/ubuntu/results_{{ '%Y-%m-%d' | strftime }}.zip"
+        format: zip
 
 
     - name: Copy results back to the parent host
@@ -102,18 +70,3 @@
         src: "/home/ubuntu/results_{{ '%Y-%m-%d' | strftime }}.zip"
         dest: "{{ results_path }}/"
         flat: yes
-    
-
-    # - name: Get name/s of singularity .sif file/s to be copied back to host
-    #   find: 
-    #     paths: "/home/ubuntu/tarball/workspace/.image"
-    #     recurse: no 
-    #     patterns: "*.sif"
-    #   register: files_to_copy
-
-    # - name: Copy singularity file/s back to parent host
-    #   fetch: 
-    #     src: "{{ item.path }}"
-    #     dest: "{{ singularity_path }}"
-    #     flat: yes
-    #   with_items: "{{ files_to_copy.files }}"

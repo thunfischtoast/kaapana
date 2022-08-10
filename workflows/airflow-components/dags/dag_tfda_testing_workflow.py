@@ -17,16 +17,14 @@ args = {
     "catchup": False,
 }
 
-# Instantiate a DAG my_dag that runs every day
-# DAG objects contain tasks
-# Time is in UTC!!!
 dag = DAG(
-    dag_id="dag-tfda-workflow",
+    dag_id="dag-tfda-testing-workflow",
     default_args=args,
-    schedule_interval="@daily",
+    # schedule_interval="@daily",
+    schedule_interval=None,
 )
 
-tfda_workflow = LocalTFDATestingOperator(dag=dag, execution_timeout=timedelta(hours=24))
+tfda_testing = LocalTFDATestingOperator(dag=dag, execution_timeout=timedelta(hours=24))
 clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True)
 
-tfda_workflow >> clean
+tfda_testing >> clean

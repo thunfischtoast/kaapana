@@ -25,9 +25,7 @@ class LocalRunAlgoSendResultOperator(KaapanaPythonBaseOperator):
             print("Playbook yaml file not found.")
             exit(1)
         
-        subm_id = kwargs["dag_run"].conf["subm_id"]
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
-        benchmark_id = "1"
 
         extra_vars = f"target_host={iso_env_ip} remote_username=ubuntu results_path={results_path}"
         command = ["ansible-playbook", playbook_path, "--extra-vars", extra_vars]

@@ -1,10 +1,8 @@
 import os
-import sys
 import glob
 import zipfile
 from subprocess import PIPE, run
 import re
-import yaml
 
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
@@ -34,11 +32,11 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
             extra_vars += f" os_project_name={os_project_name} os_project_id={os_project_id}"
             for key, value in platform_config["configurations"]["platform"][self.platformType]["dynamic_params"][self.platformFlavor].items():
                 extra_vars += f" {key}={value}"
-            # extra_vars = extra_vars.rstrip() # to remove blank space in the end 
         else:
             print(f"Sorry!! {self.platformType} is not yet supported. Exiting now...")
             exit(1)
 
+        print(f"*****************************The EXTRA-VARS are: {extra_vars}************************************")
         command = ["ansible-playbook", playbook_path, "--extra-vars", extra_vars]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')
@@ -54,7 +52,8 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
     def __init__(self,
                  dag,
                  platformType = "openstack",
-                 platformFlavor = "ubuntu_gpu"
+                 platformFlavor = "ubuntu_gpu",
+                 instance_state = "present",
                  **kwargs):
 
         super().__init__(
@@ -65,3 +64,4 @@ class LocalCreateIsoInstanceOperator(KaapanaPythonBaseOperator):
         )
         self.platformType = platformType
         self.platformFlavor = platformFlavor
+        self.instance_state = instance_state
