@@ -2,7 +2,7 @@ from airflow.utils.log.logging_mixin import LoggingMixin
 from airflow.utils.dates import days_ago
 from datetime import timedelta
 from airflow.models import DAG
-from tfda_execution_orchestrator.LocalCreateIsoInstanceOperator import LocalCreateIsoInstanceOperator
+from tfda_execution_orchestrator.LocalManageIsoInstanceOperator import LocalManageIsoInstanceOperator
 from tfda_execution_orchestrator.LocalChangeIsoInstHostnameOperator import LocalChangeIsoInstHostnameOperator
 from tfda_execution_orchestrator.LocalInstallPlatformDepsOnIsoEnvOperator import LocalInstallPlatformDepsOnIsoEnvOperator
 from tfda_execution_orchestrator.LocalDeployPlatformOnIsoEnvOperator import LocalDeployPlatformOnIsoEnvOperator
@@ -35,12 +35,13 @@ dag = DAG(
     schedule_interval=None,
 )
 
-create_iso_env = LocalCreateIsoInstanceOperator(dag=dag)
+create_iso_env = LocalManageIsoInstanceOperator(dag=dag, platformType="openstack", platformFlavor="ubuntu_gpu", instanceState="present", taskName="create-iso-inst")
 # install_platform_dependencies = LocalInstallPlatformDepsOnIsoEnvOperator(dag=dag)
 # deploy_platform = LocalDeployPlatformOnIsoEnvOperator(dag=dag)
 copy_data_algo = LocalCopyDataAndAlgoOperator(dag=dag)
 run_algo_send_result = LocalRunAlgoSendResultOperator(dag=dag)
-delete_iso_inst = LocalDeleteIsoEnvOperator(dag=dag, trigger_rule="all_done")
+# delete_iso_inst = LocalDeleteIsoEnvOperator(dag=dag, trigger_rule="all_done")
+delete_iso_inst = LocalManageIsoInstanceOperator(dag=dag, trigger_rule="all_done", platformType="openstack", platformFlavor="ubuntu_gpu", instanceState="absent", taskName="delete-iso-inst")
 clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True, trigger_rule="all_done")
 
 def final_status(**kwargs):
