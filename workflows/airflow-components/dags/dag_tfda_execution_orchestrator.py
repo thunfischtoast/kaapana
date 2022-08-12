@@ -7,7 +7,7 @@ from tfda_execution_orchestrator.LocalChangeIsoInstHostnameOperator import Local
 from tfda_execution_orchestrator.LocalInstallPlatformDepsOnIsoEnvOperator import LocalInstallPlatformDepsOnIsoEnvOperator
 from tfda_execution_orchestrator.LocalDeployPlatformOnIsoEnvOperator import LocalDeployPlatformOnIsoEnvOperator
 from tfda_execution_orchestrator.LocalCopyDataAndAlgoOperator import LocalCopyDataAndAlgoOperator
-from tfda_execution_orchestrator.LocalRunAlgoSendResultOperator import LocalRunAlgoSendResultOperator
+from tfda_execution_orchestrator.LocalRunAlgoSendFetchOperator import LocalRunAlgoFetchResultOperator
 from tfda_execution_orchestrator.LocalDeleteIsoEnvOperator import LocalDeleteIsoEnvOperator
 from kaapana.operators.LocalWorkflowCleanerOperator import LocalWorkflowCleanerOperator
 from airflow.operators.python_operator import PythonOperator
@@ -39,7 +39,7 @@ create_iso_env = LocalManageIsoInstanceOperator(dag=dag, platformType="openstack
 # install_platform_dependencies = LocalInstallPlatformDepsOnIsoEnvOperator(dag=dag)
 # deploy_platform = LocalDeployPlatformOnIsoEnvOperator(dag=dag)
 copy_data_algo = LocalCopyDataAndAlgoOperator(dag=dag)
-run_algo_send_result = LocalRunAlgoSendResultOperator(dag=dag)
+run_algo_fetch_result = LocalRunAlgoFetchResultOperator(dag=dag)
 # delete_iso_inst = LocalDeleteIsoEnvOperator(dag=dag, trigger_rule="all_done")
 delete_iso_inst = LocalManageIsoInstanceOperator(dag=dag, trigger_rule="all_done", platformType="openstack", platformFlavor="ubuntu_gpu", instanceState="absent", taskName="delete-iso-inst")
 clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True, trigger_rule="all_done")
@@ -58,4 +58,4 @@ final_status = PythonOperator(
     dag=dag,
 )
 
-create_iso_env >> copy_data_algo >> run_algo_send_result >> delete_iso_inst >> clean >> final_status
+delete_iso_inst >> create_iso_env >> copy_data_algo >> run_algo_fetch_result >> clean >> final_status

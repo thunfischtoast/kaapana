@@ -7,10 +7,10 @@ from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperato
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
 
-class LocalRunAlgoSendResultOperator(KaapanaPythonBaseOperator):
+class LocalRunAlgoFetchResultOperator(KaapanaPythonBaseOperator):
 
     def start(self, ds, ti, **kwargs):
-        print("Run algorithm in isolated environment and send result to source...")
+        print("Run algorithm in isolated environment and fetch the results...")
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         scripts_dir = os.path.join(operator_dir, "scripts")
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
@@ -19,7 +19,7 @@ class LocalRunAlgoSendResultOperator(KaapanaPythonBaseOperator):
         print(f'Playbooks directory is {playbooks_dir}, and scripts are in {scripts_dir}, and directory is {operator_dir}')
         
         playbook_path = os.path.join(
-        playbooks_dir, "run_algo_send_result.yaml"
+        playbooks_dir, "run_algo_fetch_result.yaml"
         )
         if not os.path.isfile(playbook_path):
             print("Playbook yaml file not found.")
@@ -32,7 +32,7 @@ class LocalRunAlgoSendResultOperator(KaapanaPythonBaseOperator):
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')
         if output.returncode == 0:
-            print(f'Evaluation was successful and results were copied successfully! See full logs above...')
+            print(f'Algorithm ran successfully and results were fetched! See full logs above...')
         else:
             print(f"Playbook FAILED! Cannot proceed further...\nERROR LOGS:\n{output.stderr}")
             exit(1)
@@ -43,7 +43,7 @@ class LocalRunAlgoSendResultOperator(KaapanaPythonBaseOperator):
 
         super().__init__(
             dag=dag,
-            name="run-algo-send-results",
+            name="run-algo-fetch-results",
             python_callable=self.start,
             **kwargs
         )

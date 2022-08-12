@@ -9,7 +9,7 @@
         name: "{{ target }}"
         groups: os_server
 
-- name: Run algorithm on data in isolated environment and send results back to parent data site
+- name: Run algorithm on data in isolated environment and fetch results
   hosts: os_server
   strategy: free
   gather_facts: yes
@@ -63,7 +63,7 @@
         format: zip
 
 
-    - name: Copy results back to the parent host
+    - name: Fetch results from isolated environment
       become: yes
       ## Currently Ansible doesn't directly support directory/recursive copying from remote to local
       fetch:
