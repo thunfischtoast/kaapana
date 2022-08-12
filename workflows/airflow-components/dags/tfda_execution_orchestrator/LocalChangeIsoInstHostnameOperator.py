@@ -25,8 +25,8 @@ class LocalChangeIsoInstHostnameOperator(KaapanaPythonBaseOperator):
             exit(1)
 
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
-        extra_vars = f"target_host={iso_env_ip} remote_username=root"
-        command = ["ansible-playbook", server_deps_playbook_path, "--extra-vars", extra_vars]
+        playbook_args = f"target_host={iso_env_ip} remote_username=root"
+        command = ["ansible-playbook", server_deps_playbook_path, "--extra-vars", playbook_args]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')
         if output.returncode == 0:

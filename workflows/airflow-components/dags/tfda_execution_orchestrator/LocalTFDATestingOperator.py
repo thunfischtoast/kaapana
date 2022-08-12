@@ -21,26 +21,34 @@ from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
 class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
 
+    def extract_config(self, config_filepath):
+        with open(config_filepath, "r") as stream:
+            try:
+                config_dict = yaml.safe_load(stream)
+                return config_dict
+            except yaml.YAMLError as exc:
+                logging.error(f"Could not extract configuration due to error: {exc}!! Exiting...")
+                exit(1)
+    
     def get_most_recent_dag_run(self, dag_id):
         dag_runs = DagRun.find(dag_id=dag_id)
         dag_runs.sort(key=lambda x: x.execution_date, reverse=True)
         return dag_runs[0] if dag_runs else None
 
     def start(self, ds, ti, **kwargs):
-        logging.info("Loading cloud platform config...")
         operator_dir = os.path.dirname(os.path.abspath(__file__))
-        config_path = os.path.join(operator_dir, "platform_specific_configs", "cloud_platform_config.yaml")
-        with open(config_path, "r") as stream:
-            try:
-                platform_config = yaml.safe_load(stream)
-            except yaml.YAMLError as exc:
-                print(exc)
+        platform_config_path = os.path.join(operator_dir, "platform_specific_configs", "platform_config.yaml")
+        request_config_path = os.path.join(operator_dir, "request_specific_configs", "request_config.yaml")
+        
+        logging.info("Loading platform and request specific configurations...")
+        platform_config = self.extract_config(platform_config_path)
+        request_config = self.extract_config(request_config_path)
         
         self.trigger_dag_id = "tfda-execution-orchestrator"
         # self.dag_run_id = kwargs['dag_run'].run_id
         self.conf = kwargs['dag_run'].conf
         self.conf["platform_config"] = platform_config
-        self.conf["user_selected_bucket"] = "test_site_data"
+        self.conf["request_config"] = request_config
         dag_run_id = generate_run_id(self.trigger_dag_id)
         logging.info("Triggering isolated execution orchestrator...")
         try:

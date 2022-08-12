@@ -16,38 +16,40 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         elif self.instanceState == "absent":
             logging.info("Deleting isolated environment...")
 
+        request_config = kwargs["dag_run"].conf["request_config"]
+        platform_type = request_config["request_config"]["platform_type"]
+        platform_flavor = request_config["request_config"]["platform_flavor"]
+        
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
-        playbook_path = os.path.join(playbooks_dir, "00_manage_"+self.platformType+"_instance.yaml")
+        playbook_path = os.path.join(playbooks_dir, "00_manage_"+platform_type+"_instance.yaml")
         if not os.path.isfile(playbook_path):
             logging.error("Playbook yaml not found!! Exiting...")
             exit(1)
         
-        platform_config = kwargs["dag_run"].conf["platform_config"]
-        print(f"**************************Platform config is: {platform_config}**************************")
+        playbook_args = f"instance_state={self.instanceState}"
         
-        extra_vars = f"instance_state={self.instanceState}"
-        
+        platform_config = kwargs["dag_run"].conf["platform_config"]        
         os_username = platform_config["configurations"]["username"]
         os_password = platform_config["configurations"]["password"]
         if (os_username is None or os_username == "") or (os_password is None or os_password == ""):
-            logging.error(f"{self.platformType.title()} platform credentials missing or incomplete!! Exiting...")
+            logging.error(f"{platform_type.title()} platform credentials missing or incomplete!! Exiting...")
             exit(1)
-
-        extra_vars += f" os_username={os_username} os_password={os_password}"
-        if self.platformType == "openstack":
-            os_project_name = platform_config["configurations"]["platform"][self.platformType]["os_project_name"]
-            os_project_id = platform_config["configurations"]["platform"][self.platformType]["os_project_id"]
-            extra_vars += f" os_project_name={os_project_name} os_project_id={os_project_id}"
-            for key, value in platform_config["configurations"]["platform"][self.platformType]["dynamic_params"][self.platformFlavor].items():
-                extra_vars += f" {key}={value}"
+        playbook_args += f" os_username={os_username} os_password={os_password}"
+        
+        if platform_type == "openstack":
+            os_project_name = platform_config["configurations"]["platform"][platform_type]["os_project_name"]
+            os_project_id = platform_config["configurations"]["platform"][platform_type]["os_project_id"]
+            playbook_args += f" os_project_name={os_project_name} os_project_id={os_project_id}"
+            for key, value in platform_config["configurations"]["platform"][platform_type]["dynamic_params"][platform_flavor].items():
+                playbook_args += f" {key}={value}"
         else:
-            print(f"Sorry!! {self.platformType.title()} is not yet supported. Exiting...")
+            print(f"Sorry!! {platform_type.title()} is not yet supported. Exiting...")
             exit(1)
 
         
-        print(f"*****************************The EXTRA-VARS are: {extra_vars}************************************")
-        command = ["ansible-playbook", playbook_path, "--extra-vars", extra_vars]
+        print(f"*****************************The EXTRA-VARS are: {playbook_args}************************************")
+        command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')
         if output.returncode == 0:
@@ -75,6 +77,4 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
             python_callable=self.start,
             **kwargs
         )
-        self.platformType = platformType
-        self.platformFlavor = platformFlavor
         self.instanceState = instanceState

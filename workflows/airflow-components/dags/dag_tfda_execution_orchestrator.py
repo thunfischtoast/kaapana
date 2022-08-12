@@ -10,7 +10,6 @@ from tfda_execution_orchestrator.LocalTrustedPreETLOperator import LocalTrustedP
 from tfda_execution_orchestrator.LocalCopyDataAndAlgoOperator import LocalCopyDataAndAlgoOperator
 from tfda_execution_orchestrator.LocalRunAlgoSendFetchOperator import LocalRunAlgoFetchResultOperator
 from tfda_execution_orchestrator.LocalTrustedPostETLOperator import LocalTrustedPostETLOperator
-from tfda_execution_orchestrator.LocalDeleteIsoEnvOperator import LocalDeleteIsoEnvOperator
 from kaapana.operators.LocalWorkflowCleanerOperator import LocalWorkflowCleanerOperator
 from airflow.operators.python_operator import PythonOperator
 
@@ -37,12 +36,12 @@ dag = DAG(
     schedule_interval=None,
 )
 
-create_iso_env = LocalManageIsoInstanceOperator(dag=dag, platformType="openstack", platformFlavor="ubuntu_gpu", instanceState="present", taskName="create-iso-inst")
+create_iso_env = LocalManageIsoInstanceOperator(dag=dag, instanceState="present", taskName="create-iso-inst")
 trusted_pre_etl = LocalTrustedPreETLOperator(dag=dag)
 copy_data_algo = LocalCopyDataAndAlgoOperator(dag=dag)
 run_algo_fetch_result = LocalRunAlgoFetchResultOperator(dag=dag)
 trusted_post_etl = LocalTrustedPostETLOperator(dag=dag)
-delete_iso_inst = LocalManageIsoInstanceOperator(dag=dag, trigger_rule="all_done", platformType="openstack", platformFlavor="ubuntu_gpu", instanceState="absent", taskName="delete-iso-inst")
+delete_iso_inst = LocalManageIsoInstanceOperator(dag=dag, trigger_rule="all_done", instanceState="absent", taskName="delete-iso-inst")
 clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True, trigger_rule="all_done")
 
 def final_status(**kwargs):

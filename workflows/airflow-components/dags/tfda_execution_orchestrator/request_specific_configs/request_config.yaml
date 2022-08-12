@@ -1,0 +1,6 @@
+## User request specific configuration
+
+request_config:
+  platform_type: "openstack"
+  platform_flavor: "ubuntu_gpu"
+  user_selected_study_data: "test_site_data"

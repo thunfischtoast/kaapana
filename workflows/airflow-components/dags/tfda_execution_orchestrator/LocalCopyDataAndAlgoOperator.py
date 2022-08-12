@@ -14,7 +14,7 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         airflow_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         minio_dir = os.path.join(airflow_dir, "miniobuckets")
-        platform_specific_config_path = os.path.join(operator_dir, "platform_specific_configs")
+        request_specific_config_path = os.path.join(operator_dir, "request_specific_configs")
 
         scripts_dir = os.path.join(operator_dir, "scripts")
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
@@ -24,7 +24,7 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         playbooks_dir, "copy_algo_to_iso_env.yaml"
         )
         user_input_commands_path = os.path.join(
-        platform_specific_config_path, "user_input_commands.sh"
+        request_specific_config_path, "user_input_commands.sh"
         )
         if not os.path.isfile(platform_install_playbook_path):
             print("Playbook yaml file not found.")
@@ -33,15 +33,15 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
             print("user_input_commands_path file not found.")
             exit(1)
 
-        # config_filepath = kwargs["dag_run"].conf["subm_id"]
-        user_selected_bucket = kwargs["dag_run"].conf["user_selected_bucket"]
-        user_selected_bucket_path = os.path.join(minio_dir, user_selected_bucket)
+        request_config = kwargs["dag_run"].conf["request_config"]
+        user_selected_data = request_config["request_config"]["user_selected_study_data"]
+        user_selected_data_path = os.path.join(minio_dir, user_selected_data)
 
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
         tarball_path = os.path.join(operator_dir, "tarball")
 
-        extra_vars = f"target_host={iso_env_ip} remote_username=root tarball_path={tarball_path} user_selected_data={user_selected_bucket_path} user_input_commands_path={user_input_commands_path}"
-        command = ["ansible-playbook", platform_install_playbook_path, "--extra-vars", extra_vars]
+        playbook_args = f"target_host={iso_env_ip} remote_username=root tarball_path={tarball_path} user_selected_data={user_selected_data_path} user_input_commands_path={user_input_commands_path}"
+        command = ["ansible-playbook", platform_install_playbook_path, "--extra-vars", playbook_args]
         output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
         print(f'STD OUTPUT LOG is {output.stdout}')
         if output.returncode == 0:
