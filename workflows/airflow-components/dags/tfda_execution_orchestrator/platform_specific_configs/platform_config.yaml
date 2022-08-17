@@ -7,6 +7,7 @@ configurations:
     openstack:
       os_project_name: "E230-TFDA"
       os_project_id: "f4a5b8b7adf3422d85b28b06f116941c"
+      os_auth_url: "https://cloud.hdf.dkfz-heidelberg.de:13000"
       dynamic_params:
         kaapana_gpu:
           os_instance_name: "kaapana-gpu" # -> TFDA will programatically assign inst name based on workflow name and flavour

@@ -1,14 +1,14 @@
 import os
 import glob
 import zipfile
-
-from subprocess import PIPE, run
+import logging
+import subprocess
+from subprocess import PIPE
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
 
 class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
-
     def start(self, ds, ti, **kwargs):
         print("Copy data and algorithm to isolated environment...")
         operator_dir = os.path.dirname(os.path.abspath(__file__))
@@ -40,15 +40,22 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
         tarball_path = os.path.join(operator_dir, "tarball")
 
-        playbook_args = f"target_host={iso_env_ip} remote_username=root tarball_path={tarball_path} user_selected_data={user_selected_data_path} user_input_commands_path={user_input_commands_path}"
+        playbook_args = f"target_host={iso_env_ip} remote_username=root tarball_path={tarball_path} user_selected_data={user_selected_data_path} user_input_commands_path={user_input_commands_path}"        
         command = ["ansible-playbook", platform_install_playbook_path, "--extra-vars", playbook_args]
-        output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
-        print(f'STD OUTPUT LOG is {output.stdout}')
-        if output.returncode == 0:
-            print(f'Files copied successfully! See full logs above...')
+        process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, encoding="Utf-8")
+        while True:
+            output = process.stdout.readline()
+            if process.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+        rc = process.poll()
+        if rc == 0:
+            logging.info(f"Files copied successfully!!")
         else:
-            print(f"Playbook FAILED! Cannot proceed further...\nERROR LOGS:\n{output.stderr}")
+            logging.error("Playbook FAILED! Cannot proceed further...")
             exit(1)
+            
 
     def __init__(self,
                  dag,

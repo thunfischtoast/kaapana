@@ -1,23 +1,14 @@
-import json
 import os
-import getpass
-import requests
-import smtplib
 from datetime import datetime
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
 import yaml
 import logging
 
 from subprocess import PIPE, run
 from airflow.models import DagRun
-from airflow.api.common.experimental.get_dag_run_state import get_dag_run_state
 from airflow.api.common.experimental.trigger_dag import trigger_dag as trigger
 from airflow.api.common.experimental.get_dag_run_state import get_dag_run_state
 from kaapana.blueprints.kaapana_utils import generate_run_id
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
-from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
 class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
 
@@ -84,3 +75,4 @@ class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
             python_callable=self.start,
             **kwargs
         )
+        

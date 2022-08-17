@@ -1,14 +1,14 @@
 import os
 import glob
 import zipfile
-
-from subprocess import PIPE, run
+import logging
+import subprocess
+from subprocess import PIPE
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
 
 class LocalRunAlgoFetchResultOperator(KaapanaPythonBaseOperator):
-
     def start(self, ds, ti, **kwargs):
         print("Run algorithm in isolated environment and fetch the results...")
         operator_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,13 +29,20 @@ class LocalRunAlgoFetchResultOperator(KaapanaPythonBaseOperator):
 
         playbook_args = f"target_host={iso_env_ip} remote_username=ubuntu results_path={results_path}"
         command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]
-        output = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, timeout=6000)
-        print(f'STD OUTPUT LOG is {output.stdout}')
-        if output.returncode == 0:
-            print(f'Algorithm ran successfully and results were fetched! See full logs above...')
+        process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, encoding="Utf-8")
+        while True:
+            output = process.stdout.readline()
+            if process.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+        rc = process.poll()
+        if rc == 0:
+            logging.info(f"Algorithm ran successfully and results were fetched!!")
         else:
-            print(f"Playbook FAILED! Cannot proceed further...\nERROR LOGS:\n{output.stderr}")
+            logging.error("Playbook FAILED! Cannot proceed further...")
             exit(1)
+
 
     def __init__(self,
                  dag,
