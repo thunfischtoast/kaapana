@@ -30,19 +30,19 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         playbook_args = f"instance_state={self.instanceState}"
         
         platform_config = kwargs["dag_run"].conf["platform_config"]        
-        os_username = platform_config["configurations"]["username"]
-        os_password = platform_config["configurations"]["password"]
-        if (os_username is None or os_username == "") or (os_password is None or os_password == ""):
+        username = platform_config["configurations"]["username"]
+        password = platform_config["configurations"]["password"]
+        if (username is None or username == "") or (password is None or password == ""):
             raise AirflowFailException(f"{platform_type.title()} platform credentials missing or incomplete!!")
-        playbook_args += f" os_username={os_username} os_password={os_password}"
+        playbook_args += f" username={username} password={password}"
         
         if platform_type == "openstack":
-            os_auth_url = platform_config["configurations"]["platform"][platform_type]["os_auth_url"]
-            os_project_name = platform_config["configurations"]["platform"][platform_type]["os_project_name"]
-            os_project_id = platform_config["configurations"]["platform"][platform_type]["os_project_id"]
-            playbook_args += f" os_auth_url={os_auth_url} os_project_name={os_project_name} os_project_id={os_project_id}"
-            for key, value in platform_config["configurations"]["platform"][platform_type]["dynamic_params"][platform_flavor].items():
-                playbook_args += f" {key}={value}"
+            for key, value in platform_config["configurations"]["platform"][platform_type].items():
+                if key == "dynamic_params":
+                    for key, value in platform_config["configurations"]["platform"][platform_type]["dynamic_params"][platform_flavor].items():
+                        playbook_args += f" {key}={value}"
+                else:
+                    playbook_args += f" {key}={value}"
         else:
             raise AirflowFailException(f"Sorry!! {platform_type.title()} is not yet supported. Please choose a supported platform...")
         

@@ -5,6 +5,7 @@ configurations:
   password: ""
   platform:
     openstack:
+      os_user_domain: "AD"
       os_project_name: "E230-TFDA"
       os_project_id: "f4a5b8b7adf3422d85b28b06f116941c"
       os_auth_url: "https://cloud.hdf.dkfz-heidelberg.de:13000"
