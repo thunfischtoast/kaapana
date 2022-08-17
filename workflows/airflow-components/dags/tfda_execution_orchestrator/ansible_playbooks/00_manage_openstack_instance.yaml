@@ -9,8 +9,8 @@
     project_name: "{{ os_project_name | default('E230-Kaapana') }}"
     os_project_id: "{{ os_proj_id | default('969831bf53424f1fb318a9c1d98e1941') }}"
     os_user_domain: "{{ os_user_domain | default('AD') }}"
-    username: "{{ os_username }}"
-    password: "{{ os_password }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
     instance_name: "{{ os_instance_name | default('test-isolated-environment') }}"
     volume_size: "{{ os_volume_size | default('150') }}"
     os: "{{ os_image | default('Ubuntu-20.04-LTS-DKFZ') }}"
@@ -27,8 +27,9 @@
         msg: "variable {{ item }} not defined"
       when: item is not defined
       with_items:
-        - "{{ os_username }}"
-        - "{{ os_password }}"
+        - "{{ username }}"
+        - "{{ password }}"
+      no_log: True
 
     - name: check if instance exists
       environment: 
@@ -36,8 +37,8 @@
       openstack.cloud.server_info:
         auth:
           auth_url: "{{ os_auth_url }}"
-          username: "{{ os_username }}"
-          password: "{{ os_password }}"
+          username: "{{ username }}"
+          password: "{{ password }}"
           user_domain_name: "{{ os_user_domain }}"
           project_name: "{{ os_project_name }}"
         server: "{{ os_instance_name }}"
@@ -145,8 +146,8 @@
           state: "{{ instance_state }}"
           auth:
             auth_url: "{{ os_auth_url }}"
-            username: "{{ os_username }}"
-            password: "{{ os_password }}"
+            username: "{{ username }}"
+            password: "{{ password }}"
             user_domain_name: "AD"
             project_name: "{{ os_project_name }}"
           name: "{{ os_instance_name }}"
