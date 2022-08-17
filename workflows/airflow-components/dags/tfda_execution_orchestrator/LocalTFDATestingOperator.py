@@ -1,9 +1,8 @@
 import os
-from datetime import datetime
 import yaml
 import logging
-
-from subprocess import PIPE, run
+from datetime import datetime
+from airflow.exceptions import AirflowFailException
 from airflow.models import DagRun
 from airflow.api.common.experimental.trigger_dag import trigger_dag as trigger
 from airflow.api.common.experimental.get_dag_run_state import get_dag_run_state
@@ -11,15 +10,13 @@ from kaapana.blueprints.kaapana_utils import generate_run_id
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
 
 class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
-
     def extract_config(self, config_filepath):
         with open(config_filepath, "r") as stream:
             try:
                 config_dict = yaml.safe_load(stream)
                 return config_dict
             except yaml.YAMLError as exc:
-                logging.error(f"Could not extract configuration due to error: {exc}!! Exiting...")
-                exit(1)
+                raise AirflowFailException(f"Could not extract configuration due to error: {exc}!!")
     
     def get_most_recent_dag_run(self, dag_id):
         dag_runs = DagRun.find(dag_id=dag_id)
@@ -47,11 +44,11 @@ class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
                             replace_microseconds=False)
         except Exception as e:
             logging.error(f"Error while triggering isolated workflow...")
-            print(e)
+            logging.error(e)
 
         dag_run = self.get_most_recent_dag_run(self.trigger_dag_id)
         if dag_run:
-            logging.info(f"The latest isolated workflow has been triggered at: {dag_run.execution_date}!!!")
+            logging.debug(f"The latest isolated workflow has been triggered at: {dag_run.execution_date}!!!")
 
         dag_state = get_dag_run_state(dag_id="tfda-execution-orchestrator", execution_date=dag_run.execution_date)
 
@@ -60,9 +57,9 @@ class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
             dag_state = get_dag_run_state(dag_id="tfda-execution-orchestrator", execution_date=dag_run.execution_date)                        
 
         if dag_state["state"] == "failed":
-            print(f"**************** The evaluation has FAILED ****************")
+            logging,debug(f"**************** The evaluation has FAILED ****************")
         if dag_state["state"] == "success":
-            print(f"**************** The evaluation was SUCCESSFUL ****************")
+            logging.debug(f"**************** The evaluation was SUCCESSFUL ****************")
 
 
     def __init__(self,

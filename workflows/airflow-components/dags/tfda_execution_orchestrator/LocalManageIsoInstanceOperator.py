@@ -2,10 +2,10 @@ import os
 import glob
 import zipfile
 import subprocess
-from subprocess import PIPE, run
 import re
 import logging
-
+from airflow.exceptions import AirflowFailException
+from subprocess import PIPE
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
@@ -25,8 +25,7 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
         playbook_path = os.path.join(playbooks_dir, "00_manage_"+platform_type+"_instance.yaml")
         if not os.path.isfile(playbook_path):
-            logging.error("Playbook yaml not found!! Exiting...")
-            exit(1)
+            raise AirflowFailException("Playbook yaml not found!!")
         
         playbook_args = f"instance_state={self.instanceState}"
         
@@ -34,8 +33,7 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         os_username = platform_config["configurations"]["username"]
         os_password = platform_config["configurations"]["password"]
         if (os_username is None or os_username == "") or (os_password is None or os_password == ""):
-            logging.error(f"{platform_type.title()} platform credentials missing or incomplete!! Exiting...")
-            exit(1)
+            raise AirflowFailException(f"{platform_type.title()} platform credentials missing or incomplete!!")
         playbook_args += f" os_username={os_username} os_password={os_password}"
         
         if platform_type == "openstack":
@@ -46,8 +44,7 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
             for key, value in platform_config["configurations"]["platform"][platform_type]["dynamic_params"][platform_flavor].items():
                 playbook_args += f" {key}={value}"
         else:
-            print(f"Sorry!! {platform_type.title()} is not yet supported. Exiting...")
-            exit(1)
+            raise AirflowFailException(f"Sorry!! {platform_type.title()} is not yet supported. Please choose a supported platform...")
         
         # print(f"*****************************The EXTRA-VARS are: {playbook_args}************************************")
         command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]
@@ -67,7 +64,7 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         if rc == 0:
             logging.info(f'Iso instance managed successfully!')
         else:
-            logging.error("Failed to manage isolated environment!")
+            raise AirflowFailException("Failed to manage isolated environment!")
         
 
     def __init__(self,
@@ -75,7 +72,7 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
                  platformType = "openstack",
                  platformFlavor = "ubuntu_gpu",
                  instanceState = "present",
-                 taskName = "",
+                 taskName = "create-iso-inst",
                  **kwargs):
 
         super().__init__(

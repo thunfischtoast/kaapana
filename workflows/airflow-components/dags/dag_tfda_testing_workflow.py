@@ -1,12 +1,8 @@
 from airflow.utils.log.logging_mixin import LoggingMixin
-from airflow.utils.dates import days_ago
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
-from airflow.models import Variable
-from airflow.operators.bash_operator import BashOperator
 from tfda_execution_orchestrator.LocalTFDATestingOperator import LocalTFDATestingOperator
 from kaapana.operators.LocalWorkflowCleanerOperator import LocalWorkflowCleanerOperator
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 log = LoggingMixin().log
 

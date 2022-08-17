@@ -7,7 +7,7 @@ from tfda_execution_orchestrator.LocalInstallPlatformDepsOnIsoEnvOperator import
 from tfda_execution_orchestrator.LocalDeployPlatformOnIsoEnvOperator import LocalDeployPlatformOnIsoEnvOperator
 from tfda_execution_orchestrator.LocalTrustedPreETLOperator import LocalTrustedPreETLOperator
 from tfda_execution_orchestrator.LocalCopyDataAndAlgoOperator import LocalCopyDataAndAlgoOperator
-from tfda_execution_orchestrator.LocalRunAlgoSendFetchOperator import LocalRunAlgoFetchResultOperator
+from tfda_execution_orchestrator.LocalRunAlgoFetchResultOperator import LocalRunAlgoFetchResultOperator
 from tfda_execution_orchestrator.LocalTrustedPostETLOperator import LocalTrustedPostETLOperator
 from kaapana.operators.LocalWorkflowCleanerOperator import LocalWorkflowCleanerOperator
 from airflow.operators.python_operator import PythonOperator
@@ -47,7 +47,7 @@ def final_status(**kwargs):
     for task_instance in kwargs['dag_run'].get_task_instances():
         if task_instance.current_state() != "success" and \
                 task_instance.task_id != kwargs['task_instance'].task_id:
-            raise Exception("Task {} failed. Failing this DAG run".format(task_instance.task_id))
+            raise Exception(f"Task {task_instance.task_id} failed! Failing this DAG run...")
 
 final_status = PythonOperator(
     task_id='final_status',

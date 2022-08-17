@@ -12,18 +12,12 @@ class LocalRunAlgoFetchResultOperator(KaapanaPythonBaseOperator):
     def start(self, ds, ti, **kwargs):
         print("Run algorithm in isolated environment and fetch the results...")
         operator_dir = os.path.dirname(os.path.abspath(__file__))
-        scripts_dir = os.path.join(operator_dir, "scripts")
-        playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
         results_path = os.path.join(operator_dir, "results")
+        playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")        
+        playbook_path = os.path.join(playbooks_dir, "run_algo_fetch_result.yaml")
         
-        print(f'Playbooks directory is {playbooks_dir}, and scripts are in {scripts_dir}, and directory is {operator_dir}')
-        
-        playbook_path = os.path.join(
-        playbooks_dir, "run_algo_fetch_result.yaml"
-        )
         if not os.path.isfile(playbook_path):
-            print("Playbook yaml file not found.")
-            exit(1)
+            raise AirflowFailException("Playbook yaml file not found!")
         
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
 
@@ -40,8 +34,7 @@ class LocalRunAlgoFetchResultOperator(KaapanaPythonBaseOperator):
         if rc == 0:
             logging.info(f"Algorithm ran successfully and results were fetched!!")
         else:
-            logging.error("Playbook FAILED! Cannot proceed further...")
-            exit(1)
+            raise AirflowFailException("Playbook FAILED! Cannot proceed further...")
 
 
     def __init__(self,

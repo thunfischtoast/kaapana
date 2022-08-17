@@ -10,28 +10,19 @@ from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
 class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
     def start(self, ds, ti, **kwargs):
-        print("Copy data and algorithm to isolated environment...")
-        operator_dir = os.path.dirname(os.path.abspath(__file__))
+        logging.info("Copy data and algorithm to isolated environment...")
         airflow_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         minio_dir = os.path.join(airflow_dir, "miniobuckets")
+        operator_dir = os.path.dirname(os.path.abspath(__file__))
         request_specific_config_path = os.path.join(operator_dir, "request_specific_configs")
-
-        scripts_dir = os.path.join(operator_dir, "scripts")
+        user_input_commands_path = os.path.join(request_specific_config_path, "user_input_commands.sh")
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
-        print(f'Playbooks directory is {playbooks_dir}, and scripts are in {scripts_dir}, and directory is {operator_dir}')
+        platform_install_playbook_path = os.path.join(playbooks_dir, "copy_algo_to_iso_env.yaml")
         
-        platform_install_playbook_path = os.path.join(
-        playbooks_dir, "copy_algo_to_iso_env.yaml"
-        )
-        user_input_commands_path = os.path.join(
-        request_specific_config_path, "user_input_commands.sh"
-        )
         if not os.path.isfile(platform_install_playbook_path):
-            print("Playbook yaml file not found.")
-            exit(1)
+            raise AirflowFailException("Playbook yaml file not found!")
         if not os.path.isfile(user_input_commands_path):
-            print("user_input_commands_path file not found.")
-            exit(1)
+            raise AirflowFailException("user_input_commands_path file not found!")
 
         request_config = kwargs["dag_run"].conf["request_config"]
         user_selected_data = request_config["request_config"]["user_selected_study_data"]
@@ -53,9 +44,8 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         if rc == 0:
             logging.info(f"Files copied successfully!!")
         else:
-            logging.error("Playbook FAILED! Cannot proceed further...")
-            exit(1)
-            
+            raise AirflowFailException("Playbook FAILED! Cannot proceed further...")
+
 
     def __init__(self,
                  dag,
