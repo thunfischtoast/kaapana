@@ -20,7 +20,7 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         platform_install_playbook_path = os.path.join(playbooks_dir, "copy_algo_to_iso_env.yaml")
         
         if not os.path.isfile(platform_install_playbook_path):
-            raise AirflowFailException("Playbook yaml file not found!")
+            raise AirflowFailException(f"Playbook '{playbook_path}' file not found!")
         if not os.path.isfile(user_input_commands_path):
             raise AirflowFailException("user_input_commands_path file not found!")
 

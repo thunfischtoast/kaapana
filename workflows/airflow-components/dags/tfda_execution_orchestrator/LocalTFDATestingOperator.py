@@ -57,7 +57,7 @@ class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
             dag_state = get_dag_run_state(dag_id="tfda-execution-orchestrator", execution_date=dag_run.execution_date)                        
 
         if dag_state["state"] == "failed":
-            logging,debug(f"**************** The evaluation has FAILED ****************")
+            logging.debug(f"**************** The evaluation has FAILED ****************")
         if dag_state["state"] == "success":
             logging.debug(f"**************** The evaluation was SUCCESSFUL ****************")
 

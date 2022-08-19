@@ -17,7 +17,7 @@ class LocalRunAlgoFetchResultOperator(KaapanaPythonBaseOperator):
         playbook_path = os.path.join(playbooks_dir, "run_algo_fetch_result.yaml")
         
         if not os.path.isfile(playbook_path):
-            raise AirflowFailException("Playbook yaml file not found!")
+            raise AirflowFailException(f"Playbook '{playbook_path}' file not found!")
         
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
 

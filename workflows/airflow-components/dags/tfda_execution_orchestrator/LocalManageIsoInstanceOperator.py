@@ -25,7 +25,7 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
         playbook_path = os.path.join(playbooks_dir, "00_manage_"+platform_type+"_instance.yaml")
         if not os.path.isfile(playbook_path):
-            raise AirflowFailException("Playbook yaml not found!!")
+            raise AirflowFailException(f"Playbook '{playbook_path}' file not found!")
         
         playbook_args = f"instance_state={self.instanceState}"
         
