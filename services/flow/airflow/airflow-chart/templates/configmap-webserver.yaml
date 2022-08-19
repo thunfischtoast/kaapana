@@ -22,10 +22,8 @@ data:
 
         @expose("/login/")
         def login(self):
-            # if g.user is not None and g.user.is_authenticated:
-            #     return redirect(self.appbuilder.get_url_for_index)
-
-            username = request.headers.get('X-Auth-Username')
+            username = request.headers.get('X-Forwarded-Preferred-Username')
+            email = request.headers.get('X-Forwarded-Email:')
             print(f"##### {username=}")
 
             if username:
@@ -45,11 +43,10 @@ data:
         @expose("/logout/")
         def logout(self):
             logout_user()
-            return redirect("/oauth/logout?redirect=/")
-
+            return redirect("/oauth2/sign_out?redirect=/")
 
     class CustomAirflowSecurityManager(AirflowSecurityManager):
         authremoteuserview = CustomAuthRemoteUserView
 
 
-    SECURITY_MANAGER_CLASS = CustomAirflowSecurityManager  
+    SECURITY_MANAGER_CLASS = CustomAirflowSecurityManager

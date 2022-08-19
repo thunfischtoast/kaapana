@@ -11,35 +11,37 @@ import logging
 # TODO https://discuss.elastic.co/t/reloading-the-index-field-list-automatically/116687
 # https://<domain>/meta/api/index_patterns/_fields_for_wildcard?pattern=meta-index&meta_fields=%5B%22_source%22%2C%22_id%22%2C%22_type%22%2C%22_index%22%2C%22_score%22%5D
 
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO )
 
 def import_dashboards():
-    global dashboards_url, dashboards_json, osd_xsrf
+    global dashboards_url, dashboards_json_file, osd_xsrf
     print("#")
-    print(f"# -> Importing dashboards from {dashboards_json} ...")
+    print(f"# -> Importing dashboards from {dashboards_json_file} ...")
     print("#")
-    with open(dashboards_json) as f:
-        jsonObj = json.load(f)
+    with open(dashboards_json_file) as f:
+        all_dashboards = json.load(f)
 
-    for anObject in jsonObj:
+    for dashboard in all_dashboards:
         try:
-            s_ource = anObject['_source']
-            resp = requests.post(f"{dashboards_url}/api/saved_objects/{anObject['_type']}/{anObject['_id']}?overwrite=true",
-                                 data='{"attributes":' + json.JSONEncoder().encode(s_ource) + '}', verify=False, headers=osd_xsrf)
-            if resp.status_code == 200:
-                print(f"# {s_ource['title']}: OK!")
+            dashboard_source = dashboard['_source']
+            response = requests.post(f"{dashboards_url}/api/saved_objects/{dashboard['_type']}/{dashboard['_id']}?overwrite=true",
+                                 data='{"attributes":' + json.JSONEncoder().encode(dashboard_source) + '}', verify=False, headers=osd_xsrf)
+
+            if response.status_code == 200:
+                print(f"# {dashboard_source['title']}: OK!")
                 print("#")
 
             else:
                 print("#")
-                print(f"# Could not import dashboard: {s_ource['title']}")
-                print(resp.text)
-                print(resp.content)
+                print(f"# Could not import dashboard: {dashboard_source['title']}")
+                print(response.text)
+                print(response.content)
                 print("#")
                 exit(1)
         except Exception as e:
             logging.error(traceback.format_exc())
             print("#")
-            print(f"# Could not import dashboard: {s_ource['title']} -> Exception")
+            print(f"# Could not import dashboard: {dashboard_source['title']} -> Exception")
             print("#")
             exit(1)
 
@@ -61,14 +63,14 @@ def set_ohif_template():
                        }
     }
     try:
-        resp = requests.post(f"{dashboards_url}/api/saved_objects/index-pattern/{index}?overwrite=true", data=json.dumps(index_pattern), verify=False, headers=osd_xsrf)
-        print(f"# response_code: {resp.status_code}")
-        if resp.status_code == 200:
+        response = requests.post(f"{dashboards_url}/api/saved_objects/index-pattern/{index}?overwrite=true", data=json.dumps(index_pattern), verify=False, headers=osd_xsrf)
+        print(f"# response_code: {response.status_code}")
+        if response.status_code == 200:
             print('# OHIF-template: OK!')
         else:
             print('# OHIF-template: Error!')
-            print(resp.text)
-            print(resp.content)
+            print(response.text)
+            print(response.content)
             exit(1)
 
     except Exception as e:
@@ -238,7 +240,8 @@ print("#")
 # os.environ["DASHBOARDS_JSON"] = "/home/jonas/projects/kaapana/services/meta/meta-init/meta-init-chart/files/kibana-dashboard.json"
 
 if __name__ == "__main__":
-    print("provisioning...")
+    print("# Provisioning...")
+
     init_dashboards = True if os.getenv('INIT_DASHBOARDS', False).lower() == "true" else False
     init_os = True if os.getenv('INIT_OPENSEARCH', False).lower() == "true" else False
 
@@ -251,7 +254,7 @@ if __name__ == "__main__":
     os_host = os.getenv('OS_HOST', None)
     os_port = os.getenv('OS_PORT', None)
     dashboards_url = os.getenv('DASHBOARDS_URL', None)
-    dashboards_json = os.getenv('DASHBOARDS_JSON', None)
+    dashboards_json_file = os.getenv('DASHBOARDS_JSON', None)
 
     print("#")
     print("# Configuration:")
@@ -262,7 +265,7 @@ if __name__ == "__main__":
     print(f"# os_host:         {os_host}")
     print(f"# os_port:         {os_port}")
     print(f"# dashboards_url:  {dashboards_url}")
-    print(f"# dashboards_json: {dashboards_json}")
+    print(f"# dashboards_json: {dashboards_json_file}")
     print(f"# init_dashboards: {init_dashboards}")
     print(f"# init_os:         {init_os}")
     print("#")
@@ -289,11 +292,16 @@ if __name__ == "__main__":
     )
 
     if init_os:
+        print("# Initializing OpenSearch indices...")
         create_index()
+        print("# Done.")
+
 
     if init_dashboards:
+        print("# Initializing Dashboards...")
         import_dashboards()
         set_ohif_template()
+        print("# Done.")
 
     print("#")
     print("#")

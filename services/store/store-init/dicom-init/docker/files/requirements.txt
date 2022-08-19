@@ -1,3 +1,3 @@
+pydicom==2.2.2
 opensearch-py==1.0.0
-requests==2.25.1
-pydicom
+requests==2.27.1
