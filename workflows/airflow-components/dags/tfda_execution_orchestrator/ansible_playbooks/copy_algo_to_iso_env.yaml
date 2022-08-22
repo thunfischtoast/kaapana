@@ -18,15 +18,11 @@
     #TODO: change hardcoded
     ansible_ssh_private_key_file: ~/.ssh/tfda_iso.pem
   # TODO: data could be in any or multiple instances
-  tasks:
-    # - name: Set algorithm container path
-    #   set_fact: 
-    #     container_path: "{{ tarball_path }}/{{ subm_id }}.tar"
-    
-    # - name: Copy container file
-    #   copy:
-    #     src: "{{ container_path }}"
-    #     dest: "/home/ubuntu/tarball"
+  tasks:    
+    - name: Copy algorithm file/s
+      copy:
+        src: "{{ algorithm_files_path }}/"
+        dest: "/home/ubuntu/algorithm_files"
 
     - name: Copy user selected bucket to Iso
       copy:
