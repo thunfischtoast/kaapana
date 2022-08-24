@@ -15,13 +15,10 @@ import nibabel as nib
 # os.environ['CENTER_CROPPING'] = "false"
 # os.environ['CENTER_CROPPING_SIZE'] = "400"
 
-# get platform ui inputs as environmental variables in container
-# CENTER_CROPPING = os.environ['CENTER_CROPPING']             # can be true or false (but as string)
-# CENTER_CROPPING_SIZE = os.environ['CENTER_CROPPING_SIZE']
-
 # for input parameter defined in Meta Dashboard's UI
 with open(os.path.join('/', os.environ["WORKFLOW_DIR"], 'conf/conf.json'), 'r') as f:
     ui_confs = json.load(f)
+    dim_of_processed_image = ui_confs['workflow_form']['dim_of_processed_image']
     center_cropping = ui_confs['workflow_form']['image_transform_center_cropping']
     center_cropping_size = ui_confs['workflow_form']['image_transform_center_cropping_value']
     
@@ -66,17 +63,29 @@ def main():
         nifti_img_affine = nifti_img.affine                   # get affine data from input nifti file
         nifti_img_header = nifti_img.header                   # get header from input nifti file
 
-        image_tensor = torch.tensor(image_data)         # convert to torch tensor
-        image_tensor = image_tensor.permute(2, 0, 1)    # permute dims from (H, W, C) to (C, H, W) as torh expects the dims to be
+        image_tensor = torch.tensor(image_data)               # convert to torch tensor
+        image_tensor = image_tensor.squeeze()                 # squeeze dims of size 1 
+        print(f"Dimensions of current input image: {image_tensor.size()}.")
+        if image_tensor.dim() == dim_of_processed_image:
+            image_tensor = image_tensor.permute(2, 0, 1) if dim_of_processed_image == 3 else image_tensor   # permute dims from (H, W, C) to (C, H, W) as torch expects the dims to be, BUT only if tensor is 3D
 
-        # apply transformations
-        print("Applying selected transformations ...")
-        transformed_image = transformations(image_tensor).permute(1, 2, 0)  # transformations and un-do the previously applied dim permutation
+            # apply transformations
+            print(f"Applying selected transformations on (permuted) input tensor with shape: {image_tensor.size()}")
+            transformed_image = transformations(image_tensor)     # apply composed transformations
+            transformed_image = transformed_image.permute(1, 2, 0) if dim_of_processed_image == 3 else transformed_image  # un-do the previously applied dim permutation if tensor is 3D
+            print(f"Shape of output tensor: {transformed_image.size()}")
 
-        transformed_image = transformed_image.cpu().numpy()     # convert back to numpy array
-        output_image_data = transformed_image
-        output_nifti_img = nib.Nifti1Image(output_image_data, affine=nifti_img_affine, header=nifti_img_header) # save to output nifti file with previoulsy saved affine and header attributes
-        nib.save(output_nifti_img, os.path.join(element_output_dir, nifti_file_fname))  # save nifti to output_dir
+            transformed_image = transformed_image.cpu().numpy().astype('int16')     # convert back to numpy array
+            output_image_data = transformed_image
+            output_nifti_img = nib.Nifti1Image(output_image_data, affine=nifti_img_affine, header=nifti_img_header) # save to output nifti file with previoulsy saved affine and header attributes
+            nib.save(output_nifti_img, os.path.join(element_output_dir, nifti_file_fname))  # save nifti to output_dir
+        
+        else:   # dims of sqeezed image_tensor do not match the desired dims of the processed tensor --> write an error log file
+            print(f"The dimensions of the current input image and the given dimensions of processed images do NOT match: current image dims = {image_tensor.dim()}; given image dims = {dim_of_processed_image}.")
+            
+            with open(os.path.join(element_output_dir, "error_log.txt"), "w") as f:
+                f.write(f"The dimensions of {nifti_file_fname} in {nifti_file} do not match the specified input dimension of {dim_of_processed_image}." \
+                    f"==> {nifti_file_fname} is skipped in the further processing pipeline!")
 
 
 if __name__ == "__main__":
