@@ -1,7 +1,7 @@
-FROM opensearchproject/opensearch:1.2.3
+FROM opensearchproject/opensearch:2.2.0
 
 LABEL IMAGE="opensearch"
-LABEL VERSION="1.2.3"
+LABEL VERSION="2.2.0"
 LABEL CI_IGNORE="False"
 
 RUN whoami

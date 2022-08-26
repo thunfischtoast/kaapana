@@ -5,13 +5,13 @@ dependencies:
     repository: file://../../../projects/kaapana-core-chart
   - name: meta-init-chart
     condition: Release.IsInstall
-    version: "1.2.3"
+    version: "2.2.0"
     repository: file://../../../services/meta/meta-init/meta-init-chart
   - name: opensearch-chart
-    version: "1.2.3"
+    version: "2.2.0"
     repository: file://../../../services/meta/opensearch/opensearch-chart
   - name: os-dashboards-chart
-    version: "1.2.0"
+    version: "2.2.0"
     repository: file://../../../services/meta/os-dashboards/os-dashboards/os-dashboards-chart
   - name: landing-page-kaapana-chart
     version: "0.1.3"

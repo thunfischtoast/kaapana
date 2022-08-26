@@ -31,7 +31,7 @@ spec:
             #   name: ssl-config
       containers:
         - name: opensearch-container
-          image: {{ .Values.global.registry_url }}/opensearch:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__1.2.3
+          image: {{ .Values.global.registry_url }}/opensearch:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__2.2.0
           imagePullPolicy: {{ .Values.global.pull_policy_pods }}
           # command: [ "/bin/bash", "-c", "--" ]
           # args: [ "while true; do sleep 30; done;" ]
@@ -74,9 +74,9 @@ spec:
           #   value: "single-node"
           resources:
             requests:
-              memory: 500Mi
+              memory: 800Mi
             limits:
-              memory: 1000Mi
+              memory: 1600Mi
           volumeMounts:
             # - name: ssl-config
             #   # readOnly: true

@@ -1,7 +1,7 @@
-FROM opensearchproject/opensearch-dashboards:1.2.0
+FROM opensearchproject/opensearch-dashboards:2.2.0
 
 LABEL IMAGE="os-dashboards"
-LABEL VERSION="1.2.0"
+LABEL VERSION="2.2.0"
 LABEL CI_IGNORE="False"
 
 ADD files/kaapana.svg /usr/share/opensearch-dashboards/src/core/server/core_app/assets/kaapana.svg
