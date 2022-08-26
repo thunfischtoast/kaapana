@@ -16,7 +16,7 @@ spec:
     spec:
       initContainers:
           - name: volume-permissions
-            image: registry.hzdr.de/jonas.scherer/kaapana/busybox:1.31
+            image: {{ .Values.global.registry_url }}/busybox:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__1.31
             imagePullPolicy:  IfNotPresent
             command: ["sh", "-c", "chown -R 1000:1000 /os_data && chown -R 1000:1000 /os_logs"]
             # command: ["sh", "-c", "chown -R 1000:1000 /os_data && chown -R 1000:1000 /os_logs && cp /os_ssl/* /os_config && chown -R 1000:1000 /os_config"]
@@ -31,7 +31,7 @@ spec:
             #   name: ssl-config
       containers:
         - name: opensearch-container
-          image: 'registry.hzdr.de/jonas.scherer/kaapana/opensearch:1.2.3'
+          image: {{ .Values.global.registry_url }}/opensearch:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__1.2.3
           imagePullPolicy: {{ .Values.global.pull_policy_pods }}
           # command: [ "/bin/bash", "-c", "--" ]
           # args: [ "while true; do sleep 30; done;" ]

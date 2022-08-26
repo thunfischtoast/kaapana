@@ -16,14 +16,14 @@ spec:
         imagePullPolicy:  {{ .Values.global.pull_policy_jobs }}
         env:
           - name: WAIT
-            value: "kibana,os-dashboards-service.meta.svc,5601;elastic,opensearch-service.meta.svc,9200"
+            value: "os-dashboards,os-dashboards-service.meta.svc,5601;opensearch,opensearch-service.meta.svc,9200"
           - name: DELAY
             value: "1"
           - name: TIMEOUT
             value: "10"
       containers:
       - name: init-meta
-        image: {{ .Values.global.registry_url }}/init-meta:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__6.8.12
+        image: {{ .Values.global.registry_url }}/init-meta:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__1.2.3
         imagePullPolicy:  {{ .Values.global.pull_policy_jobs }}
         env:
           - name: DOMAIN

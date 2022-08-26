@@ -18,7 +18,7 @@ spec:
     nodePort: 5601
     protocol: TCP
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: osd-ingress-ip
@@ -33,7 +33,10 @@ spec:
     http:
       paths:
       - path: /meta
+        pathType: ImplementationSpecific
         backend:
-          serviceName: os-dashboards-service
-          servicePort: osd-port
+          service:
+            name: os-dashboards-service
+            port:
+              name: osd-port
 ---

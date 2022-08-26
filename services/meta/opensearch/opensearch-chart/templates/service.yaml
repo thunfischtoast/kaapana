@@ -20,7 +20,7 @@ spec:
     targetPort: 9600
     protocol: TCP
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: os-ip
@@ -35,7 +35,11 @@ spec:
     http:
       paths:
       - path: /os
+        pathType: ImplementationSpecific
         backend:
-          serviceName: opensearch-service
-          servicePort: os-api
+          service:
+            name: opensearch-service
+            port:
+              name: os-api
+        
 ---

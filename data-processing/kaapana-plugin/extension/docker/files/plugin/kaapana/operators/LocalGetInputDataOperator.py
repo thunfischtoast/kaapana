@@ -23,7 +23,7 @@ class LocalGetInputDataOperator(KaapanaPythonBaseOperator):
 
     **Inputs:**
 
-    * inputs: 'dcm-uid' or 'elastic-query'
+    * inputs: 'dcm-uid' or 'opensearch-query'
     * data_type: 'dicom' or 'json'
     * cohort_limit: limit the download series list number
 
@@ -125,9 +125,9 @@ class LocalGetInputDataOperator(KaapanaPythonBaseOperator):
         if self.cohort_limit is None and self.inputs is None and self.conf is not None:
             trigger_conf = self.conf
             self.cohort_limit = int(trigger_conf["cohort_limit"]) if "cohort_limit" in trigger_conf and trigger_conf["cohort_limit"] is not None else None
-            if "elasticsearch_form" in trigger_conf:
-                elasticsearch_data = trigger_conf["elasticsearch_form"]
-                self.cohort_limit = int(elasticsearch_data["cohort_limit"]) if ("cohort_limit" in elasticsearch_data and elasticsearch_data["cohort_limit"] is not None) else None
+            if "opensearch_form" in trigger_conf:
+                opensearch_data = trigger_conf["opensearch_form"]
+                self.cohort_limit = int(opensearch_data["cohort_limit"]) if ("cohort_limit" in opensearch_data and opensearch_data["cohort_limit"] is not None) else None
 
         print(f"# Cohort-limit: {self.cohort_limit}")
         print("#")
@@ -198,31 +198,30 @@ class LocalGetInputDataOperator(KaapanaPythonBaseOperator):
         print("#")
         download_list = []
         for input in self.inputs:
-            if "elastic-query" in input:
-                elastic_query = input["elastic-query"]
-                if "query" not in elastic_query:
-                    print("'query' not found in 'elastic-query': {}".format(input))
+            if "opensearch-query" in input:
+                opensearch_query = input["opensearch-query"]
+                if "query" not in opensearch_query:
+                    print("'query' not found in 'opensearch-query': {}".format(input))
                     print("abort...")
                     raise ValueError('ERROR')
-                if "index" not in elastic_query:
-                    print("'index' not found in 'elastic-query': {}".format(input))
+                if "index" not in opensearch_query:
+                    print("'index' not found in 'opensearch-query': {}".format(input))
                     print("abort...")
                     raise ValueError('ERROR')
 
-                query = elastic_query["query"]
-                index = elastic_query["index"]
+                query = opensearch_query["query"]
+                index = opensearch_query["index"]
 
-                cohort = HelperOpensearch.get_query_cohort(elastic_index=index, elastic_query=query)
+                cohort = HelperOpensearch.get_query_cohort(index=index, query=query)
 
                 for series in cohort:
                     series = series["_source"]
 
                     study_uid = series[HelperOpensearch.study_uid_tag]
                     series_uid = series[HelperOpensearch.series_uid_tag]
-                    # SOPInstanceUID = series[ElasticDownloader.SOPInstanceUID_tag]
                     modality = series[HelperOpensearch.modality_tag]
 
-                    print(f"# Found elastic result: {modality}: {series_uid}")
+                    print(f"# Found opensearch result: {modality}: {series_uid}")
                     if self.check_modality:
                         print("# checking modality...")
                         self.check_dag_modality(input_modality=modality)
@@ -265,7 +264,7 @@ class LocalGetInputDataOperator(KaapanaPythonBaseOperator):
             else:
                 print("Error with dag-config!")
                 print("Unknown input: {}".format(input))
-                print("Supported 'dcm-uid' and 'elastic-query' ")
+                print("Supported 'dcm-uid' and 'opensearch-query' ")
                 print("Dag-conf: {}".format(self.conf))
                 raise ValueError('ERROR')
 
@@ -313,7 +312,7 @@ class LocalGetInputDataOperator(KaapanaPythonBaseOperator):
                  batch_name=None,
                  **kwargs):
         """
-        :param inputs: 'dcm-uid' or 'elastic-query'.
+        :param inputs: 'dcm-uid' or 'opensearch-query'.
         :param data_type: 'dicom' or 'json'
         :param check_modality: 'True' or 'False'
         :param cohort_limit: limits the download list

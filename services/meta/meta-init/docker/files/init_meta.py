@@ -237,7 +237,7 @@ print("#")
 # os.environ["OS_HOST"] = "jip-dktk"
 # os.environ["OS_PORT"] = "80"
 # os.environ["DASHBOARDS_URL"] = "https://jip-dktk.dkfz-heidelberg.de/meta"
-# os.environ["DASHBOARDS_JSON"] = "/home/jonas/projects/kaapana/services/meta/meta-init/meta-init-chart/files/kibana-dashboard.json"
+# os.environ["DASHBOARDS_JSON"] = "/home/jonas/projects/kaapana/services/meta/meta-init/meta-init-chart/files/dashboard_import.json"
 
 if __name__ == "__main__":
     print("# Provisioning...")

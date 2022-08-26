@@ -10,7 +10,6 @@ spec:
     - /traefik
     - /error-pages
     - /kubernetes
-    - /elasticsearch
     - /meta
     - /alert
     - /grafana
