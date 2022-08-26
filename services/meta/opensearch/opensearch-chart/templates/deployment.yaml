@@ -46,7 +46,7 @@ spec:
             value: "os-node1"
           - name: discovery.seed_hosts
             value: "os-node1"
-          - name: cluster.initial_master_nodes
+          - name: cluster.initial_cluster_manager_nodes
             value: "os-node1"
           - name: OPENSEARCH_JAVA_OPTS
             value: '-Xms512m -Xmx512m'
