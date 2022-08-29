@@ -1,0 +1,5 @@
+---
+global:
+    image: "dag-bdc-federated"
+    version: "0.1.0"
+    action: "copy"

@@ -63,3 +63,6 @@ dependencies:
   - name: bdc-workflow
     version: 0.1.0
     repository: file://../../data-processing/processing-pipelines/breast_density_classification/extension/bdc-workflow
+  - name: bdc-federated-workflow
+    version: 0.1.0
+    repository: file://../../data-processing/processing-pipelines/breast_density_classification-federated/extension/bdc-federated-workflow
