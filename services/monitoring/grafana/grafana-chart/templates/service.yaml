@@ -15,7 +15,7 @@ spec:
       protocol: TCP
       targetPort: 3000
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1 
 kind: Ingress
 metadata:
   name: grafna-ingress
@@ -23,7 +23,7 @@ metadata:
 
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-errorpages@kubernetescrd,kube-system-strip-prefix@kubernetescrd,kube-system-remove-auth-headers@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-errorpages@kubernetescrd,kube-system-strip-prefix@kubernetescrd
     kubernetes.io/ingress.global-static-ip-name: "kubernetes-ingress"
 spec:
   rules:
@@ -31,6 +31,10 @@ spec:
     http:
       paths:
       - path: /grafana
+        pathType: ImplementationSpecific
         backend:
-          serviceName: grafana
-          servicePort: 3000
+          service:
+            name: grafana
+            port:
+              number: 3000
+---
