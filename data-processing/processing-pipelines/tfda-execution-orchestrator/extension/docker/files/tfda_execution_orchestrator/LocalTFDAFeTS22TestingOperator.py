@@ -127,7 +127,7 @@ class LocalTFDAFeTS22TestingOperator(KaapanaPythonBaseOperator):
                         subm_dict[subm_id] = "skipped"
                         continue
                     
-                    self.trigger_dag_id = "tfda-execution-orchestrator"
+                    self.trigger_dag_id = "dag-tfda-execution-orchestrator"
                     # self.dag_run_id = kwargs['dag_run'].run_id
                     self.conf = kwargs['dag_run'].conf
                     self.conf["platform_config"] = platform_config

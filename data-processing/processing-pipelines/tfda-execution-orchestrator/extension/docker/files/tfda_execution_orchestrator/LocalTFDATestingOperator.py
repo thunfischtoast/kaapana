@@ -32,7 +32,7 @@ class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
         platform_config = self.extract_config(platform_config_path)
         request_config = self.extract_config(request_config_path)
         
-        self.trigger_dag_id = "tfda-execution-orchestrator"
+        self.trigger_dag_id = "dag-tfda-execution-orchestrator"
         # self.dag_run_id = kwargs['dag_run'].run_id
         self.conf = kwargs['dag_run'].conf
         self.conf["platform_config"] = platform_config

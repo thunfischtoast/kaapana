@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
-# ENV http_proxy http://www-int2.dkfz-heidelberg.de:80
-# ENV https_proxy http://www-int2.dkfz-heidelberg.de:80
+ENV http_proxy http://www-int2.dkfz-heidelberg.de:80
+ENV https_proxy http://www-int2.dkfz-heidelberg.de:80
 
 LABEL IMAGE="airflow"
 LABEL VERSION="2.2.5"
