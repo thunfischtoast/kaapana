@@ -61,13 +61,22 @@ class LocalTrainValDataSplitOperator(KaapanaPythonBaseOperator):
 
         # assigned selected data samples randomly to train and val dataset by adding another column to "selected_imgs" table (aka lists in list)
         # generate a vector which contains 0 = train and 1 = val dataset assignments
-        #TODO: needs better solution which does it more precisely
-        train_val_assigns = np.random.choice([0, 1], size=len(selected_imgs), p=[ratio_train_split, ratio_val_split])
+        # train_val_assigns = np.random.choice([0, 1], size=len(selected_imgs), p=[ratio_train_split, ratio_val_split]) # not accurate enough :(
+        train_val_assigns = np.ones(len(selected_imgs))
+        train_val_assigns[:int(ratio_train_split * len(selected_imgs))] = 0
+        np.random.shuffle(train_val_assigns)
         # add assignments to datasamples
+        count_train_samples = 0
+        count_val_samples = 0
         for i in range(len(selected_imgs)):
             selected_imgs[i].append(str(train_val_assigns[i]))
+            if train_val_assigns[i] == 0:
+                count_train_samples += 1
+            elif train_val_assigns[i] == 1:
+                count_val_samples += 1
 
-        print(f"Total number of selected images: {len(selected_imgs)}")
+        print(f"Total number of selected images: {len(selected_imgs)}.")
+        print(f"Data is divided into {count_train_samples} train samples and {count_val_samples} validation samples.")
 
         # convert select_imgs list to .csv and return it
         # with open(os.path.join(data_dir, f"train_val_splitted_samples-{kwargs['dag_run'].run_id}.csv"), "w", newline="") as f:
