@@ -50,7 +50,7 @@ ui_forms = {
             },
             "train_split": {
                 "title": "relative train data split",
-                "default": '0.5',
+                "default": '0.7',
                 "description": "Relative amount of data used for training, rest is using for validation split.",
                 "type": "string",
                 "required": True,
@@ -76,6 +76,14 @@ ui_forms = {
                 "title": "validation ferquency",
                 "default": 3,
                 "description": "Validation frequency in ratio to executed training epochs.",
+                "type": "integer",
+                "required": True,
+                "readOnly": False
+            },
+            "crop_size": {
+                "title": "cropping size",
+                "default": 1000,
+                "description": "Image size to which train images are randomly cropped and val images are center cropped.",
                 "type": "integer",
                 "required": True,
                 "readOnly": False
@@ -143,7 +151,7 @@ breast_density_classifier = BreastDensityClassifierOperator(dag=dag,
                                                             allow_federated_learning=True,
                                                             trigger_rule=TriggerRule.ALL_DONE,  # if marked as skip_operator still skipped, but if not helps to enforce execution
                                                             # whitelist_federated_learning=
-                                                            # dev_server='code-server'   # argument which enables debugging via code_server in "Pending Applications"
+                                                            dev_server='code-server'   # argument which enables debugging via code_server in "Pending Applications"
                                                             # cmds=["tail"], arguments=["-f", "/dev/null"],
                                                             )                                                            
 

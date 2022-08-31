@@ -31,11 +31,11 @@ class BreastDensityClassifierOperator(KaapanaBaseOperator):
         super().__init__(
             dag=dag,
             name='breast_density_classifier',
-            image=f"{default_registry}/breast-density-classification:{default_platform_abbr}_{default_platform_version}__0.1.0",
+            image=f"{default_registry}/simple-classification:{default_platform_abbr}_{default_platform_version}__0.1.0",
             image_pull_secrets=["registry-secret"],
             execution_timeout=execution_timeout,
             env_vars=env_vars,      # forward newly set env variables to container
-            gpu_mem_mb=24000,        # define GPU memory; default=6000
+            gpu_mem_mb=10000,        # define GPU memory; default=6000
             ram_mem_mb=8000,        # and RAM memory specs to avoid K8s' OMMKilled errros; default=2000
             ram_mem_mb_lmt=24000,   # default=12000
             image_pull_policy="Always",

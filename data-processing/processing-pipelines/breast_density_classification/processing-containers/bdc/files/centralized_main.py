@@ -128,6 +128,7 @@ def main():
     BATCH_SIZE = ui_confs['workflow_form']['batch_size']
     NUM_EPOCHS = ui_confs['workflow_form']['num_epochs']
     VAL_FREQ = ui_confs['workflow_form']['val_frequency']
+    CROP_SIZE = ui_confs['workflow_form']['crop_size']
 
     # print hyperparameter
     print(f"Hyperparameter: batch_size={BATCH_SIZE} ; num_workers={NUM_WORKERS} ; num_epochs={NUM_EPOCHS} ; device={DEVICE} ; val_freq={VAL_FREQ} !")
@@ -137,12 +138,12 @@ def main():
         # transforms.ToPILImage(),
         transforms.ToTensor(),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomCrop(100, padding=4),
+        transforms.RandomCrop(CROP_SIZE, padding=4),
         transforms.Normalize(0.5, 0.5),
     ])
     val_transforms = transforms.Compose([
         transforms.ToTensor(),
-        transforms.CenterCrop(100),
+        transforms.CenterCrop(CROP_SIZE),
         transforms.Normalize(0.5, 0.5),
     ])
 
