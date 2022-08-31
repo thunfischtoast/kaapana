@@ -151,7 +151,7 @@ breast_density_classifier = BreastDensityClassifierOperator(dag=dag,
                                                             allow_federated_learning=True,
                                                             trigger_rule=TriggerRule.ALL_DONE,  # if marked as skip_operator still skipped, but if not helps to enforce execution
                                                             # whitelist_federated_learning=
-                                                            dev_server='code-server'   # argument which enables debugging via code_server in "Pending Applications"
+                                                            # dev_server='code-server'   # argument which enables debugging via code_server in "Pending Applications"
                                                             # cmds=["tail"], arguments=["-f", "/dev/null"],
                                                             )                                                            
 
