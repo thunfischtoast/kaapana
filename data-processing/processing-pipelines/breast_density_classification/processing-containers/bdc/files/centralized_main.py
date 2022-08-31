@@ -4,6 +4,7 @@ from tqdm import tqdm
 import os
 import glob
 import json
+from distutils.dir_util import copy_tree
 
 # ml stuff
 import torch
@@ -11,7 +12,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch.optim as optim
-
+from torch.utils.tensorboard import SummaryWriter
 
 
 # from files
@@ -26,6 +27,9 @@ NUM_EPOCHS = 5
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'   # use "local-only/base-python-gpu"
 # DEVICE = 'cpu'    # for debugging; use "local-only/base-python-cpu"
 VAL_FREQ = 5
+
+# instantiate tensorboard's SummaryWriter
+writer = SummaryWriter()
 
 
 def train_epoch(network, loss_fn, optimizer, scheduler, data_loader, epoch):
@@ -197,12 +201,15 @@ def main():
         # train
         avg_train_loss, net = train_epoch(net, loss_fn, optimizer, scheduler, train_loader, epoch)
         print(f"Average training loss after {epoch+1} training epochs: {avg_train_loss}")
+        writer.add_scalar("Loss/train", avg_train_loss, epoch)
 
-        # # eval
+        # eval
         if ((epoch + 1) % VAL_FREQ) == 0:
             avg_val_loss, val_accuracy = val_epoch(net, loss_fn, val_loader, epoch)
             print(f"Average validation loss after {epoch+1} training epochs: {avg_val_loss}")
             print(f"Average validation accuracy after {epoch+1} training epochs: {val_accuracy}")
+            writer.add_scalar("Loss/val", avg_val_loss, epoch)
+            writer.add_scalar("Accuracy/val", val_accuracy, epoch)
   
     print("Training finished!")
 
@@ -222,6 +229,12 @@ def main():
                 'optimizer_state_dict': optimizer.state_dict(),
                 },
                 out_fname2)
+
+    # save tensorboard's event.out.tfevent-file to out_dir and to minio-bucket 'tensorboard'
+    minio_tensorboard_dir = os.path.join('/minio/tensorboard', MY_RUN_ID, MY_OPERATOR_OUT_DIR)
+    os.makedirs(minio_tensorboard_dir, exist_ok=True)
+    copy_tree('/kaapanasrc/runs', minio_tensorboard_dir)    # copy to minio
+    copy_tree('/kaapanasrc/runs', my_model_out_dir)         # copy to operator out_dir
 
     print("Processing finished!")
 
