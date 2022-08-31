@@ -31,7 +31,7 @@ class BreastDensityClassifierOperator(KaapanaBaseOperator):
         super().__init__(
             dag=dag,
             name='breast_density_classifier',
-            image=f"{default_registry}/simple-classification:{default_platform_abbr}_{default_platform_version}__0.1.0",
+            image=f"{default_registry}/breast-density-classification:{default_platform_abbr}_{default_platform_version}__0.1.0",
             image_pull_secrets=["registry-secret"],
             execution_timeout=execution_timeout,
             env_vars=env_vars,      # forward newly set env variables to container
