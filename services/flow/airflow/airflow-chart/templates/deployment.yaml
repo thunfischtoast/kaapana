@@ -311,9 +311,9 @@ spec:
           type: DirectoryOrCreate
       # - name: ssh-key-path
       #   secret:
-      #     secretName: tfda_iso.pem.pub
+      #     secretName: airflow-secrets
       #     optional: false
-      #     defaultMode: 384
+      #     defaultMode: 0600
       imagePullSecrets:
       - name: registry-secret
 ---

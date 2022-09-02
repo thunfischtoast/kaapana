@@ -4,4 +4,4 @@ request_config:
   platform_type: "openstack"
   platform_flavor: "ubuntu_gpu"
   user_selected_algorithm: "test_algo"
-  user_selected_study_data: "test_site_data"
+  user_selected_study_data: "test-site-data"

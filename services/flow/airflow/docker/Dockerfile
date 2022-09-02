@@ -46,9 +46,9 @@ RUN chmod +x /bootstrap.sh
 
 COPY files/scheduler_job.py /usr/local/lib/python3.8/dist-packages/airflow/jobs/
 
-## TODO: use kube secrets instead of the following
-RUN mkdir -p /root/.ssh
-COPY files/tfda_iso.pem  /root/.ssh/tfda_iso.pem
-RUN chmod 600 /root/.ssh/tfda_iso.pem
+# ## TODO: use kube secrets instead of the following
+# RUN mkdir -p /root/.ssh
+# COPY files/tfda_iso.pem  /root/.ssh/tfda_iso.pem
+# RUN chmod 600 /root/.ssh/tfda_iso.pem
 
 ENTRYPOINT ["./bootstrap.sh"]
