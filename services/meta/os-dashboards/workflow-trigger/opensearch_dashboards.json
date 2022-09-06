@@ -1,0 +1,10 @@
+{
+  "id": "workflowTrigger",
+  "version": "0.0.2",
+  "opensearchDashboardsVersion": "opensearchDashboards",
+  "server": false,
+  "ui": true,
+  "requiredPlugins": ["visualizations"],
+  "optionalPlugins": [],
+  "requiredBundles": []
+}

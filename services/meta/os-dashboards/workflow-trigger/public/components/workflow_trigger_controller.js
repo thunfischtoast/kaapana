@@ -1,6 +1,5 @@
-import "./brutusin-json-forms.min.js"
-import "./brutusin-json-forms.min.css"
-// import "./brutusin-json-forms-bootstrap.min.js"
+import "../dependencies/brutusin-json-forms.min.js"
+import "../dependencies/brutusin-json-forms.min.scss"
 
 class VisController {
   static metricBtn = document.createElement(`button`);
@@ -15,7 +14,7 @@ class VisController {
     this.vis = vis;
     VisController.vis = vis;
     this.el = el;
-
+    console.log(this.vis)
     this.container = document.createElement('div');
     this.container.className = 'myvis-container-div';
     this.el.appendChild(this.container);
@@ -38,12 +37,12 @@ class VisController {
   start_dag() {
 
     var dag_id = VisController.metricDag.options[VisController.metricDag.selectedIndex].text.toLowerCase()
-    var trigger_url = VisController.airflow_url + "/trigger/meta-trigger"
+    var trigger_url = VisController.airflow_url + "/trigger/" + dag_id
 
     var query = (this.vis.searchSource.history[0].fetchParams.body.query);
     var index = this.vis.searchSource.history[0].fetchParams.index.title;
     var conf = {
-      "conf": { "query": query, "index": index, "dag": dag_id, "cohort_limit": VisController.cohort_limit, "form_data": this.dag_form_data }
+      "conf": { "query": query, "index": index, "cohort_limit": VisController.cohort_limit, "form_data": this.dag_form_data }
     };
 
     var conf_json = JSON.stringify(conf)
@@ -173,7 +172,7 @@ class VisController {
             send_button.setAttribute("class", "kuiButton kuiButton--secondary");
             send_button.setAttribute("id", "form-ok-button");
             send_button.setAttribute('style', "font-weight: bold;font-size: 2em;margin: 10px;height: 50px;");
-            send_button.innerHTML = "START";
+            send_button.innerHTML = this.vis.params.buttonTitle;
             send_button.addEventListener('click', () => {
               if (bf_pub && bf_pub.validate()) {
                 if (bf_pub.getData().hasOwnProperty("confirmation")) {
@@ -440,4 +439,3 @@ document.onkeydown = function (evt) {
     }
   }
 };
-
