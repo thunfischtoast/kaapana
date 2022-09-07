@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         nano \
         unzip \
         zip \
+        openssh-client \
         # libczmq-dev \
         # libcurlpp-dev \
         # libssl-dev \
@@ -41,13 +42,14 @@ RUN python3.8 -m pip install --no-cache-dir -r requirements.txt --constraint "ht
 
 COPY files/scripts/ /scripts
 
+RUN ansible-galaxy collection install openstack.cloud
+
 COPY files/bootstrap.sh /bootstrap.sh
 RUN chmod +x /bootstrap.sh
 
 COPY files/scheduler_job.py /usr/local/lib/python3.8/dist-packages/airflow/jobs/
 
-# ## TODO: use kube secrets instead of the following
-# RUN mkdir -p /root/.ssh
+RUN mkdir -p /root/.ssh
 # COPY files/tfda_iso.pem  /root/.ssh/tfda_iso.pem
 # RUN chmod 600 /root/.ssh/tfda_iso.pem
 

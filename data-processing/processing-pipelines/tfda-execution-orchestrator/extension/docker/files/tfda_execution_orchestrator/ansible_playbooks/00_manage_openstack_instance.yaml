@@ -73,13 +73,35 @@
     
     - name: Create instance if not already present
       block:
+      - name: Create ssh key-pair if not existing
+        openssh_keypair:
+          path: "/root/.ssh/{{ ssh_key }}"
+          type: rsa
+          size: 4096
+          state: present
+          force: no
+
+      - name: Add ssh-key to OpenStack cloud
+        environment:
+          OS_TENANT_ID: "{{ os_project_id }}"
+        openstack.cloud.keypair:
+          auth:
+            auth_url: "{{ os_auth_url }}"
+            username: "{{ username }}"
+            password: "{{ password }}"
+            user_domain_name: "{{ os_user_domain }}"
+            project_name: "{{ project_name }}"
+          state: replace # will only replace if the remote key is different than local
+          name: "{{ ssh_key }}"
+          public_key_file: "/root/.ssh/{{ ssh_key }}.pub"
+
       - name: check ssh_key_file present
         stat: 
-          path: "~/.ssh/{{ ssh_key }}.pem"
+          path: "~/.ssh/{{ ssh_key }}"
         register: ssh_key_file
 
       - name: check ssh_key_file
-        fail: msg="The ssh-key ~/.ssh/{{ ssh_key }}.pem must be present on the host!"
+        fail: msg="The ssh-key ~/.ssh/{{ ssh_key }} must be present on the host!"
         when: not ssh_key_file.stat.exists
 
       - name: launch an instance
@@ -121,7 +143,7 @@
         ignore_errors: yes
 
       - name: Wait for SSH on the Instance
-        command: "ssh -oBatchMode=yes -oStrictHostKeyChecking=no -i ~/.ssh/{{ ssh_key }}.pem root@{{ new_instance.openstack.accessIPv4 }} true"
+        command: "ssh -oBatchMode=yes -oStrictHostKeyChecking=no -i ~/.ssh/{{ ssh_key }} root@{{ new_instance.openstack.accessIPv4 }} true"
         register: result
         until: result.rc == 0
         retries: 6
