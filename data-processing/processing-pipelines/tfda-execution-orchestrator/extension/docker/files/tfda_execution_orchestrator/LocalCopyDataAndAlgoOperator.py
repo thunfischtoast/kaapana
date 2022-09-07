@@ -17,7 +17,7 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         request_specific_config_path = os.path.join(operator_dir, "request_specific_configs")
         user_input_commands_path = os.path.join(request_specific_config_path, "user_input_commands.sh")
-        algorithm_path = os.path.join(operator_dir, "algorithm_path")
+        algorithm_path = os.path.join(operator_dir, "algorithm_files")
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
         playbook_path = os.path.join(playbooks_dir, "copy_algo_to_iso_env.yaml")
         

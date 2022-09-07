@@ -1,11 +1,9 @@
 #!/bin/bash
 echo "Hello World"
-result_folder='/home/ubuntu/results'
-dir='/home/kaapana/minio/test_site_data'
+results_folder='/home/ubuntu/results'
+dir='/home/kaapana/minio/test-site-data'
 
 for entry in "$dir"/*
 do
-  echo "$entry" > "$result_folder"/out.txt
+  echo "$entry" >> "$results_folder"/out.txt
 done
-
-

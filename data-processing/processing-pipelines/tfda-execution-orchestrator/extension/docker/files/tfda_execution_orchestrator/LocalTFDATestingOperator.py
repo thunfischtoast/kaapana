@@ -50,11 +50,11 @@ class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
         if dag_run:
             logging.debug(f"The latest isolated workflow has been triggered at: {dag_run.execution_date}!!!")
 
-        dag_state = get_dag_run_state(dag_id="tfda-execution-orchestrator", execution_date=dag_run.execution_date)
+        dag_state = get_dag_run_state(dag_id=self.trigger_dag_id, execution_date=dag_run.execution_date)
 
         while dag_state["state"] != "failed" and dag_state['state'] != "success":
             dag_run = self.get_most_recent_dag_run(self.trigger_dag_id)
-            dag_state = get_dag_run_state(dag_id="tfda-execution-orchestrator", execution_date=dag_run.execution_date)                        
+            dag_state = get_dag_run_state(dag_id=self.trigger_dag_id, execution_date=dag_run.execution_date)                        
 
         if dag_state["state"] == "failed":
             logging.debug(f"**************** The evaluation has FAILED ****************")
