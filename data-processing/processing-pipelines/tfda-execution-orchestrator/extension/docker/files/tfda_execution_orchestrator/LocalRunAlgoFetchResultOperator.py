@@ -22,7 +22,14 @@ class LocalRunAlgoFetchResultOperator(KaapanaPythonBaseOperator):
         
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
 
-        playbook_args = f"target_host={iso_env_ip} remote_username=ubuntu results_path={results_path}"
+        platform_config = kwargs["dag_run"].conf["platform_config"]        
+        request_config = kwargs["dag_run"].conf["request_config"]
+        
+        platform_type = request_config["request_config"]["platform_type"]
+        platform_flavor = request_config["request_config"]["platform_flavor"]
+        remote_username = platform_config["configurations"]["platform"][platform_type]["dynamic_params"][platform_flavor]["os_remote_username"]
+
+        playbook_args = f"target_host={iso_env_ip} remote_username={remote_username} results_path={results_path}"
         command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]
         process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, encoding="Utf-8")
         while True:

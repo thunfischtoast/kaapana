@@ -1,9 +1,13 @@
 #!/bin/bash
 echo "Hello World"
 results_folder='/home/ubuntu/results'
-dir='/home/kaapana/minio/test-site-data'
+dir='/home/ubuntu/test-site-data'
 
-for entry in "$dir"/*
-do
-  echo "$entry" >> "$results_folder"/out.txt
-done
+if [ -z "$(ls -A $dir)" ]; then
+  echo "Data bucket is empty" >> "$results_folder"/out.txt
+else
+  for entry in $dir/*
+  do
+   echo "$entry" >> "$results_folder"/out.txt
+  done
+fi

@@ -17,20 +17,21 @@
   vars:
     #TODO: change hardcoded
     ansible_ssh_private_key_file: ~/.ssh/tfda_iso
+    dst_results_dir: /home/{{ remote_username }}/results
   environment:
-    PATH: '/home/ubuntu/.local/bin:{{ ansible_env.PATH }}'
+    PATH: '/home/{{ remote_username }}/.local/bin:{{ ansible_env.PATH }}'
 
   tasks:
     - name: Create results directory if it doesn't exist
       file:
-        path: /home/ubuntu/results
+        path: "{{ dst_results_dir }}"
         state: directory
         recurse: yes
 
     - name: Run user Shell script
       become: yes # -> not sure if a good idea to allow sudo to the shell script (actually, DON'T DO IT!)
       ## TODO: HARDCODED the user uploaded script name should be renamed to below file name or the extracted contents has to be pasted into below file name
-      shell: bash /home/ubuntu/user_input_commands.sh
+      shell: bash /home/{{ remote_username }}/user_input_commands.sh
          
     # - name: Update submission tarfile name in MLCube config
     #   replace:
@@ -54,7 +55,7 @@
   
     - name: Check if actually result files exist
       find:
-        path: /home/ubuntu/results
+        path: "{{ dst_results_dir }}"
         #patterns: 'result.yaml'
         file_type: file
         recurse: yes
@@ -64,8 +65,8 @@
     - name: Create an archive of results into a zip file
       archive: 
         path: 
-        - /home/ubuntu/results
-        dest: "/home/ubuntu/results_{{ '%Y-%m-%d' | strftime }}.zip"
+        - "{{ dst_results_dir }}"
+        dest: "{{ dst_results_dir }}_{{ '%Y-%m-%d' | strftime }}.zip"
         format: zip
 
 
@@ -73,6 +74,6 @@
       become: yes
       ## Currently Ansible doesn't directly support directory/recursive copying from remote to local
       fetch:
-        src: "/home/ubuntu/results_{{ '%Y-%m-%d' | strftime }}.zip"
+        src: "{{ dst_results_dir }}_{{ '%Y-%m-%d' | strftime }}.zip"
         dest: "{{ results_path }}/"
         flat: yes

@@ -10,30 +10,54 @@
         name: "{{ target }}"
         groups: os_server
 
-- name: Copy algorithm chart to isolated environment
+- name: Copy algorithm chart and study data to isolated environment
   hosts: os_server
   strategy: free
+  gather_facts: yes
   remote_user: "{{ remote_username }}"
   vars:
     #TODO: change hardcoded
     ansible_ssh_private_key_file: ~/.ssh/tfda_iso
+    dst_algorithm_dir: /home/{{ remote_username }}/algorithm_files
+    dst_data_dir: /home/{{ remote_username }}/{{ user_selected_study_data }}
   # TODO: data could be in any or multiple instances
-  tasks:    
+  tasks:
+    - name: Create directory for algorithm files if it doesn't exist
+      file:
+        path: "{{ dst_algorithm_dir }}"
+        state: directory
+        recurse: yes
+    
+    - name: Create data directory if it doesn't exist
+      file:
+        path: "{{ dst_data_dir }}"
+        state: directory
+        recurse: yes
+
     - name: Copy algorithm file/s
       copy:
-        src: "{{ algorithm_files_path }}/"
-        dest: "/home/ubuntu/algorithm_files"
+        src: "{{ user_selected_algo_path }}/"
+        dest: "{{ dst_algorithm_dir }}"
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: '660'
 
-    - name: Copy user selected bucket to Iso
+    - name: Copy user selected study-data bucket to Iso
+      become: yes
       copy:
-        src: "{{ user_selected_data }}"
-        # the input data path will be /home/ubuntu/<USER_SELECTED_BUCKET>
-        dest: "/home/ubuntu"
-        directory_mode: yes
+        src: "{{ study_data_src_path }}/"
+        dest: "{{ dst_data_dir }}"
+        # directory_mode: yes
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: '400' # TODO: data permissions need to be clarified
 
     - name: Copy user shell script to Iso
       copy:
         src: "{{ user_input_commands_path }}"
         dest: "/home/ubuntu"
         # directory_mode: yes
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: '740'
         

@@ -13,11 +13,11 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
     def start(self, ds, ti, **kwargs):
         logging.info("Copy data and algorithm to isolated environment...")
         airflow_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        minio_dir = os.path.join(airflow_dir, "miniobuckets")
+        minio_path = os.path.join(airflow_dir, "miniobuckets")
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         request_specific_config_path = os.path.join(operator_dir, "request_specific_configs")
         user_input_commands_path = os.path.join(request_specific_config_path, "user_input_commands.sh")
-        algorithm_path = os.path.join(operator_dir, "algorithm_files")
+        algorithm_files_path = os.path.join(operator_dir, "algorithm_files")
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
         playbook_path = os.path.join(playbooks_dir, "copy_algo_to_iso_env.yaml")
         
@@ -26,15 +26,22 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         if not os.path.isfile(user_input_commands_path):
             raise AirflowFailException("user_input_commands_path file not found!")
 
+
+        platform_config = kwargs["dag_run"].conf["platform_config"]        
         request_config = kwargs["dag_run"].conf["request_config"]
+        
+        platform_type = request_config["request_config"]["platform_type"]
+        platform_flavor = request_config["request_config"]["platform_flavor"]
+        remote_username = platform_config["configurations"]["platform"][platform_type]["dynamic_params"][platform_flavor]["os_remote_username"]
         user_selected_algo = request_config["request_config"]["user_selected_algorithm"]
-        user_selected_algo_path = os.path.join(algorithm_path, user_selected_algo)
-        user_selected_data = request_config["request_config"]["user_selected_study_data"]
-        user_selected_data_path = os.path.join(minio_dir, user_selected_data)
+        user_selected_study_data = request_config["request_config"]["user_selected_study_data"]
+        
+        user_selected_algo_path = os.path.join(algorithm_files_path, user_selected_algo)
+        study_data_src_path = os.path.join(minio_path, user_selected_study_data)
 
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
 
-        playbook_args = f"target_host={iso_env_ip} remote_username=root algorithm_files_path={user_selected_algo_path} user_selected_data={user_selected_data_path} user_input_commands_path={user_input_commands_path}"        
+        playbook_args = f"target_host={iso_env_ip} remote_username={remote_username} user_selected_algo_path={user_selected_algo_path} study_data_src_path={study_data_src_path} user_selected_study_data={user_selected_study_data} user_input_commands_path={user_input_commands_path}"        
         command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]
         process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, encoding="Utf-8")
         while True:

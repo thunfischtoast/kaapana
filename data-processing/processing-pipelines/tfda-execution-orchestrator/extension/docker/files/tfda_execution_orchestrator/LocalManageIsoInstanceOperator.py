@@ -69,8 +69,6 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
 
     def __init__(self,
                  dag,
-                 platformType = "openstack",
-                 platformFlavor = "ubuntu_gpu",
                  instanceState = "present",
                  taskName = "create-iso-inst",
                  **kwargs):

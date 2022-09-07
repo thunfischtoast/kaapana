@@ -15,16 +15,19 @@ configurations:
           os_image: ""
           os_volume_size: ""
           os_instance_flavor: ""
+          os_remote_username: ""
         ubuntu_gpu:
           os_instance_name: ""
           os_image: ""
           os_volume_size: ""
           os_instance_flavor: ""
+          os_remote_username: ""
         custom: # custom config -> operating sys, gpu memory, storage space (we provide available options)
           os_instance_name: ""
           os_image: ""
           os_volume_size: ""
           os_instance_flavor: ""
+          os_remote_username: ""
     vmware: 
       dynamic_params:
         var1: ""
