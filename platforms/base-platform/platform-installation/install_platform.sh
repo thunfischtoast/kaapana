@@ -23,7 +23,7 @@ DEV_MODE="true" # dev-mode -> containers will always be re-downloaded after pod-
 DEV_PORTS="false"
 GPU_SUPPORT="false"
 
-HELM_NAMESPACE="kaapana"
+HELM_NAMESPACE="basekaapana"
 PREFETCH_EXTENSIONS="false"
 CHART_PATH=""
 NO_HOOKS=""
