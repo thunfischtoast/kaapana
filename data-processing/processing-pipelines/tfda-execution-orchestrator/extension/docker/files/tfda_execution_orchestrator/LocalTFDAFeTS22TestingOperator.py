@@ -4,6 +4,7 @@ import synapseclient as sc
 import smtplib
 import logging
 import subprocess
+import yaml
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -21,6 +22,14 @@ from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperato
 from kaapana.blueprints.kaapana_global_variables import BATCH_NAME, WORKFLOW_DIR
 
 class LocalTFDAFeTS22TestingOperator(KaapanaPythonBaseOperator):
+    def extract_config(self, config_filepath):
+        with open(config_filepath, "r") as stream:
+            try:
+                config_dict = yaml.safe_load(stream)
+                return config_dict
+            except yaml.YAMLError as exc:
+                raise AirflowFailException(f"Could not extract configuration due to error: {exc}!!")
+
     def run_command(self, command):
         process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, encoding="Utf-8")
         while True:
@@ -73,9 +82,9 @@ class LocalTFDAFeTS22TestingOperator(KaapanaPythonBaseOperator):
 
 
     def start(self, ds, ti, **kwargs):
-        synapse_user = "santhosh.p"
+        synapse_user = ""
         API_KEY = ""
-        synapse_pw = "TFDAPassword@123"
+        synapse_pw = ""
         container_reg = "docker.synapse.org"
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         subm_logs_path = os.path.join(operator_dir, "data", "subm_logs")

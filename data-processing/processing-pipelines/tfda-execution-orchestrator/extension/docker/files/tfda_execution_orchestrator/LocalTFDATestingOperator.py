@@ -1,5 +1,5 @@
 import os
-import yaml
+import json
 import logging
 from datetime import datetime
 from airflow.exceptions import AirflowFailException
@@ -13,9 +13,9 @@ class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
     def extract_config(self, config_filepath):
         with open(config_filepath, "r") as stream:
             try:
-                config_dict = yaml.safe_load(stream)
+                config_dict = json.load(stream)
                 return config_dict
-            except yaml.YAMLError as exc:
+            except Exception as exc:
                 raise AirflowFailException(f"Could not extract configuration due to error: {exc}!!")
     
     def get_most_recent_dag_run(self, dag_id):
@@ -25,8 +25,8 @@ class LocalTFDATestingOperator(KaapanaPythonBaseOperator):
 
     def start(self, ds, ti, **kwargs):
         operator_dir = os.path.dirname(os.path.abspath(__file__))
-        platform_config_path = os.path.join(operator_dir, "platform_specific_configs", "platform_config.yaml")
-        request_config_path = os.path.join(operator_dir, "request_specific_configs", "request_config.yaml")
+        platform_config_path = os.path.join(operator_dir, "platform_specific_configs", "platform_config.json")
+        request_config_path = os.path.join(operator_dir, "request_specific_configs", "request_config.json")
         
         logging.info("Loading platform and request specific configurations...")
         platform_config = self.extract_config(platform_config_path)

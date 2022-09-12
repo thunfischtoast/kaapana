@@ -1,0 +1,50 @@
+{
+    "configurations": {
+      "username": "",
+      "password": "",
+      "platform": {
+        "openstack": {
+          "os_user_domain": "",
+          "os_project_name": "",
+          "os_project_id": "",
+          "os_auth_url": "",
+          "os_ssh_key_name": "",
+          "platform_flavor": {
+            "kaapana_gpu": {
+              "os_image": "",
+              "os_volume_size": "",
+              "os_instance_flavor": "",
+              "os_remote_username": "",
+              "os_security_groups": ""
+            },
+            "ubuntu_gpu": {
+              "os_image": "",
+              "os_volume_size": "",
+              "os_instance_flavor": "",
+              "os_remote_username": "",
+              "os_security_groups": ""
+            },
+            "custom": {
+              "os_image": "",
+              "os_volume_size": "",
+              "os_instance_flavor": "",
+              "os_remote_username": "",
+              "os_security_groups": ""
+            }
+          }
+        },
+        "vmware": {
+          "platform_flavor": {
+            "var1": "",
+            "var2": ""
+          }
+        },
+        "baremetal_kvm": {
+          "platform_flavor": {
+            "var1": "",
+            "var2": ""
+          }
+        }
+      }
+    }
+  }
