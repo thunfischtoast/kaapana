@@ -27,7 +27,7 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         if not os.path.isfile(playbook_path):
             raise AirflowFailException(f"Playbook '{playbook_path}' file not found!")
         
-        playbook_args = f"instance_state={self.instanceState}"
+        playbook_args = f"os_instance_name={platform_flavor} instance_state={self.instanceState}"
         
         platform_config = kwargs["dag_run"].conf["platform_config"]        
         username = platform_config["configurations"]["username"]
@@ -38,8 +38,8 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         
         if platform_type == "openstack":
             for key, value in platform_config["configurations"]["platform"][platform_type].items():
-                if key == "dynamic_params":
-                    for key, value in platform_config["configurations"]["platform"][platform_type]["dynamic_params"][platform_flavor].items():
+                if key == "platform_flavor":
+                    for key, value in platform_config["configurations"]["platform"][platform_type]["platform_flavor"][platform_flavor].items():
                         playbook_args += f" {key}={value}"
                 else:
                     playbook_args += f" {key}={value}"

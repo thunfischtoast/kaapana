@@ -16,12 +16,19 @@
   remote_user: "{{ remote_username }}"
   vars:
     #TODO: change hardcoded
-    ansible_ssh_private_key_file: ~/.ssh/tfda_iso
+    ansible_ssh_private_key_file: ~/.ssh/{{ os_ssh_key_name }}
     dst_results_dir: /home/{{ remote_username }}/results
   environment:
     PATH: '/home/{{ remote_username }}/.local/bin:{{ ansible_env.PATH }}'
 
   tasks:
+    - name: Check if all required variables are passed using --extra-vars
+      fail:
+        msg: "Variable {{ item }} not defined"
+      when: item is not defined
+      with_items:
+        - "{{ os_ssh_key_name }}"
+
     - name: Create results directory if it doesn't exist
       file:
         path: "{{ dst_results_dir }}"
@@ -29,29 +36,11 @@
         recurse: yes
 
     - name: Run user Shell script
-      become: yes # -> not sure if a good idea to allow sudo to the shell script (actually, DON'T DO IT!)
-      ## TODO: HARDCODED the user uploaded script name should be renamed to below file name or the extracted contents has to be pasted into below file name
+      become: no
+      ## TODO: HARDCODED user commands script name
       shell: bash /home/{{ remote_username }}/user_input_commands.sh
-         
-    # - name: Update submission tarfile name in MLCube config
-    #   replace:
-    #     path: /home/ubuntu/tarball/mlcube.yaml
-    #     regexp: 'tar_file: /home/ubuntu/tarball/'
-    #     replace: 'tar_file: /home/ubuntu/tarball/{{ subm_id }}.tar'
-
-    # - name: Run Mini conda Installation for Cuda Support
-    #   shell: bash /home/ubuntu/Miniconda3-py38_4.12.0-Linux-x86_64.sh -b -p /home/ubuntu/miniconda3
 
     # - debug: msg="{{ '%H:%M:%S' | strftime }}"
-
-    # - name: Get job ID of GPU monitoring task
-    #   async_status:
-    #     jid: "{{ gpu_and_ram_monitor.ansible_job_id }}"
-    #   register: monitor_job_result
-    #   until: monitor_job_result.finished
-    #   retries: 350
-    #   delay: 2
-    #   ignore_errors: yes
   
     - name: Check if actually result files exist
       find:

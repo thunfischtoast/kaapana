@@ -27,9 +27,10 @@ class LocalRunAlgoFetchResultOperator(KaapanaPythonBaseOperator):
         
         platform_type = request_config["request_config"]["platform_type"]
         platform_flavor = request_config["request_config"]["platform_flavor"]
-        remote_username = platform_config["configurations"]["platform"][platform_type]["dynamic_params"][platform_flavor]["os_remote_username"]
+        os_ssh_key_name = platform_config["configurations"]["platform"][platform_type]["os_ssh_key_name"]
+        remote_username = platform_config["configurations"]["platform"][platform_type]["platform_flavor"][platform_flavor]["os_remote_username"]
 
-        playbook_args = f"target_host={iso_env_ip} remote_username={remote_username} results_path={results_path}"
+        playbook_args = f"target_host={iso_env_ip} os_ssh_key_name={os_ssh_key_name} remote_username={remote_username} results_path={results_path}"
         command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]
         process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, encoding="Utf-8")
         while True:

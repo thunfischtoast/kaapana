@@ -4,32 +4,47 @@
   gather_facts: false
 
   vars:
-    ssh_key: "{{ os_ssh_key | default('tfda_iso') }}"
-    os_auth_url: "{{ os_auth_url | default('https://cloud.dkfz-heidelberg.de:13000') }}"
-    project_name: "{{ os_project_name | default('E230-Kaapana') }}"
-    os_project_id: "{{ os_proj_id | default('969831bf53424f1fb318a9c1d98e1941') }}"
-    os_user_domain: "{{ os_user_domain | default('AD') }}"
+    ssh_key: "{{ os_ssh_key_name }}"
+    os_auth_url: "{{ os_auth_url }}"
+    project_name: "{{ os_project_name }}"
+    os_project_id: "{{ os_proj_id }}"
+    os_user_domain: "{{ os_user_domain }}"
     username: "{{ username }}"
     password: "{{ password }}"
     instance_name: "{{ os_instance_name | default('test-isolated-environment') }}"
     volume_size: "{{ os_volume_size | default('150') }}"
-    os: "{{ os_image | default('Ubuntu-20.04-LTS-DKFZ') }}"
-    instance_flavor: "{{ os_instance_flavor | default('dkfz-8.16') }}"
+    instance_image: "{{ os_image }}"
+    instance_flavor: "{{ os_instance_flavor }}"
     instance_state: "{{ instance_state | default('present') }}"
+    sec_grp: "{{ os_security_groups }}"
 
   environment:
     OS_IDENTITY_API_VERSION: 2
     OS_ENDPOINT_TYPE: publicURL
 
   tasks:
-    - name: Check if all required variables are passed using --extra-vars
+    - name: Check if OpenStack credentials are provided
       fail:
-        msg: "variable {{ item }} not defined"
+        msg: "OpenStack username/password {{ item }} not defined"
       when: item is not defined
       with_items:
         - "{{ username }}"
         - "{{ password }}"
       no_log: True
+    
+    - name: Check if all required variables are passed using --extra-vars
+      fail:
+        msg: "Variable {{ item }} not defined"
+      when: item is not defined
+      with_items:
+        - "{{ os_ssh_key_name }}"
+        - "{{ os_auth_url }}"
+        - "{{ os_project_name }}"
+        - "{{ os_project_id }}"
+        - "{{ os_user_domain }}"
+        - "{{ os_image }}"
+        - "{{ os_instance_flavor }}"
+        - "{{ os_security_groups }}"
 
     - name: check if instance exists
       environment: 
@@ -49,10 +64,6 @@
       debug: 
         msg: "Instance does NOT already exist!"
       when: inst_info.openstack_servers | length == 0
-      
-    - name: Set custom Instance Image
-      set_fact:
-        instance_image: "{{ os }}"
 
     - fail: msg="{{ project_name }} this project is not supported! [E230 E230-DKTK-JIP E230-Kaapana-CI E230-DCIPHER-CI E130-OP41 E230-Production]"
       when: 
@@ -124,7 +135,7 @@
           region_name: regionOne
           boot_from_volume: True
           terminate_volume: True
-          security_groups: default
+          security_groups: "{{ sec_grp }}"
           delete_fip: yes
           # auto_ip: yes
           reuse_ips: yes
@@ -170,7 +181,7 @@
             auth_url: "{{ os_auth_url }}"
             username: "{{ username }}"
             password: "{{ password }}"
-            user_domain_name: "AD"
+            user_domain_name: "{{ os_user_domain }}"
             project_name: "{{ os_project_name }}"
           name: "{{ os_instance_name }}"
           terminate_volume: True
