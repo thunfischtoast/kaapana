@@ -19,7 +19,7 @@
     sec_grp: "{{ os_security_groups }}"
 
   environment:
-    OS_IDENTITY_API_VERSION: 2
+    OS_IDENTITY_API_VERSION: 3
     OS_ENDPOINT_TYPE: publicURL
 
   tasks:

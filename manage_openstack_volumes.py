@@ -5,7 +5,7 @@ import logging
 logging.getLogger().setLevel(logging.INFO)
 # openstack.enable_logging(debug=True)
 
-def delete_unused_volumes(conn_params):
+def delete_unused_volumes(conn_params, detect_only=True):
     conn = connection.Connection(
         region_name="regionOne",
         auth=dict(
@@ -24,9 +24,14 @@ def delete_unused_volumes(conn_params):
     snapshot_volume_ids = [x["volume_id"] for x in snapshots]
     ## A volume that's not in use and also not attached to any snapshot can be deleted
     delete_volumes_ids = [x["id"] for x in volumes if x["id"] not in snapshot_volume_ids and x["status"] != "in-use"]
+    
     if not delete_volumes_ids:
         logging.info(f"There are currently no unused volumes under the {conn_params['project_name']} project!!!")
         return
+    elif detect_only:
+        print(f"Following is a list of currently unused volumes under {conn_params['project_name']} OpenStack project:\n{delete_volumes_ids}")
+        return
+    
     for volume_id in delete_volumes_ids:
         logging.debug(f"Deleting volume with ID - {volume_id} since it is not in use and not attached to any snapshot...")
         conn.delete_volume(volume_id)
@@ -44,7 +49,7 @@ if __name__ == "__main__":
         "project_name": ""
         # "user_domain": ""
     }
-    delete_unused_volumes(conn_params)
+    delete_unused_volumes(conn_params, detect_only=True)
 
 print("The end...")
 
