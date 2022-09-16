@@ -1,0 +1,14 @@
+[
+    {
+        "search_tags": {},
+        "dag_ids": {
+            "service-mint-xml-parser": {
+                "fetch_method": "copy",
+                "rest_call": {
+                    "global": {}
+                },
+                "single_execution" : false
+            }
+        }
+    }
+]
