@@ -16,7 +16,6 @@
   gather_facts: yes
   remote_user: "{{ remote_username }}"
   vars:
-    #TODO: change hardcoded
     ansible_ssh_private_key_file: ~/.ssh/{{ os_ssh_key_name }}
     dst_algorithm_dir: /home/{{ remote_username }}/algorithm_files
     dst_data_dir: /home/{{ remote_username }}/{{ user_selected_study_data }}
@@ -47,7 +46,7 @@
         dest: "{{ dst_algorithm_dir }}"
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_id }}"
-        mode: '640'
+        mode: '600'
 
     - name: Copy user selected study-data bucket to Iso
       become: yes
@@ -66,5 +65,5 @@
         # directory_mode: yes
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_id }}"
-        mode: '740'
+        mode: '700'
         
