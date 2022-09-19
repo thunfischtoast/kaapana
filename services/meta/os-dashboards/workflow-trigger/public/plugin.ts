@@ -8,22 +8,23 @@ import { BaseVisTypeOptions } from 'src/plugins/visualizations/public/';
 
 import { PLUGIN_NAME } from '../common';
 // @ts-expect-error
-import { VisController } from './components/workflow_trigger_controller'
+import { getWorkflowTriggerVisController } from './components/workflow_trigger_controller'
 
-//import { Schemas } from '../../../src/plugins/vis_default_editor/public/';
+import { Schemas } from '../../../src/plugins/vis_default_editor/public/';
 import { WorkflowTriggerOptions } from './components/workflow_trigger_options';
-
 
 
 export class WorkflowTriggerPlugin
   implements Plugin<WorkflowTriggerPluginSetup, WorkflowTriggerPluginStart> {
-  public setup(_core: CoreSetup, { visualizations }: WorkflowTriggerSetupDependencies): WorkflowTriggerPluginSetup {
+
+  public setup(core: CoreSetup, {visualizations, data}: WorkflowTriggerSetupDependencies): WorkflowTriggerPluginSetup {
+
     const config: BaseVisTypeOptions = {
       name: PLUGIN_NAME,
       title: 'Start Process Button',
       icon: 'logstashIf',
       description: 'An actionable button',
-      visualization: VisController,
+      visualization: getWorkflowTriggerVisController(data, core.getStartServices),
       visConfig: {
         defaults: {
           fontSize: 30,
@@ -33,7 +34,7 @@ export class WorkflowTriggerPlugin
       },
       editorConfig: {
         optionsTemplate: WorkflowTriggerOptions,
-        schemas: new Object([
+        schemas: new Schemas([
           {
             group: 'metrics',
             name: 'metric',
@@ -54,13 +55,14 @@ export class WorkflowTriggerPlugin
         ]),
       }
     };
+  
     visualizations.createBaseVisualization(config);
 
     // Return methods that should be available to other plugins
     return {};
   }
 
-  public start(core: CoreStart): WorkflowTriggerPluginStart {
+  public start(_core: CoreStart): WorkflowTriggerPluginStart {
     return {};
   }
 

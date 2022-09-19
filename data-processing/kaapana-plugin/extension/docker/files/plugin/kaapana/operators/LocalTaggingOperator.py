@@ -44,7 +44,7 @@ class LocalTaggingOperator(KaapanaPythonBaseOperator):
  
         # Write Tags back
         body = {"doc": {self.tag_field: final_tags}}
-        os_client.update(index=self.opensearch_index, id=series_instance_uid, body=body, doc_type="_doc")
+        os_client.update(index=self.opensearch_index, id=series_instance_uid, body=body)
  
 
     def start(self, ds, **kwargs):

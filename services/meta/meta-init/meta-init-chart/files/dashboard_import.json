@@ -568,8 +568,8 @@
     "_id": "841de2c0-450b-11eb-8e37-1b27e5353ac5",
     "_type": "visualization",
     "_source": {
-      "title": "trigger_workflow",
-      "visState": "{\"title\":\"trigger_workflow\",\"type\":\"workflow_trigger\",\"params\":{\"fontSize\":30,\"margin\":10,\"buttonTitle\":\"START\",\"filterprovider\":{\"_listeners\":{\"update\":[],\"fetch\":[]},\"_emitChain\":{}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}]}",
+      "title": "Trigger Workflow",
+      "visState": "{\"title\":\"Trigger Workflow\",\"type\":\"dashboards-workflow-trigger\",\"params\":{\"fontSize\":30,\"margin\":10,\"buttonTitle\":\"START\",\"filterprovider\":{\"_listeners\":{\"update\":[],\"fetch\":[]},\"_emitChain\":{}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}]}",
       "uiStateJSON": "{}",
       "description": "",
       "version": 1,

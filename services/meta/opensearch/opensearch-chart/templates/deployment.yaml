@@ -25,16 +25,10 @@ spec:
               name: osdata
             - mountPath: /os_logs
               name: oslogs
-            # - mountPath: /os_ssl
-            #   name: ssl-secret
-            # - mountPath: /os_config
-            #   name: ssl-config
       containers:
         - name: opensearch-container
           image: {{ .Values.global.registry_url }}/opensearch:{{ .Values.global.platform_abbr | default "uk" }}_{{ .Values.global.platform_version | default "0" }}__2.2.0
           imagePullPolicy: {{ .Values.global.pull_policy_pods }}
-          # command: [ "/bin/bash", "-c", "--" ]
-          # args: [ "while true; do sleep 30; done;" ]
           env:
           - name: plugins.security.disabled
             value: "true"
@@ -50,37 +44,12 @@ spec:
             value: "os-node1"
           - name: OPENSEARCH_JAVA_OPTS
             value: '-Xms512m -Xmx512m'
-          # - name: plugins.security.ssl.transport.enabled
-          #   value: "true"
-          # - name: plugins.security.ssl.transport.pemkey_filepath
-          #   value: "certs/node1-key.pem"
-          # - name: plugins.security.ssl.transport.pemcert_filepath
-          #   value: "certs/node1.pem"
-          # - name: plugins.security.ssl.transport.pemtrustedcas_filepath
-          #   value: "certs/root-ca.pem"
-          # - name: plugins.security.ssl.transport.enforce_hostname_verification
-          #   value: "false"
-          # - name: plugins.security.ssl.http.enabled
-          #   value: "true"
-          # - name: plugins.security.ssl.http.pemcert_filepath
-          #   value: "certs/node1.pem"
-          # - name: plugins.security.ssl.http.pemkey_filepath
-          #   value: "certs/node1-key.pem"
-          # - name: plugins.security.ssl.http.pemtrustedcas_filepath
-          #   value: "certs/root-ca.pem"
-          # - name: bootstrap.memory_lock
-          #   value: "true"
-          # - name: discovery.type
-          #   value: "single-node"
           resources:
             requests:
               memory: 500Mi
             limits:
               memory: 1000Mi
           volumeMounts:
-            # - name: ssl-config
-            #   # readOnly: true
-            #   mountPath: /usr/share/opensearch/config/certs
             - name: osdata
               mountPath: /usr/share/opensearch/data
             - name: oslogs
@@ -88,43 +57,14 @@ spec:
             - name: sec-config
               mountPath: plugins/opensearch-security/securityconfig/config.yml
               subPath: config.yml
-            # - name: config-file
-            #   mountPath: /usr/share/opensearch/config/opensearch.yml
-            #   subPath: opensearch.yml
-            # - name: internal_users
-            #   mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
-            #   subPath: internal_users.yml
-            # - name: roles_mapping
-            #   mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/roles_mapping.yml
-            #   subPath: roles_mapping.yml
-            # - name: tenants
-            #   mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/tenants.yml
-            #   subPath: tenants.yml
-            # - name: roles
-            #   mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/roles.yml
-            #   subPath: roles.yml
-            # - name: action_groups
-            #   mountPath: /usr/share/opensearch/plugins/opensearch-security/securityconfig/action_groups.yml
-            #   subPath: action_groups.yml
-
-      # /usr/share/opensearch/config/root-ca.pem
-      # /usr/share/opensearch/config/node.pem
-      # /usr/share/opensearch/config/node-key.pem
-      # /usr/share/opensearch/config/admin.pem
-      # /usr/share/opensearch/config/admin-key.pem
-          # livenessProbe:
-          #   tcpSocket:
-          #     port: 9200
-          #   initialDelaySeconds: 15
-          #   periodSeconds: 120
       volumes:
       - name: osdata
         hostPath:
-          path: /home/kaapana-osdev/opensearch-data
+          path: {{ .Values.global.fast_data_dir | default "/home/kaapana" }}/opensearch-data
           type: DirectoryOrCreate
       - name: oslogs
         hostPath:
-          path: /home/kaapana-osdev/opensearch-logs
+          path: {{ .Values.global.fast_data_dir | default "/home/kaapana" }}/opensearch-logs
           type: DirectoryOrCreate
       - name: sec-config
         configMap:
@@ -132,43 +72,6 @@ spec:
           items:
           - key: config.yml
             path: config.yml
-      # - name: ssl-secret
-      #   secret:
-      #     secretName: certificate
-      # - name: ssl-config
-      #   hostPath:
-      #     path: /home/kaapana-osdev/opensearch-data/ssl
-      #     type: DirectoryOrCreate
-      # - name: config-file
-      #   configMap:
-      #     name: os-config
-      #     items:
-      #     - key: opensearch.yml
-      #       path: opensearch.yml
-      # - name: internal_users
-      #   configMap:
-      #     name: os-config
-      #     items:
-      #     - key: internal_users.yml
-      #       path: internal_users.yml
-      # - name: roles_mapping
-      #   configMap:
-      #     name: os-config
-      #     items:
-      #     - key: roles_mapping.yml
-      #       path: roles_mapping.yml
-      # - name: tenants
-      #   configMap:
-      #     name: os-config
-      #     items:
-      #     - key: tenants.yml
-      #       path: tenants.yml
-      # - name: action_groups
-      #   configMap:
-      #     name: os-config
-      #     items:
-      #     - key: action_groups.yml
-      #       path: action_groups.yml
       imagePullSecrets:
       - name: registry-secret
 ---

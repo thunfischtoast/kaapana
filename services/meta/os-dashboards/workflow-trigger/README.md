@@ -1,4 +1,4 @@
-# workflow_trigger
+# dashboards-workflow-trigger
 
 A OpenSearch Dashboards plugin
 

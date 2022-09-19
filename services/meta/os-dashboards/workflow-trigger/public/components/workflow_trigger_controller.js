@@ -1,7 +1,9 @@
 import "../dependencies/brutusin-json-forms.min.js"
 import "../dependencies/brutusin-json-forms.min.scss"
+import "../styles/workflow_trigger_controller.scss"
 
-class VisController {
+export const getWorkflowTriggerVisController = (data, getStartServices) => {
+return class VisController {
   static metricBtn = document.createElement(`button`);
   static metricDag = document.createElement(`select`);
   static airflow_url = null;
@@ -14,11 +16,13 @@ class VisController {
     this.vis = vis;
     VisController.vis = vis;
     this.el = el;
-    console.log(this.vis)
+
     this.container = document.createElement('div');
     this.container.className = 'myvis-container-div';
     this.el.appendChild(this.container);
-    this.filterprovider = this.vis.params.filterprovider;
+    
+    this.filter_manager = data.query.filterManager;
+    getStartServices().then((start_services) => { this.index_patterns = start_services[1].data.indexPatterns});
 
     this.workflow_dialog = null;
     this.dag_list = null;
@@ -34,15 +38,23 @@ class VisController {
     this.el.innerHTML = '';
   }
 
-  start_dag() {
+  async start_dag() {
+    if (!this.index_patterns) {
+      console.error('indexPatterns prerequisite not ready yet');
+      return;
+    }
 
     var dag_id = VisController.metricDag.options[VisController.metricDag.selectedIndex].text.toLowerCase()
     var trigger_url = VisController.airflow_url + "/trigger/" + dag_id
 
-    var query = (this.vis.searchSource.history[0].fetchParams.body.query);
-    var index = this.vis.searchSource.history[0].fetchParams.index.title;
+    const filters = this.filter_manager.getFilters();
+
+    var query = filters && filters.length > 0? filters[0].query : {};
+    var index = filters && filters.length > 0 ? filters[0].meta.index : undefined;
+    var index_title = index ? (await this.index_patterns.get(index)).title : undefined;
+
     var conf = {
-      "conf": { "query": query, "index": index, "cohort_limit": VisController.cohort_limit, "form_data": this.dag_form_data }
+      "conf": { "query": query, "index": index_title, "cohort_limit": VisController.cohort_limit, "form_data": this.dag_form_data }
     };
 
     var conf_json = JSON.stringify(conf)
@@ -210,7 +222,7 @@ class VisController {
             });
 
             const cancel_button = document.createElement(`button`);
-            cancel_button.setAttribute("id", "form-cancle-button")
+            cancel_button.setAttribute("id", "form-cancel-button")
             cancel_button.setAttribute("class", "kuiButton kuiButton--danger")
             cancel_button.setAttribute('style', "font-weight: bold;font-size: 2em;margin: 10px;height: 50px;");
             cancel_button.innerHTML = "CANCEL"
@@ -404,7 +416,6 @@ class VisController {
                 console.log(response.statusText);
                 console.log(response.type);
                 console.log(response.url);
-
               }
             })
               .catch(function (err) {
@@ -426,14 +437,13 @@ class VisController {
   }
 };
 
-export { VisController };
-
+}
 
 document.onkeydown = function (evt) {
   if ($('#workflow_dialog').length > 0 && $('#workflow_dialog').get(0).style.display === "block") {
     evt = evt || window.event;
     if (evt.keyCode === 27 || (evt.key === "Escape" || evt.key === "Esc")) {
-      document.getElementById("form-cancle-button").click();
+      document.getElementById("form-cancel-button").click();
     } else if (evt.key === "Enter" || evt.keyCode == 13) {
       document.getElementById("form-ok-button").focus();
     }

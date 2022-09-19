@@ -13,7 +13,7 @@ export const WorkflowTriggerOptions = (props: VisOptionsProps<WorkflowTriggerOpt
             <input type="range" onChange={e => props.setValue("margin", parseInt(e.target.value))} className="form-control" minLength={0} maxLength={30} defaultValue={props.stateParams.margin} />
             <br/><br/>
             <label>Button Title</label>
-            <input type="text" onChange={e => props.setValue("buttonTitle", e.target.value)} className="form-control" />
+            <input type="text" onChange={e => props.setValue("buttonTitle", e.target.value)} defaultValue={props.stateParams.buttonTitle} className="form-control" />
             <br/>
         </div>
     );

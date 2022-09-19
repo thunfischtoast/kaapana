@@ -9,7 +9,9 @@
     "common/**/*.ts",
     "public/**/*.ts",
     "public/**/*.tsx",
-    "public/**/workflow_trigger_controller.js",
+    "public/components/workflow_trigger_controller.js",
+    "public/dependencies/*.js",
+    "public/dependencies/*.scss",
     "../../typings/**/*"
   ],
   "exclude": []

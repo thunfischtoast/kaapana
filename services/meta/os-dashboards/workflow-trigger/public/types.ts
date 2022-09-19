@@ -1,4 +1,5 @@
-import { VisualizationsSetup } from 'src/plugins/visualizations/public/';
+import { VisualizationsSetup, VisualizationsStart } from 'src/plugins/visualizations/public/';
+import { DataPublicPluginSetup, DataPublicPluginStart } from 'src/plugins/data/public/';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WorkflowTriggerPluginSetup {}
@@ -7,6 +8,7 @@ export interface WorkflowTriggerPluginStart {}
 
 export interface WorkflowTriggerSetupDependencies {
     visualizations: VisualizationsSetup;
+    data: DataPublicPluginSetup;
 }
 
 export interface WorkflowTriggerOptionProps {
