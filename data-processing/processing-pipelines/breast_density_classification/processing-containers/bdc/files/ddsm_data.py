@@ -10,6 +10,7 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import Optional, Any 
+import random
 
 
 class DDSMDataset(Dataset):
@@ -33,7 +34,7 @@ class DDSMDataset(Dataset):
         with open(metadata_path, 'r') as f:
             reader = csv.reader(f)
             for row in reader:
-                if int(row[-1]) == self.mode_equivalent:
+                if int(float(row[-1])) == self.mode_equivalent:
                     self.metadata.append(row)
 
         # get image data fnames
@@ -78,6 +79,10 @@ class DDSMDataset(Dataset):
         index_in_metadata = [i for i, s in enumerate(metadata_t[12]) if unique_dcm_name in s][0] if len([i for i, s in enumerate(metadata_t[12]) if unique_dcm_name in s])!=0 else index_in_metadata
         index_in_metadata = [i for i, s in enumerate(metadata_t[13]) if unique_dcm_name in s][0] if len([i for i, s in enumerate(metadata_t[13]) if unique_dcm_name in s])!=0 else index_in_metadata
         label = int(self.metadata[index_in_metadata][1])-1  # -1 because labels should be between 0 and 3
+
+        if label < 0:   # label is wrong -> select randomly another datasample
+            valid_sample = self.__getitem__(random.randint(0, (self.__len__()-1)))
+            return valid_sample
         
         # combine to a valid data sample
         sample = {'index': idx, 'image': dcm_image, 'label': label}
