@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euf -o pipefail
+set -ef -o pipefail # -u doesn't allow me to check an ENV var if it's not set
 export HELM_EXPERIMENTAL_OCI=1
 # if unusual home dir of user: sudo dpkg-reconfigure apparmor
 
@@ -103,6 +103,28 @@ else
     GPU_SUPPORT="true"
 fi
 
+function preflight_checks {
+    # Check if KUBECONFIG is set
+    if [[ -z "$KUBECONFIG" ]]; then
+        echo -e "${YELLOW}KUBECONFIG env var not set${NC}"
+    fi
+
+    # Check if kube config output matches that of microk8s command
+    if [ "$(cat /home/$USER/.kube/config)" == "$(microk8s.kubectl config view --raw)" ]; then
+        echo -e "${GREEN}Kube Config output OK${NC}"
+    else
+        echo -e "${RED}Mismatch in Kube Config${NC}"
+    fi
+
+    GROUPNAME="microk8s"
+    # Check if user is in microk8s group
+    if id -nG "$USER" | grep -qw "$GROUPNAME"; then
+        echo -e "${GREEN}$USER user belongs to $GROUPNAME${NC}"
+    else
+        echo -e "${RED}$USER user does not belong to $GROUPNAME${NC}"
+    fi
+}
+
 function delete_all_images_docker {
     while true; do
         read -e -p "Do you really want to remove all the Docker images from the system?" -i " no" yn
@@ -174,7 +196,7 @@ function delete_deployment {
     microk8s.kubectl delete namespace kaapana --ignore-not-found=true
 
     if [ "$idx" -eq "$WAIT_UNINSTALL_COUNT" ]; then
-        echo "${RED}Something went wrong while undeployment please check manually if there are still namespaces or pods floating around. Everything must be delete before the deployment:${NC}"
+        echo "${RED}Something went wrong while undeployment please check manually if there are still namespaces or pods floating around. Everything must be deleted before the deployment:${NC}"
         echo "${RED}kubectl get pods -A${NC}"
         echo "${RED}kubectl get namespaces${NC}"
         echo "${RED}Executing './deploy_platform.sh --purge-kube-and-helm' is an option to force the resources to be removed.${NC}"        
@@ -616,5 +638,6 @@ elif [[ $deployments == *"$PROJECT_NAME"* ]] && [[ $QUIET = true ]];then
 
 else
     echo -e "${GREEN}No previous deployment found -> deploy ${NC}"
-    deploy_chart
+    preflight_checks
+    #deploy_chart
 fi
