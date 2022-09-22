@@ -63,7 +63,7 @@ def set_ohif_template():
                        }
     }
     try:
-        response = requests.post(f"{dashboards_url}/api/saved_objects/index-pattern/{index}?overwrite=true", data=json.dumps(index_pattern), verify=False, headers=osd_xsrf)
+        response = requests.put(f"{dashboards_url}/api/saved_objects/index-pattern/{index}?overwrite=true", data=json.dumps(index_pattern), verify=False, headers=osd_xsrf)
         print(f"# response_code: {response.status_code}")
         if response.status_code == 200:
             print('# OHIF-template: OK!')
