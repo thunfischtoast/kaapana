@@ -106,7 +106,7 @@ fi
 function preflight_checks {
     # Check if KUBECONFIG is set
     if [[ -z "$KUBECONFIG" ]]; then
-        echo -e "${YELLOW}KUBECONFIG env var not set${NC}"
+        echo -e "${YELLOW}KUBECONFIG environment variable not set${NC}"
     fi
 
     # Check if kube config output matches that of microk8s command
@@ -119,9 +119,9 @@ function preflight_checks {
     GROUPNAME="microk8s"
     # Check if user is in microk8s group
     if id -nG "$USER" | grep -qw "$GROUPNAME"; then
-        echo -e "${GREEN}$USER user belongs to $GROUPNAME${NC}"
+        echo -e "${GREEN}$USER user belongs to the group -> $GROUPNAME${NC}"
     else
-        echo -e "${RED}$USER user does not belong to $GROUPNAME${NC}"
+        echo -e "${YELLOW}$USER user does not belong to the group -> $GROUPNAME${NC}"
     fi
 }
 
@@ -639,5 +639,5 @@ elif [[ $deployments == *"$PROJECT_NAME"* ]] && [[ $QUIET = true ]];then
 else
     echo -e "${GREEN}No previous deployment found -> deploy ${NC}"
     preflight_checks
-    #deploy_chart
+    deploy_chart
 fi
