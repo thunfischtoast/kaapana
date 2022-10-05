@@ -1,50 +1,85 @@
 {
-    "configurations": {
-      "username": "",
-      "password": "",
-      "platform": {
-        "openstack": {
+  "platform_choice": "openstack",
+  "platform_config": {
+    "openstack": {
+      "platform_flavor": {
+        "kaapana_workflow": {
+          "username": "",
+          "password": "",
           "os_user_domain": "",
           "os_project_name": "",
           "os_project_id": "",
           "os_auth_url": "",
-          "os_ssh_key_name": "",
-          "platform_flavor": {
-            "kaapana_gpu": {
-              "os_image": "",
-              "os_volume_size": "",
-              "os_instance_flavor": "",
-              "os_remote_username": "",
-              "os_security_groups": ""
-            },
-            "ubuntu_gpu": {
-              "os_image": "",
-              "os_volume_size": "",
-              "os_instance_flavor": "",
-              "os_remote_username": "",
-              "os_security_groups": ""
-            },
-            "custom": {
-              "os_image": "",
-              "os_volume_size": "",
-              "os_instance_flavor": "",
-              "os_remote_username": "",
-              "os_security_groups": ""
-            }
-          }
+          "ssh_key_path": "",
+          "ssh_key_name": "",
+          "os_image": "",
+          "os_volume_size": "",
+          "os_instance_flavor": "",
+          "remote_username": "",
+          "os_security_groups": ""
         },
-        "vmware": {
-          "platform_flavor": {
-            "var1": "",
-            "var2": ""
-          }
-        },
-        "baremetal_kvm": {
-          "platform_flavor": {
-            "var1": "",
-            "var2": ""
-          }
+        "shell_execute": {
+          "username": "",
+          "password": "",
+          "os_user_domain": "",
+          "os_project_name": "",
+          "os_project_id": "",
+          "os_auth_url": "",
+          "ssh_key_path": "",
+          "ssh_key_name": "",
+          "os_image": "",
+          "os_volume_size": "",
+          "os_instance_flavor": "",
+          "remote_username": "",
+          "os_security_groups": ""
         }
+      }
+    },
+    "qemu_kvm": {
+      "platform_flavor": {
+        "kaapana_workflow": {
+          "offline_image_source": "",
+          "base_image_name": "",
+          "base_image_path": "",
+          "base_image_url": "",
+          "base_image_sha": "",
+          "libvirt_pool_dir": "",
+          "vm_config_filepath": "",
+          "vm_vcpus": "",
+          "vm_ram_mb": "",
+          "vm_net": "",
+          "remote_username": "",
+          "vm_root_pass": "",
+          "ssh_key_path": "",
+          "ssh_key_name": "",
+          "cleanup_download": "",
+          "cleanup_libvirt": ""
+        },
+        "shell_execute": {
+          "offline_image_source": "",
+          "base_image_name": "",
+          "base_image_path": "",
+          "base_image_url": "",
+          "base_image_sha": "",
+          "libvirt_pool_dir": "",
+          "vm_config_filepath": "",
+          "vm_vcpus": "",
+          "vm_ram_mb": "",
+          "vm_net": "",
+          "remote_username": "",
+          "vm_root_pass": "",
+          "ssh_key_path": "",
+          "ssh_key_name": "",
+          "cleanup_download": "",
+          "cleanup_libvirt": ""
+        }
+      }
+    },
+    "vmware": {
+      "platform_flavor": {
+        "var1": "",
+        "var2": ""
       }
     }
   }
+}

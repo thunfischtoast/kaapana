@@ -25,12 +25,13 @@ class LocalRunAlgoFetchResultOperator(KaapanaPythonBaseOperator):
         platform_config = kwargs["dag_run"].conf["platform_config"]        
         request_config = kwargs["dag_run"].conf["request_config"]
         
-        platform_type = request_config["request_config"]["platform_type"]
-        platform_flavor = request_config["request_config"]["platform_flavor"]
-        os_ssh_key_name = platform_config["configurations"]["platform"][platform_type]["os_ssh_key_name"]
-        remote_username = platform_config["configurations"]["platform"][platform_type]["platform_flavor"][platform_flavor]["os_remote_username"]
+        platform_choice = platform_config["platform_choice"]
+        platform_flavor = request_config["request_type"]
+        # ssh_key_path = platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor]["ssh_key_path"]
+        ssh_key_name = platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor]["ssh_key_name"]
+        remote_username = platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor]["remote_username"]
 
-        playbook_args = f"target_host={iso_env_ip} os_ssh_key_name={os_ssh_key_name} remote_username={remote_username} results_path={results_path}"
+        playbook_args = f"target_host={iso_env_ip} ssh_key_name={ssh_key_name} remote_username={remote_username} results_path={results_path}"
         command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]
         process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, encoding="Utf-8")
         while True:

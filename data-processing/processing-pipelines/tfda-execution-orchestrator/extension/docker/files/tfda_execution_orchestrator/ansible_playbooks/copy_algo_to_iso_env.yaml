@@ -16,7 +16,7 @@
   gather_facts: yes
   remote_user: "{{ remote_username }}"
   vars:
-    ansible_ssh_private_key_file: ~/.ssh/{{ os_ssh_key_name }}
+    ansible_ssh_private_key_file: ~/.ssh/{{ ssh_key_name }}
     dst_algorithm_dir: /home/{{ remote_username }}/algorithm_files
     dst_data_dir: /home/{{ remote_username }}/{{ user_selected_study_data }}
   # TODO: data could be in any or multiple instances
@@ -26,7 +26,7 @@
         msg: "Variable {{ item }} not defined"
       when: item is not defined
       with_items:
-        - "{{ os_ssh_key_name }}"
+        - "{{ ssh_key_name }}"
 
     - name: Create directory for algorithm files if it doesn't exist
       file:

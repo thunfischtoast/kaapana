@@ -30,19 +30,20 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         platform_config = kwargs["dag_run"].conf["platform_config"]        
         request_config = kwargs["dag_run"].conf["request_config"]
         
-        platform_type = request_config["request_config"]["platform_type"]
-        platform_flavor = request_config["request_config"]["platform_flavor"]
-        os_ssh_key_name = platform_config["configurations"]["platform"][platform_type]["os_ssh_key_name"]
-        remote_username = platform_config["configurations"]["platform"][platform_type]["platform_flavor"][platform_flavor]["os_remote_username"]
-        user_selected_algo = request_config["request_config"]["user_selected_algorithm"]
-        user_selected_study_data = request_config["request_config"]["user_selected_study_data"]
+        platform_choice = platform_config["platform_choice"]
+        platform_flavor = request_config["request_type"]
+        # ssh_key_path = platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor]["ssh_key_path"]
+        ssh_key_name = platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor]["ssh_key_name"]
+        remote_username = platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor]["remote_username"]
+        user_selected_algo = request_config["user_selected_algorithm"]
+        user_selected_study_data = request_config["user_selected_study_data"]
         
         user_selected_algo_path = os.path.join(algorithm_files_path, user_selected_algo)
         study_data_src_path = os.path.join(minio_path, user_selected_study_data)
 
         iso_env_ip = ti.xcom_pull(key="iso_env_ip", task_ids="create-iso-inst")
 
-        playbook_args = f"target_host={iso_env_ip} os_ssh_key_name={os_ssh_key_name} remote_username={remote_username} user_selected_algo_path={user_selected_algo_path} study_data_src_path={study_data_src_path} user_selected_study_data={user_selected_study_data} user_input_commands_path={user_input_commands_path}"        
+        playbook_args = f"target_host={iso_env_ip} ssh_key_name={ssh_key_name} remote_username={remote_username} user_selected_algo_path={user_selected_algo_path} study_data_src_path={study_data_src_path} user_selected_study_data={user_selected_study_data} user_input_commands_path={user_input_commands_path}"        
         command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]
         process = subprocess.Popen(command, stdout=PIPE, stderr=PIPE, encoding="Utf-8")
         while True:

@@ -17,34 +17,25 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         elif self.instanceState == "absent":
             logging.info("Deleting isolated environment...")
 
-        request_config = kwargs["dag_run"].conf["request_config"]
-        platform_type = request_config["request_config"]["platform_type"]
-        platform_flavor = request_config["request_config"]["platform_flavor"]
+        platform_config = kwargs["dag_run"].conf["platform_config"]
+        platform_choice = platform_config["platform_choice"]
         
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
-        playbook_path = os.path.join(playbooks_dir, "00_manage_"+platform_type+"_instance.yaml")
+        playbook_path = os.path.join(playbooks_dir, "00_manage_"+platform_choice+"_instance.yaml")
         if not os.path.isfile(playbook_path):
             raise AirflowFailException(f"Playbook '{playbook_path}' file not found!")
         
-        playbook_args = f"os_instance_name={platform_flavor} instance_state={self.instanceState}"
+        request_config = kwargs["dag_run"].conf["request_config"]
+        platform_flavor = request_config["request_type"]
+
+        playbook_args = f"instance_name={platform_flavor}_instance instance_state={self.instanceState}"
         
-        platform_config = kwargs["dag_run"].conf["platform_config"]        
-        username = platform_config["configurations"]["username"]
-        password = platform_config["configurations"]["password"]
-        if (username is None or username == "") or (password is None or password == ""):
-            raise AirflowFailException(f"{platform_type.title()} platform credentials missing or incomplete!!")
-        playbook_args += f" username={username} password={password}"
-        
-        if platform_type == "openstack":
-            for key, value in platform_config["configurations"]["platform"][platform_type].items():
-                if key == "platform_flavor":
-                    for key, value in platform_config["configurations"]["platform"][platform_type]["platform_flavor"][platform_flavor].items():
-                        playbook_args += f" {key}={value}"
-                else:
-                    playbook_args += f" {key}={value}"
+        if platform_choice in ["openstack", "qemu_kvm"]:
+            for key, value in platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor].items():
+                playbook_args += f" {key}={value}"
         else:
-            raise AirflowFailException(f"Sorry!! {platform_type.title()} is not yet supported. Please choose a supported platform...")
+            raise AirflowFailException(f"Sorry!! {platform_choice.title()} is not yet supported. Please choose a supported platform...")
         
         # print(f"*****************************The EXTRA-VARS are: {playbook_args}************************************")
         command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]

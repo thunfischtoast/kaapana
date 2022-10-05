@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from airflow.exceptions import AirflowFailException
 from airflow.models import DagRun
-from airflow.api.common.experimental.trigger_dag import trigger_dag as trigger
+from airflow.api.common.trigger_dag import trigger_dag as trigger
 from airflow.api.common.experimental.get_dag_run_state import get_dag_run_state
 from kaapana.blueprints.kaapana_utils import generate_run_id
 from kaapana.operators.KaapanaPythonBaseOperator import KaapanaPythonBaseOperator
