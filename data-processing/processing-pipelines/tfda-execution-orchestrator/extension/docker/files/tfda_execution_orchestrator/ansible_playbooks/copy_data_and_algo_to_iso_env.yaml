@@ -17,7 +17,8 @@
   remote_user: "{{ remote_username }}"
   vars:
     ansible_ssh_private_key_file: ~/.ssh/{{ ssh_key_name }}
-    dst_algorithm_dir: /home/{{ remote_username }}/algorithm_files
+    src_algorithm_dir: "{{ src_algorithm_files_path }}/{{ user_selected_algo }}"
+    dst_algorithm_dir: /home/{{ remote_username }}/algorithm_files/{{ user_selected_algo }}
     dst_data_dir: /home/{{ remote_username }}/{{ user_selected_study_data }}
   # TODO: data could be in any or multiple instances
   tasks:
@@ -42,7 +43,7 @@
 
     - name: Copy algorithm file/s
       copy:
-        src: "{{ user_selected_algo_path }}/"
+        src: "{{ src_algorithm_dir }}/"
         dest: "{{ dst_algorithm_dir }}"
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_id }}"
@@ -58,12 +59,12 @@
         group: "{{ ansible_user_id }}"
         mode: '400' # TODO: data permissions need to be clarified
 
-    - name: Copy user shell script to Iso
-      copy:
-        src: "{{ user_input_commands_path }}"
-        dest: "/home/ubuntu"
-        # directory_mode: yes
-        owner: "{{ ansible_user_id }}"
-        group: "{{ ansible_user_id }}"
-        mode: '700'
+    # - name: Copy user shell script to Iso
+    #   copy:
+    #     src: "{{ user_input_commands_path }}"
+    #     dest: "/home/ubuntu"
+    #     # directory_mode: yes
+    #     owner: "{{ ansible_user_id }}"
+    #     group: "{{ ansible_user_id }}"
+    #     mode: '700'
         

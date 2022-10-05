@@ -9,7 +9,7 @@
         name: "{{ target }}"
         groups: os_server
 
-- name: Run algorithm on data in isolated environment and fetch results
+- name: Fetch results from isolated execution environment
   hosts: os_server
   strategy: free
   gather_facts: yes
@@ -28,20 +28,7 @@
       when: item is not defined
       with_items:
         - "{{ ssh_key_name }}"
-
-    - name: Create results directory if it doesn't exist
-      file:
-        path: "{{ dst_results_dir }}"
-        state: directory
-        recurse: yes
-
-    - name: Run user Shell script
-      become: no
-      ## TODO: HARDCODED user commands script name
-      shell: bash /home/{{ remote_username }}/user_input_commands.sh
-
-    # - debug: msg="{{ '%H:%M:%S' | strftime }}"
-  
+    
     - name: Check if actually result files exist
       find:
         path: "{{ dst_results_dir }}"

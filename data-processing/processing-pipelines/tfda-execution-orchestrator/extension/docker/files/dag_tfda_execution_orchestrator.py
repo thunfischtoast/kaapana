@@ -7,7 +7,8 @@ from tfda_execution_orchestrator.LocalInstallPlatformDepsOnIsoEnvOperator import
 from tfda_execution_orchestrator.LocalDeployPlatformOnIsoEnvOperator import LocalDeployPlatformOnIsoEnvOperator
 from tfda_execution_orchestrator.LocalTrustedPreETLOperator import LocalTrustedPreETLOperator
 from tfda_execution_orchestrator.LocalCopyDataAndAlgoOperator import LocalCopyDataAndAlgoOperator
-from tfda_execution_orchestrator.LocalRunAlgoFetchResultOperator import LocalRunAlgoFetchResultOperator
+from tfda_execution_orchestrator.LocalRunAlgoOperator import LocalRunAlgoOperator
+from tfda_execution_orchestrator.LocalFetchResultsOperator import LocalFetchResultsOperator
 from tfda_execution_orchestrator.LocalTrustedPostETLOperator import LocalTrustedPostETLOperator
 from kaapana.operators.LocalWorkflowCleanerOperator import LocalWorkflowCleanerOperator
 from airflow.operators.python_operator import PythonOperator
@@ -38,7 +39,8 @@ dag = DAG(
 create_iso_env = LocalManageIsoInstanceOperator(dag=dag, instanceState="present", taskName="create-iso-inst")
 trusted_pre_etl = LocalTrustedPreETLOperator(dag=dag)
 copy_data_algo = LocalCopyDataAndAlgoOperator(dag=dag)
-run_algo_fetch_result = LocalRunAlgoFetchResultOperator(dag=dag)
+run_isolated_workflow = LocalRunAlgoOperator(dag=dag)
+fetch_results = LocalFetchResultsOperator(dag=dag)
 trusted_post_etl = LocalTrustedPostETLOperator(dag=dag)
 delete_iso_inst = LocalManageIsoInstanceOperator(dag=dag, trigger_rule="all_done", instanceState="absent", taskName="delete-iso-inst")
 clean = LocalWorkflowCleanerOperator(dag=dag, clean_workflow_dir=True, trigger_rule="all_done")
@@ -57,4 +59,4 @@ final_status = PythonOperator(
     dag=dag,
 )
 
-create_iso_env >> trusted_pre_etl >> copy_data_algo >> run_algo_fetch_result >> trusted_post_etl >> delete_iso_inst >> clean >> final_status
+create_iso_env >> trusted_pre_etl >> copy_data_algo >> run_isolated_workflow >> fetch_results >> trusted_post_etl >> delete_iso_inst >> clean >> final_status

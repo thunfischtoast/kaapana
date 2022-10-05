@@ -113,7 +113,7 @@
         shell: virsh net-dhcp-leases default
         register: results
       - set_fact:
-          vm_ip: "{{ results.stdout | regex_search(regexp, '\\1') | list | first }}"
+          vm_ip: "{{ results.stdout | regex_search(regexp) }}"
         vars:
           regexp: '(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
       - debug:
@@ -124,6 +124,7 @@
         ignore_errors: yes
 
       - name: Wait for SSH on the Instance
+        become: yes
         command: "ssh -oBatchMode=yes -oStrictHostKeyChecking=no -i {{ ssh_key }} root@{{ vm_ip }} true"
         register: result
         until: result.rc == 0
@@ -134,7 +135,7 @@
         debug:
           msg: "VM CREATED SUCCESSFULLY"
 
-      when: "vm_name not in existing_vms.list_vms" and "{{ instance_state }}" == "present"
+      when: "vm_name not in existing_vms.list_vms and instance_state == 'present'"
 
     - name: Delete the desired VM
       block:
@@ -168,4 +169,4 @@
         debug:
           msg: "VM DELETED SUCCESSFULLY"
 
-      when: "vm_name in existing_vms.list_vms" and "{{ instance_state }}" == "absent"
+      when: "vm_name in existing_vms.list_vms and instance_state == 'absent'"
