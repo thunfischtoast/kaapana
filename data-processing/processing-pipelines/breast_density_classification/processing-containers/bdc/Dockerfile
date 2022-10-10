@@ -6,7 +6,7 @@ LABEL CI_IGNORE="False"
 
 COPY files/requirements.txt /kaapanasrc/requirements.txt
 
-RUN pip install --upgrade pip && pip install -r /kaapanasrc/requirements.txt
+RUN pip3 install --upgrade pip && pip install -r /kaapanasrc/requirements.txt
 
 COPY files/* /kaapanasrc/
 # COPY ddsm_data /

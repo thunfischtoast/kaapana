@@ -3,6 +3,7 @@ from airflow.utils.dates import days_ago
 from datetime import timedelta
 from airflow.models import DAG
 from bdc.BreastDensityClassifierOperator import BreastDensityClassifierOperator
+from bdc.TrainValDataSplitOperator import TrainValDataSplitOperator
 from kaapana.operators.LocalTrainValDataSplitOperator import LocalTrainValDataSplitOperator
 # from kaapana.operators.BreastDensityClassifierOperator import BreastDensityClassifierOperator
 from kaapana.operators.LocalGetInputDataOperator import LocalGetInputDataOperator
@@ -118,28 +119,16 @@ get_from_minio_init = LocalMinioOperator(dag=dag,
                                     bucket_name='simpleclassification',
                                     file_white_tuples=('.csv'))
 
-train_val_split = LocalTrainValDataSplitOperator(dag=dag,
-                                                 input_operator=get_input,
-                                                 # minio_operator=get_from_minio_init,
-                                                 )
+# train_val_split = LocalTrainValDataSplitOperator(dag=dag,
+#                                                  input_operator=get_input,
+#                                                  # minio_operator=get_from_minio_init,
+#                                                  )
 
-# put_to_minio_split = LocalMinioOperator(dag=dag,                    # This operator ...
-#                                   name='put_to_minio_split',        # ... named "put_to_minio_split" ...
-#                                   action='put',                     # ... puts ...
-#                                   input_operator=train_val_split,   # ... every file from this input_operator ...
-#                                   file_white_tuples=('.csv'),       # ... , which is a .csv-file, ...
-#                                   bucket_name='splitteddata',       # ... to this bucket. Bucket is created if not already there, which is pretty cool 8)
-#                                   )
-
-# get_from_minio_split = LocalMinioOperator(dag=dag,
-#                                     name='get_from_minio_split',
-#                                     action='get',
-#                                     # action_operators = [put_to_minio_split],
-#                                     bucket_name='splitteddata',
-#                                     file_white_tuples=('.csv'),
-#                                     operator_out_dir='get_from_minio_split',
-#                                     trigger_rule=TriggerRule.ALL_DONE,  # if marked as skip_operator still skipped, but if not helps to enforce execution
-#                                     )
+train_val_split = TrainValDataSplitOperator(dag=dag,
+                                            input_operator=get_input,
+                                            minio_operator=get_from_minio_init,
+                                            # dev_server='code-server'
+                                            )
 
 # dcm images from 'get_input' are mounted in Pod/Container at data/batch/<long char string>/*.dcm
 # minio data from 'get_from_minio' is mounted in Pod/Container at minio/simpleclassification/*.csv
@@ -163,19 +152,3 @@ clean = LocalWorkflowCleanerOperator(dag=dag,clean_workflow_dir=True)
 # w/o minio
 get_from_minio_init >> train_val_split >> breast_density_classifier >> clean
 get_input >> train_val_split
-
-# currently working version
-# get_from_minio_init >> train_val_split >> put_to_minio_split >> get_from_minio_split >> breast_density_classifier >> clean
-# get_input >> train_val_split
-
-# # get_input >> get_from_minio_init >> train_val_split >> put_to_minio_split >> get_from_minio_split >> breast_density_classifier
-# get_from_minio_init >> train_val_split >> put_to_minio_split >> get_from_minio_split >> breast_density_classifier >> clean
-# get_input >> train_val_split
-# # get_input >> breast_density_classifier >> clean
-
-# get_input >> train_val_split
-# get_from_minio_init >> train_val_split >> put_to_minio_split >> get_from_minio_split >> breast_density_classifier
-# get_input >> breast_density_classifier >> clean
-
-# get_from_minio >> breast_density_classifier
-# get_input >> breast_density_classifier >> clean

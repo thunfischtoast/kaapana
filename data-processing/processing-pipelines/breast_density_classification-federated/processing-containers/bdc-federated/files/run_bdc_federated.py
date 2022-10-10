@@ -11,6 +11,7 @@ import collections
 # from torch.utils.tensorboard import SummaryWriter
 
 from resnet import ResNet50     # import the model which is used at the sites for training!
+from densenet import DensNet121
 
 sys.path.insert(0, '../')
 sys.path.insert(0, '/kaapanasrc')

@@ -69,6 +69,12 @@ class DDSMDataset(Dataset):
 
         # get the image data and apply transformations
         dcm_image = dcm_f.pixel_array
+        # additional filter which chaches images which do not fulfill all requirements to apply the tranforms on -> if not, choose random new data sample
+        if dcm_image.shape[0] < int(os.environ["CROP_SIZE"]) or dcm_image.shape[1] < int(os.environ["CROP_SIZE"]):
+            print("Current image too small for crop_size --> select a new one!")
+            valid_sample = self.__getitem__(random.randint(0, (self.__len__()-1)))
+            return valid_sample
+        # apply transformations to valid samples
         dcm_image = self.transforms(dcm_image.astype(np.float))
 
         # compose a unique name for the dcm-file, search for it in metadata and get it's label
