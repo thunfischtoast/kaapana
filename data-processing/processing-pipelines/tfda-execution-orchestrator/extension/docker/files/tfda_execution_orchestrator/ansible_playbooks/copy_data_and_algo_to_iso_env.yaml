@@ -58,13 +58,4 @@
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_id }}"
         mode: '400' # TODO: data permissions need to be clarified
-
-    # - name: Copy user shell script to Iso
-    #   copy:
-    #     src: "{{ user_input_commands_path }}"
-    #     dest: "/home/ubuntu"
-    #     # directory_mode: yes
-    #     owner: "{{ ansible_user_id }}"
-    #     group: "{{ ansible_user_id }}"
-    #     mode: '700'
         

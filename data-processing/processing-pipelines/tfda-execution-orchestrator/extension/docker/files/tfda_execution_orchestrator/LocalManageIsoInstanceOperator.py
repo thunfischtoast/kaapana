@@ -17,25 +17,26 @@ class LocalManageIsoInstanceOperator(KaapanaPythonBaseOperator):
         elif self.instanceState == "absent":
             logging.info("Deleting isolated environment...")
 
+        request_config = kwargs["dag_run"].conf["request_config"]
+        request_type = request_config["request_type"]
+
         platform_config = kwargs["dag_run"].conf["platform_config"]
-        platform_choice = platform_config["platform_choice"]
+        platform_name = platform_config["default_platform"][request_type]
+        flavor_name = platform_config["platform_config"][platform_name]["default_flavor"][request_type]
         
         operator_dir = os.path.dirname(os.path.abspath(__file__))
         playbooks_dir = os.path.join(operator_dir, "ansible_playbooks")
-        playbook_path = os.path.join(playbooks_dir, "00_manage_"+platform_choice+"_instance.yaml")
+        playbook_path = os.path.join(playbooks_dir, "manage_"+platform_name+"_instance.yaml")
         if not os.path.isfile(playbook_path):
             raise AirflowFailException(f"Playbook '{playbook_path}' file not found!")
-        
-        request_config = kwargs["dag_run"].conf["request_config"]
-        platform_flavor = request_config["request_type"]
 
-        playbook_args = f"instance_name={platform_flavor}_instance instance_state={self.instanceState}"
+        playbook_args = f"instance_name={request_type}_instance instance_state={self.instanceState}"
         
-        if platform_choice in ["openstack", "qemu_kvm"]:
-            for key, value in platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor].items():
+        if platform_name in ["openstack", "qemu_kvm"]:
+            for key, value in platform_config["platform_config"][platform_name]["platform_flavors"][flavor_name].items():
                 playbook_args += f" {key}={value}"
         else:
-            raise AirflowFailException(f"Sorry!! {platform_choice.title()} is not yet supported. Please choose a supported platform...")
+            raise AirflowFailException(f"Sorry!! {platform_name.title()} is not yet supported. Please choose a supported platform...")
         
         # print(f"*****************************The EXTRA-VARS are: {playbook_args}************************************")
         command = ["ansible-playbook", playbook_path, "--extra-vars", playbook_args]

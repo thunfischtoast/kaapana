@@ -2,10 +2,10 @@
 - name: Create/delete a (QEMU) KVM based VM as an isolated execution environment
   hosts: localhost
   gather_facts: yes
-  # become: yes
 
   vars:
     offline_image_source: "{{ offline_image_source }}"
+    selinux_enabled_os: "{{ selinux_enabled_os }}"
     base_image_name: "{{ base_image_name }}"
     base_image_path: "{{ base_image_path }}"
     base_image_url: "{{ base_image_url }}"
@@ -72,16 +72,16 @@
           mode: 0660
         register: copy_results
 
-      # - name: Configure the image
-      #   become: yes
-      #   command: |
-      #     virt-customize -a {{ libvirt_img_filepath }} \
-      #     --hostname {{ vm_name }} \
-      #     --root-password password:{{ vm_root_pass }} \
-      #     --ssh-inject 'root:file:{{ ssh_pub_key }}' \
-      #     --uninstall cloud-init \
-      #     --selinux-relabel
-      #   when: copy_results is changed
+      - name: Configure the "SELinux" enabled image
+        become: yes
+        command: |
+          virt-customize -a {{ libvirt_img_filepath }} \
+          --hostname {{ vm_name }} \
+          --root-password password:{{ vm_root_pass }} \
+          --ssh-inject 'root:file:{{ ssh_pub_key }}' \
+          --uninstall cloud-init \
+          --selinux-relabel
+        when: copy_results is changed and selinux_enabled_os
 
       - name: Configure the image
         become: yes
@@ -90,7 +90,7 @@
           --hostname {{ vm_name }} \
           --root-password password:{{ vm_root_pass }} \
           --ssh-inject 'root:file:{{ ssh_pub_key }}' \
-        when: copy_results is changed
+        when: copy_results is changed and not selinux_enabled_os
       
       - name: Define VM
         become: yes

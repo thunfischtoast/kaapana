@@ -25,11 +25,12 @@ class LocalCopyDataAndAlgoOperator(KaapanaPythonBaseOperator):
         platform_config = kwargs["dag_run"].conf["platform_config"]        
         request_config = kwargs["dag_run"].conf["request_config"]
         
-        platform_choice = platform_config["platform_choice"]
-        platform_flavor = request_config["request_type"]
-        # ssh_key_path = platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor]["ssh_key_path"]
-        ssh_key_name = platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor]["ssh_key_name"]
-        remote_username = platform_config["platform_config"][platform_choice]["platform_flavor"][platform_flavor]["remote_username"]
+        request_type = request_config["request_type"]
+        platform_name = platform_config["default_platform"][request_type]
+        flavor_name = platform_config["platform_config"][platform_name]["default_flavor"][request_type]
+        # ssh_key_path = platform_config["platform_config"][platform_name]["platform_flavors"][flavor_name]["ssh_key_path"]
+        ssh_key_name = platform_config["platform_config"][platform_name]["platform_flavors"][flavor_name]["ssh_key_name"]
+        remote_username = platform_config["platform_config"][platform_name]["platform_flavors"][flavor_name]["remote_username"]
         user_selected_algo = request_config["user_selected_algorithm"]
         user_selected_study_data = request_config["user_selected_study_data"]
         

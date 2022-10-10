@@ -1,9 +1,16 @@
 {
-  "platform_choice": "openstack",
+  "default_platform": {
+    "shell_execute": "qemu_kvm",
+    "kaapana_workflow": "openstack"
+  },
   "platform_config": {
     "openstack": {
-      "platform_flavor": {
-        "kaapana_workflow": {
+      "default_flavor": {
+        "shell_execute": "flavor_1",
+        "kaapana_workflow": "flavor_2"
+      },
+      "platform_flavors": {
+        "flavor_1": {
           "username": "",
           "password": "",
           "os_user_domain": "",
@@ -18,7 +25,7 @@
           "remote_username": "",
           "os_security_groups": ""
         },
-        "shell_execute": {
+        "flavor_2": {
           "username": "",
           "password": "",
           "os_user_domain": "",
@@ -36,9 +43,14 @@
       }
     },
     "qemu_kvm": {
-      "platform_flavor": {
-        "kaapana_workflow": {
+      "default_flavor": {
+        "shell_execute": "flavor_1",
+        "kaapana_workflow": "flavor_1"
+      },
+      "platform_flavors": {
+        "flavor_1": {
           "offline_image_source": "",
+          "selinux_enabled_os": "",
           "base_image_name": "",
           "base_image_path": "",
           "base_image_url": "",
@@ -47,25 +59,7 @@
           "vm_config_filepath": "",
           "vm_vcpus": "",
           "vm_ram_mb": "",
-          "vm_net": "",
-          "remote_username": "",
-          "vm_root_pass": "",
-          "ssh_key_path": "",
-          "ssh_key_name": "",
-          "cleanup_download": "",
-          "cleanup_libvirt": ""
-        },
-        "shell_execute": {
-          "offline_image_source": "",
-          "base_image_name": "",
-          "base_image_path": "",
-          "base_image_url": "",
-          "base_image_sha": "",
-          "libvirt_pool_dir": "",
-          "vm_config_filepath": "",
-          "vm_vcpus": "",
-          "vm_ram_mb": "",
-          "vm_net": "",
+          "vm_net": "default",
           "remote_username": "",
           "vm_root_pass": "",
           "ssh_key_path": "",
@@ -76,10 +70,8 @@
       }
     },
     "vmware": {
-      "platform_flavor": {
-        "var1": "",
-        "var2": ""
-      }
+      "default_flavor": {},
+      "platform_flavors": {}
     }
   }
 }
